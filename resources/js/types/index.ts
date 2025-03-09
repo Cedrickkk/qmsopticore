@@ -23,7 +23,8 @@ export interface NavItem {
 
 export interface SharedData {
   name: string;
-  quote: { message: string; author: string };
+  version: string;
+  quote: { message: string };
   auth: Auth;
   [key: string]: unknown;
 }
@@ -38,3 +39,24 @@ export interface User {
   updated_at: string;
   [key: string]: unknown; // This allows for additional properties...
 }
+
+export type PaginatedData<T> = {
+  current_page: number;
+  last_page: number;
+  data: T[];
+  first_page_url: string;
+  last_page_url: string;
+  from: number;
+  to: number;
+  links: Links[];
+  next_page_url: string | null;
+  prev_page_url: string | null;
+  path: string;
+  total: number;
+};
+
+export type Links = {
+  url: string;
+  label: string;
+  active: boolean;
+};

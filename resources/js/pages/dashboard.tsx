@@ -1,33 +1,29 @@
-import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
+import DocumentActivityChart from '@/components/document-activity-chart';
+import RecentDocuments from '@/components/recent-documents';
+import TotalDocuments from '@/components/total-documents';
+import TotalUsers from '@/components/total-users';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import { type Document } from '@/types/document';
+import { Head, usePage } from '@inertiajs/react';
 
-const breadcrumbs: BreadcrumbItem[] = [
-  {
-    title: 'Dashboard',
-    href: '/dashboard',
-  },
-];
+export const description = 'An interactive bar chart';
 
 export default function Dashboard() {
+  const { totalDocuments, totalUsers, userDocuments } = usePage<{ totalDocuments: number; totalUsers: number; userDocuments: Document[] }>().props;
+
   return (
-    <AppLayout breadcrumbs={breadcrumbs}>
+    <AppLayout>
       <Head title="Dashboard" />
-      <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-        <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-          <div className="border-sidebar-border/70 dark:border-sidebar-border relative aspect-video overflow-hidden rounded-xl border">
-            <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+      <div className="mt-12 flex min-h-full flex-col justify-center gap-4 overflow-hidden scroll-smooth">
+        <div className="grid gap-4 xl:grid-cols-2">
+          <div className="grid w-full grid-flow-row auto-rows-max gap-4 xl:grid-cols-2">
+            <TotalDocuments totalDocuments={totalDocuments} />
+            <TotalUsers totalUsers={totalUsers} />
+            <div className="col-span-2 flex">
+              <DocumentActivityChart />
+            </div>
           </div>
-          <div className="border-sidebar-border/70 dark:border-sidebar-border relative aspect-video overflow-hidden rounded-xl border">
-            <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-          </div>
-          <div className="border-sidebar-border/70 dark:border-sidebar-border relative aspect-video overflow-hidden rounded-xl border">
-            <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-          </div>
-        </div>
-        <div className="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] flex-1 rounded-xl border md:min-h-min">
-          <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+          <RecentDocuments documents={userDocuments} />
         </div>
       </div>
     </AppLayout>
