@@ -7,7 +7,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
@@ -58,8 +58,8 @@
 }
 
 /*
-  The default border color has changed to `currentColor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
+  Thdefault border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make se ure everything still
   looks the same as it did with Tailwind CSS v3.
 
   If we ever want to remove these styles, we need to add an explicit border
@@ -75,6 +75,62 @@
   }
 }
 
+/* 
+:root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.2 0.1 222.2);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.2 0.1 222.2);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.2 0.1 222.2);
+  --primary: oklch(0.6 0.2 221.2);
+  --primary-foreground: oklch(0.95 0.05 210);
+  --secondary: oklch(0.95 0.05 210);
+  --secondary-foreground: oklch(0.2 0.1 222.2);
+  --muted: oklch(0.95 0.05 210);
+  --muted-foreground: oklch(0.5 0.1 215.4);
+  --accent: oklch(0.95 0.05 210);
+  --accent-foreground: oklch(0.2 0.1 222.2);
+  --destructive: oklch(0.6 0.2 0);
+  --destructive-foreground: oklch(0.95 0.05 210);
+  --border: oklch(0.95 0.05 214.3);
+  --input: oklch(0.95 0.05 214.3);
+  --ring: oklch(0.6 0.2 221.2);
+  --radius: 0.5rem;
+  --chart-1: oklch(0.7 0.2 12);
+  --chart-2: oklch(0.5 0.2 173);
+  --chart-3: oklch(0.3 0.1 197);
+  --chart-4: oklch(0.8 0.2 43);
+  --chart-5: oklch(0.8 0.2 27);
+}
+
+.dark {
+  --background: oklch(0.2 0.1 222.2);
+  --foreground: oklch(0.95 0.05 210);
+  --card: oklch(0.2 0.1 222.2);
+  --card-foreground: oklch(0.95 0.05 210);
+  --popover: oklch(0.2 0.1 222.2);
+  --popover-foreground: oklch(0.95 0.05 210);
+  --primary: oklch(0.7 0.2 217.2);
+  --primary-foreground: oklch(0.2 0.1 222.2);
+  --secondary: oklch(0.3 0.1 217.2);
+  --secondary-foreground: oklch(0.95 0.05 210);
+  --muted: oklch(0.3 0.1 217.2);
+  --muted-foreground: oklch(0.6 0.1 215);
+  --accent: oklch(0.3 0.1 217.2);
+  --accent-foreground: oklch(0.95 0.05 210);
+  --destructive: oklch(0.4 0.2 0);
+  --destructive-foreground: oklch(0.95 0.05 210);
+  --border: oklch(0.3 0.1 217.2);
+  --input: oklch(0.3 0.1 217.2);
+  --ring: oklch(0.7 0.2 224.3);
+  --chart-1: oklch(0.6 0.2 220);
+  --chart-2: oklch(0.5 0.2 160);
+  --chart-3: oklch(0.7 0.2 30);
+  --chart-4: oklch(0.7 0.2 280);
+  --chart-5: oklch(0.7 0.2 340);
+}  */
+
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -82,7 +138,8 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+  /* --primary: oklch(0.205 0 0); */
+  --primary: oklch(43.2% 0.1526 259.33);
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
@@ -120,6 +177,8 @@
   --popover-foreground: oklch(0.985 0 0);
   --primary: oklch(0.985 0 0);
   --primary-foreground: oklch(0.205 0 0);
+  --primary-light: oklch(43.2% 0.1526 259.33);
+  --primary-light-foreground: oklch(43.2% 0.1526 259.33);
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);

@@ -12,7 +12,7 @@ import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { FileArchive, FolderRoot, LayoutGrid, LayoutPanelTop, Menu, Search, Users } from 'lucide-react';
 import AppLogo from './app-logo';
-import AppLogoIcon from './app-logo-icon';
+import { Input } from './ui/input';
 
 const mainNavItems: NavItem[] = [
   {
@@ -67,7 +67,9 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
               <SheetContent side="left" className="bg-sidebar flex h-full w-64 flex-col items-stretch justify-between p-4">
                 <SheetTitle className="sr-only">Quality Management System Menu</SheetTitle>
                 <SheetHeader className="flex justify-start text-left">
-                  <AppLogoIcon className="h-6 w-6 fill-current text-black dark:text-white" />
+                  {/* <AppLogoIcon className="h-6 w-6 fill-current text-black dark:text-white" /> */}
+                  <img src="/images/plp.png" alt="Pamantasan ng Lungsod ng Pasig Logo" className="size-9" />
+                  <span className="text-sm">Quality Management System</span>
                 </SheetHeader>
                 <div className="mt-6 flex h-full flex-1 flex-col space-y-4">
                   <div className="flex h-full flex-col justify-between text-sm">
@@ -102,7 +104,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                       {item.icon && <Icon iconNode={item.icon} className="mr-2 h-4 w-4" />}
                       {item.title}
                     </Link>
-                    {page.url === item.url && <div className="absolute bottom-0 left-0 h-0.5 w-full translate-y-px bg-black dark:bg-white"></div>}
+                    {page.url === item.url && <div className="bg-primary absolute bottom-0 left-0 h-0.5 w-full translate-y-px dark:bg-white"></div>}
                   </NavigationMenuItem>
                 ))}
               </NavigationMenuList>
@@ -110,7 +112,8 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
           </div>
 
           <div className="ml-auto flex items-center space-x-2">
-            <div className="relative flex items-center space-x-1">
+            <Input id="search" type="text" />
+            <div className="relative hidden items-center space-x-1 sm:flex">
               <Button variant="ghost" size="icon" className="group h-9 w-9 cursor-pointer">
                 <Search className="!size-5 opacity-80 group-hover:opacity-100" />
               </Button>
