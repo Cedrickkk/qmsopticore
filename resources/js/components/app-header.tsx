@@ -10,7 +10,7 @@ import { useInitials } from '@/hooks/use-initials';
 import { cn } from '@/lib/utils';
 import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { FileArchive, FolderRoot, LayoutGrid, LayoutPanelTop, Menu, Search, Users } from 'lucide-react';
+import { FileArchive, FolderRoot, LayoutGrid, LayoutPanelTop, Menu, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 import { Input } from './ui/input';
 
@@ -40,6 +40,11 @@ const mainNavItems: NavItem[] = [
     url: '/archives',
     icon: FileArchive,
   },
+  {
+    title: 'System Settings',
+    url: '/archives',
+    icon: FileArchive,
+  },
 ];
 
 const activeItemStyles = 'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100';
@@ -52,23 +57,28 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
   const page = usePage<SharedData>();
   const { auth } = page.props;
   const getInitials = useInitials();
+
+  const isActiveRoute = (url: string) => {
+    return page.url.startsWith(url);
+  };
+
   return (
     <>
       <div className="border-sidebar-border/80 border-b">
-        <div className="mx-auto flex h-16 items-center px-4 md:max-w-7xl">
+        <div className="mx-auto flex h-16 items-center gap-2 px-4 md:max-w-7xl">
           {/* Mobile Menu */}
           <div className="lg:hidden">
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="mr-2 h-[34px] w-[34px]">
+                <Button variant="ghost" size="icon" className="h-[34px] w-[34px] md:mr-2">
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="bg-sidebar flex h-full w-64 flex-col items-stretch justify-between p-4">
                 <SheetTitle className="sr-only">Quality Management System Menu</SheetTitle>
-                <SheetHeader className="flex justify-start text-left">
+                <SheetHeader className="flex justify-start gap-3 text-left">
                   {/* <AppLogoIcon className="h-6 w-6 fill-current text-black dark:text-white" /> */}
-                  <img src="/images/plp.png" alt="Pamantasan ng Lungsod ng Pasig Logo" className="size-9" />
+                  <img src="/images/plp.png" alt="Pamantasan ng Lungsod ng Pasig Logo" className="size-9 scale-125 rounded-full dark:bg-white" />
                   <span className="text-sm">Quality Management System</span>
                 </SheetHeader>
                 <div className="mt-6 flex h-full flex-1 flex-col space-y-4">
@@ -104,7 +114,8 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                       {item.icon && <Icon iconNode={item.icon} className="mr-2 h-4 w-4" />}
                       {item.title}
                     </Link>
-                    {page.url === item.url && <div className="bg-primary absolute bottom-0 left-0 h-0.5 w-full translate-y-px dark:bg-white"></div>}
+                    {isActiveRoute(item.url) && <div className="bg-primary absolute bottom-0 left-0 h-0.5 w-full translate-y-px dark:bg-white" />}
+                    {/* {page.url === item.url && <div className="bg-primary absolute bottom-0 left-0 h-0.5 w-full translate-y-px dark:bg-white"></div>} */}
                   </NavigationMenuItem>
                 ))}
               </NavigationMenuList>
@@ -113,11 +124,11 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
 
           <div className="ml-auto flex items-center space-x-2">
             <Input id="search" type="text" />
-            <div className="relative hidden items-center space-x-1 sm:flex">
+            {/* <div className="relative hidden items-center space-x-1 sm:flex">
               <Button variant="ghost" size="icon" className="group h-9 w-9 cursor-pointer">
                 <Search className="!size-5 opacity-80 group-hover:opacity-100" />
               </Button>
-            </div>
+            </div> */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="size-10 rounded-full p-1">

@@ -1,6 +1,5 @@
-import PaginationLink from '@/components/pagination-link';
+import { TablePagination } from '@/components/table-pagination';
 import { Badge } from '@/components/ui/badge';
-import { Pagination, PaginationContent, PaginationItem } from '@/components/ui/pagination';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { PaginatedData } from '@/types';
@@ -46,28 +45,7 @@ export default function Documents() {
             </TableBody>
           </Table>
         </div>
-
-        <div className="flex items-center justify-between px-2">
-          <div className="text-muted-foreground text-xs">
-            Showing {documents?.data?.length} of {documents?.total}
-          </div>
-
-          <div className="flex items-center space-x-6 lg:space-x-8">
-            <div className="w-full text-xs font-medium">
-              Page {documents?.current_page} of {documents?.last_page}
-            </div>
-
-            <Pagination>
-              <PaginationContent>
-                {documents?.links.map((link, idx) => (
-                  <PaginationItem key={idx}>
-                    <PaginationLink link={link} className="text-xs" />
-                  </PaginationItem>
-                ))}
-              </PaginationContent>
-            </Pagination>
-          </div>
-        </div>
+        <TablePagination data={documents} />
       </div>
     </AppLayout>
   );

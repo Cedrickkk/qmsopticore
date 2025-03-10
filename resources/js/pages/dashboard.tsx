@@ -14,7 +14,7 @@ export default function Dashboard() {
   return (
     <AppLayout>
       <Head title="Dashboard" />
-      <div className="mt-12 flex min-h-full flex-col justify-center gap-4 overflow-hidden scroll-smooth">
+      <div className="flex min-h-full flex-col gap-4 overflow-hidden scroll-smooth">
         <div className="grid gap-4 xl:grid-cols-2">
           <div className="grid w-full grid-flow-row auto-rows-max gap-4 xl:grid-cols-2">
             <TotalDocuments totalDocuments={totalDocuments} />

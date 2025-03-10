@@ -35,9 +35,7 @@ class DocumentController extends Controller
     {
         $user = Auth::user();
 
-        $filePath = Storage::url("documents/{$document->document_title}");
-
-        dd($document);
+        $filePath = Storage::url("documents/many_pages.pdf");
 
         return Inertia::render('documents/show', [
             'document' => $document,
