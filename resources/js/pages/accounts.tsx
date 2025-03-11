@@ -1,5 +1,11 @@
 import AppLayout from '@/layouts/app-layout';
+import { Head } from '@inertiajs/react';
 
 export default function Accounts() {
-  return <AppLayout>accounts</AppLayout>;
+  return (
+    <AppLayout>
+      <Head title="Accounts" />
+      Accounts
+    </AppLayout>
+  );
 }

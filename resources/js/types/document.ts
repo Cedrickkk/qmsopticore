@@ -11,7 +11,7 @@ export interface Document {
     id: number;
     name: string;
   };
-  status: string;
+  status: 'approved' | 'rejected' | 'pending' | 'updated';
   version: string;
   created_at: string;
   updated_at: string;

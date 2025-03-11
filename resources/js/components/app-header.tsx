@@ -12,7 +12,6 @@ import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { FileArchive, FolderRoot, LayoutGrid, LayoutPanelTop, Menu, Users } from 'lucide-react';
 import AppLogo from './app-logo';
-import { Input } from './ui/input';
 
 const mainNavItems: NavItem[] = [
   {
@@ -42,7 +41,7 @@ const mainNavItems: NavItem[] = [
   },
   {
     title: 'System Settings',
-    url: '/archives',
+    url: '/system-settings',
     icon: FileArchive,
   },
 ];
@@ -123,12 +122,6 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
           </div>
 
           <div className="ml-auto flex items-center space-x-2">
-            <Input id="search" type="text" />
-            {/* <div className="relative hidden items-center space-x-1 sm:flex">
-              <Button variant="ghost" size="icon" className="group h-9 w-9 cursor-pointer">
-                <Search className="!size-5 opacity-80 group-hover:opacity-100" />
-              </Button>
-            </div> */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="size-10 rounded-full p-1">

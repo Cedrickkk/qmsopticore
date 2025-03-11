@@ -1,13 +1,11 @@
 import AppLayout from '@/layouts/app-layout';
 import { Head } from '@inertiajs/react';
 
-export default function index() {
+export default function SystemSettings() {
   return (
     <AppLayout>
-      <Head title="Accounts" />
-      <div>
-        <p>Hellow</p>
-      </div>
+      <Head title="System Settings" />
+      System Settings
     </AppLayout>
   );
 }
