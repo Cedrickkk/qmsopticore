@@ -4,8 +4,16 @@ import { BreadcrumbItem } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 import { File } from 'react-pdf/dist/esm/shared/types.js';
 
+type PageProps = {
+  file: File;
+  document: {
+    title: string;
+    code: string;
+  };
+};
+
 export default function Show() {
-  const { file } = usePage<{ file: File }>().props;
+  const { file, document } = usePage<PageProps>().props;
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -13,7 +21,7 @@ export default function Show() {
       href: '/documents',
     },
     {
-      title: 'sample_pdf',
+      title: document.title,
       href: window.location.pathname,
     },
   ];

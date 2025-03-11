@@ -1,6 +1,9 @@
-import { Button } from '@/components/ui/button';
+import { DocumentInfo } from '@/components/document-info';
+import { PDFControls } from '@/components/pdf-controls';
+import { PDFThumbnails } from '@/components/pdf-thumbnails';
 import { cn } from '@/lib/utils';
-import { Pen } from 'lucide-react';
+import { type Document as TDocument } from '@/types/document';
+import { usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { File } from 'react-pdf/dist/esm/shared/types.js';
@@ -24,10 +27,12 @@ interface PDFViewerProps {
 }
 
 export function PDFViewer({ file, className, showThumbnails = false }: PDFViewerProps) {
+  const { document } = usePage<{ document: TDocument }>().props;
+
   const [pdfState, setPdfState] = useState<PDFPageState>({
     numPages: 0,
     currentPage: 1,
-    scale: 1.0,
+    scale: 0.8,
     isLoading: true,
   });
 
@@ -55,93 +60,45 @@ export function PDFViewer({ file, className, showThumbnails = false }: PDFViewer
 
   return (
     <div className={cn('flex flex-col gap-6', className)}>
-      {/* Top Actions Bar */}
-      <div className="flex items-center justify-between">
-        <Button className="gap-2" size="lg">
-          <Pen className="size-4" />
-          Sign
-        </Button>
-      </div>
-
-      {/* PDF Controls */}
-      <div className="flex items-center justify-between gap-2 border-b pb-4">
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            className="rounded-sm"
-            onClick={() => handlePageChange(pdfState.currentPage - 1)}
-            disabled={pdfState.currentPage <= 1}
-          >
-            Previous
-          </Button>
-          <span className="text-sm font-medium">
-            Page {pdfState.currentPage} of {pdfState.numPages}
-          </span>
-          <Button
-            variant="outline"
-            className="rounded-sm"
-            onClick={() => handlePageChange(pdfState.currentPage + 1)}
-            disabled={pdfState.currentPage >= pdfState.numPages}
-          >
-            Next
-          </Button>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => handleZoom(-0.1)} className="rounded-sm">
-            -
-          </Button>
-          <span className="text-sm font-medium">{Math.round(pdfState.scale * 100)}%</span>
-          <Button variant="outline" onClick={() => handleZoom(0.1)} className="rounded-sm">
-            +
-          </Button>
-        </div>
-      </div>
-
-      {/* PDF Viewer */}
-      <Document
-        className="bg-background relative rounded-sm border shadow-sm"
-        file={file}
-        loading={
-          <div className="flex h-[700px] items-center justify-center">
-            <span className="text-muted-foreground">Loading PDF...</span>
+      <div className="my-4 flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:gap-6">
+        <Document
+          className="bg-muted relative flex justify-center rounded-sm border shadow-sm transition-colors"
+          file={file}
+          loading={
+            <div className="flex h-[700px] items-center justify-center">
+              <span className="text-muted-foreground text-sm">Loading PDF...</span>
+            </div>
+          }
+          onLoadSuccess={handleDocumentLoadSuccess}
+        >
+          <div className="flex h-[700px] items-center justify-center overflow-y-auto p-4">
+            <Page
+              key={`page_${pdfState.currentPage}`}
+              pageNumber={pdfState.currentPage}
+              scale={pdfState.scale}
+              className="shadow-sm"
+              renderTextLayer={false}
+              renderAnnotationLayer={false}
+            />
           </div>
-        }
-        onLoadSuccess={handleDocumentLoadSuccess}
-        onLoadError={() => {
-          console.error('Error loading PDF');
-        }}
-      >
-        <div className="flex h-[700px] items-center justify-center overflow-y-auto p-4">
-          <Page
-            key={`page_${pdfState.currentPage}`}
-            pageNumber={pdfState.currentPage}
+        </Document>
+
+        <div className="flex flex-col justify-between gap-4">
+          <DocumentInfo document={document} />
+
+          {showThumbnails && (
+            <PDFThumbnails file={file} numPages={pdfState.numPages} currentPage={pdfState.currentPage} onPageChange={handlePageChange} />
+          )}
+
+          <PDFControls
+            currentPage={pdfState.currentPage}
+            numPages={pdfState.numPages}
             scale={pdfState.scale}
-            className="shadow-sm"
-            renderTextLayer={false}
-            renderAnnotationLayer={false}
+            onPageChange={handlePageChange}
+            onZoom={handleZoom}
           />
         </div>
-      </Document>
-
-      {/* Thumbnails */}
-      {showThumbnails && (
-        <div className="mt-4 flex gap-2 overflow-x-auto border-t pt-4">
-          {Array.from({ length: pdfState.numPages }, (_, i) => i + 1).map(pageNum => (
-            <button
-              key={`thumb_${pageNum}`}
-              onClick={() => handlePageChange(pageNum)}
-              className={cn(
-                'min-w-[100px] rounded-sm border p-1 transition-colors',
-                pageNum === pdfState.currentPage ? 'border-primary bg-primary/10' : 'hover:border-primary/50'
-              )}
-            >
-              <Document file={file}>
-                <Page pageNumber={pageNum} width={100} renderTextLayer={false} renderAnnotationLayer={false} />
-              </Document>
-            </button>
-          ))}
-        </div>
-      )}
+      </div>
     </div>
   );
 }
