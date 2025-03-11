@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Services\DashboardService;
+use App\Services\DocumentService;
+use App\Services\UserService;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -11,7 +14,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(DocumentService::class);
+        $this->app->singleton(DashboardService::class);
+        $this->app->singleton(UserService::class);
     }
 
     /**
