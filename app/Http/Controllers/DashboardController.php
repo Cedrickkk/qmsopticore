@@ -4,36 +4,31 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Inertia\Inertia;
-use App\Models\Document;
+use App\Services\DashboardService;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
+
+    public function __construct(private readonly DashboardService $service) {}
+
     public function index()
     {
-        $documents = Document::count();
-        $users = User::count();
+        $user = User::find(Auth::user()->id)->first();
 
-        $user = Auth::user();
+        $stats = $this->service->getDashboardStats();
 
-        $userDocuments = Document::query()
-            ->where(function ($query) use ($user) {
-                $query->whereHas('recipients', function ($query) use ($user) {
-                    $query->where('user_id', $user->id);
-                })->orWhereHas('signatories', function ($query) use ($user) {
-                    $query->where('user_id', $user->id);
-                });
-            })
-            ->with('creator:id,name,email')
-            ->with('category:id,name')
-            ->latest()
-            ->take(10)
-            ->get();
+        $userDocuments = $this->service->getUserDocuments($user);
 
         return Inertia::render('dashboard', [
-            'totalDocuments' => $documents,
-            'totalUsers' => $users,
+            'totalDocuments' => $stats['totalDocuments'],
+            'totalUsers' => $stats['totalUsers'],
             'userDocuments' => $userDocuments,
+            'stats' => [
+                'documentsGrowth' => $stats['documentsGrowth'],
+                'usersGrowth' => $stats['usersGrowth'],
+                'documentActivity' => $stats['documentActivity']
+            ],
         ]);
     }
 }
