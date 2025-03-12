@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { LoaderCircle } from 'lucide-react';
 import { Document, Page } from 'react-pdf';
 import { File } from 'react-pdf/dist/esm/shared/types.js';
 
@@ -26,11 +27,21 @@ export function PDFThumbnails({ file, numPages, currentPage, onPageChange }: PDF
             className="flex justify-center"
             loading={
               <div className="items-center justify-center">
-                <span className="text-muted-foreground text-sm">Loading PDF...</span>
+                <LoaderCircle className="text-muted-foreground animate-spin">Loading PDF...</LoaderCircle>
               </div>
             }
           >
-            <Page pageNumber={pageNum} width={150} renderTextLayer={false} renderAnnotationLayer={false} />
+            <Page
+              pageNumber={pageNum}
+              width={150}
+              renderTextLayer={false}
+              renderAnnotationLayer={false}
+              loading={
+                <div className="items-center justify-center">
+                  <LoaderCircle className="text-muted-foreground animate-spin">Loading PDF...</LoaderCircle>
+                </div>
+              }
+            />
           </Document>
         </button>
       ))}

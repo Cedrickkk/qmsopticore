@@ -1,6 +1,6 @@
+import PaginationLink from '@/components/pagination-link';
 import { Pagination, PaginationContent, PaginationItem } from '@/components/ui/pagination';
 import { PaginatedData } from '@/types';
-import PaginationLink from './pagination-link';
 
 interface TablePaginationProps<T> {
   data: PaginatedData<T>;

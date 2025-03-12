@@ -1,4 +1,4 @@
-import { PDFViewer } from '@/components/pdf-viewer';
+import { PDFViewer } from '@/components/document-viewer';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { Head, usePage } from '@inertiajs/react';

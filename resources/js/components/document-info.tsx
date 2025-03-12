@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { type Document } from '@/types/document';
 import { format } from 'date-fns';
-import { PenLine } from 'lucide-react';
+import { Download, PenLine } from 'lucide-react';
 
 interface DocumentInfoProps {
   document: Document;
@@ -37,9 +37,14 @@ export function DocumentInfo({ document }: DocumentInfoProps) {
           <span>Updated:</span>
           <time className="text-foreground font-medium">{format(new Date(document.updated_at), 'MMMM d, yyyy')}</time>
         </div>
-        <Button className="flex cursor-pointer items-center rounded-sm leading-relaxed uppercase" size="lg">
-          <PenLine /> <span>Sign</span>
-        </Button>
+        <div className="mt-4 flex items-center gap-3">
+          <Button className="flex cursor-pointer items-center rounded-sm leading-relaxed uppercase" size="lg">
+            <PenLine /> Sign Document
+          </Button>
+          <Button className="flex cursor-pointer items-center rounded-sm leading-relaxed uppercase" size="lg" variant="ghost">
+            <Download /> Download
+          </Button>
+        </div>
       </div>
     </div>
   );

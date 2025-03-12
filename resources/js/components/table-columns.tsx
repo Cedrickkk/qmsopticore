@@ -9,10 +9,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { DocumentServiceApi } from '@/services/app';
 import { type Document } from '@/types/document';
 import { Link } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
-import { MoreHorizontal } from 'lucide-react';
+import { ArchiveX, Download, Eye, History, MoreHorizontal, Send } from 'lucide-react';
 
 const DocumentStatus = {
   APPROVED: 'approved',
@@ -77,13 +78,62 @@ export const columns: ColumnDef<Document>[] = [
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <DropdownMenuItem asChild>
             <Link href={`/documents/${row.original.id}`} prefetch>
-              View document
+              <Eye />
+              <span>View Document</span>
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href={`/documents/${row.original.id}/history`} prefetch>
+              <History /> <span>View History</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem className="text-destructive">Archive document</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => handleDownload(row.original)}>
+            <Download /> <span>Download PDF </span>
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <Send />
+            <span>Share Document</span>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem className="text-destructive">
+            <ArchiveX />
+            <span>Archive Document</span>
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     ),
   },
 ];
+
+/**
+ *
+ *
+ * TODO: Organize separation of concerns
+ *
+ */
+
+const handleDownload = async (documentData: Document) => {
+  try {
+    const response = await DocumentServiceApi.download(documentData);
+    if (response.error) {
+      console.log(response.error);
+      return;
+    }
+
+    if (response.data) {
+      const url = window.URL.createObjectURL(response.data);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = document.title;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      console.log('Document downloaded successfully');
+    }
+  } catch (error) {
+    console.log('Failed to download document', error);
+  }
+};

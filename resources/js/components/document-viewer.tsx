@@ -1,9 +1,10 @@
 import { DocumentInfo } from '@/components/document-info';
-import { PDFControls } from '@/components/pdf-controls';
-import { PDFThumbnails } from '@/components/pdf-thumbnails';
+import { PDFControls } from '@/components/document-viewer-controls';
+import { PDFThumbnails } from '@/components/document-viewer-thumbnails';
 import { cn } from '@/lib/utils';
 import { type Document as TDocument } from '@/types/document';
 import { usePage } from '@inertiajs/react';
+import { LoaderCircle } from 'lucide-react';
 import { useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { File } from 'react-pdf/dist/esm/shared/types.js';
@@ -66,7 +67,7 @@ export function PDFViewer({ file, className, showThumbnails = false }: PDFViewer
           file={file}
           loading={
             <div className="flex h-[700px] items-center justify-center">
-              <span className="text-muted-foreground text-sm">Loading PDF...</span>
+              <LoaderCircle className="text-muted-foreground animate-spin text-sm">Loading PDF...</LoaderCircle>
             </div>
           }
           onLoadSuccess={handleDocumentLoadSuccess}
@@ -79,6 +80,11 @@ export function PDFViewer({ file, className, showThumbnails = false }: PDFViewer
               className="shadow-sm"
               renderTextLayer={false}
               renderAnnotationLayer={false}
+              loading={
+                <div className="items-center justify-center">
+                  <LoaderCircle className="text-muted-foreground animate-spin">Loading PDF...</LoaderCircle>
+                </div>
+              }
             />
           </div>
         </Document>

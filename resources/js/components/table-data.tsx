@@ -1,8 +1,11 @@
+import { TablePagination } from '@/components/table-pagination';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useDebouncedSearch } from '@/hooks/use-search';
 import { PaginatedData } from '@/types';
+import { Link } from '@inertiajs/react';
 import {
   ColumnDef,
   flexRender,
@@ -13,35 +16,56 @@ import {
   useReactTable,
   VisibilityState,
 } from '@tanstack/react-table';
+import { LoaderCircle } from 'lucide-react';
 import { useState } from 'react';
-import { TablePagination } from './table-pagination';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: PaginatedData<TData>;
 }
 
+/**
+ *
+ * TODO: Figure out what is the best approach for live search with the current tech stack.
+ *
+ */
+
 export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [globalFilter, setGlobalFilter] = useState<string>('');
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 
+  /**
+   *
+   * Global filtering only on current page
+   *
+   */
+
+  const [globalFilter, setGlobalFilter] = useState<string>('');
+
+  /**
+   *
+   * Debouncing approach for documents search
+   *
+   */
+  const { search, handleSearch, isProcessing } = useDebouncedSearch();
+
   const table = useReactTable({
-    data: data.data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    manualPagination: true,
-    pageCount: data.last_page,
-    onSortingChange: setSorting,
-    getSortedRowModel: getSortedRowModel(),
-    onGlobalFilterChange: setGlobalFilter,
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
     state: {
       sorting,
       globalFilter,
       columnVisibility,
     },
+    columns,
+    data: data.data,
+    manualPagination: true,
+    manualFiltering: true,
+    pageCount: data.last_page,
+    onSortingChange: setSorting,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    onGlobalFilterChange: setGlobalFilter,
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
   });
 
   const noResultsMessage = globalFilter ? `No results found for "${globalFilter}"` : 'No documents available';
@@ -49,40 +73,49 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
   return (
     <>
       <div className="flex items-center justify-between">
-        <Input
-          placeholder="Filter documents..."
-          value={globalFilter ?? ''} // Use the state value
-          onChange={event => setGlobalFilter(event.target.value)}
-          className="max-w-lg"
-        />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto rounded-sm">
-              Columns
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter(column => column.getCanHide())
-              .map(column => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={value => column.toggleVisibility(!!value)}
-                  >
-                    {column.id
-                      .replace(/_?name$/, '')
-                      .split('_')
-                      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                      .join(' ')}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex items-center gap-3">
+          {/** Debounce search input */}
+          <Input placeholder="Search documents..." value={search} onChange={event => handleSearch(event.target.value)} className="max-w-lg" />
+
+          {/** Global filtering input */}
+          {/* <Input
+            placeholder="Filter documents..."
+            value={globalFilter ?? ''}
+            onChange={event => setGlobalFilter(event.target.value)}
+            className="max-w-lg"
+          /> */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="ml-auto rounded-sm">
+                Columns
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {table
+                .getAllColumns()
+                .filter(column => column.getCanHide())
+                .map(column => {
+                  return (
+                    <DropdownMenuCheckboxItem
+                      key={column.id}
+                      className="capitalize"
+                      checked={column.getIsVisible()}
+                      onCheckedChange={value => column.toggleVisibility(!!value)}
+                    >
+                      {column.id
+                        .replace(/_?name$/, '')
+                        .split('_')
+                        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                        .join(' ')}
+                    </DropdownMenuCheckboxItem>
+                  );
+                })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        <Button asChild>
+          <Link href="/documents/create">Create New Document</Link>
+        </Button>
       </div>
       <div className="rounded-sm">
         <Table className="rounded-sm border">
@@ -98,7 +131,16 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows.length ? (
+            {isProcessing ? (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="h-16">
+                  <div className="flex items-center justify-center gap-2">
+                    <LoaderCircle className="text-muted-foreground h-6 w-6 animate-spin" />
+                    <p className="text-muted-foreground text-sm">Searching documents...</p>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : table.getRowModel().rows.length ? (
               table.getRowModel().rows.map(row => (
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map(cell => (
