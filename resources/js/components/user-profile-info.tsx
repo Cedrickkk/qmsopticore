@@ -19,9 +19,10 @@ interface ProfileInformationProps {
   data: CreateAccountFormData;
   errors: Partial<Record<keyof CreateAccountFormData | `signatures.${number}`, string>>;
   setData: (key: keyof CreateAccountFormData, value: string | File | File[] | null) => void;
+  processing: boolean;
 }
 
-export function ProfileInformation({ data, setData, errors }: ProfileInformationProps) {
+export function ProfileInformation({ data, setData, errors, processing }: ProfileInformationProps) {
   const [profileImageUrl, setProfileImageUrl] = useState<string>('');
   const { departments } = usePage<{ departments: Department[] }>().props;
 
@@ -69,20 +70,21 @@ export function ProfileInformation({ data, setData, errors }: ProfileInformation
             <p className="text-muted-foreground text-xs">.png, .jpeg, .jpg file up to 1mb. Recommended size is 150x150px</p>
           </div>
         </div>
-        <InputError message={errors.image} className="mt-2" />
+        <InputError message={errors.image} />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="fullname">Fullname</Label>
+        <Label htmlFor="fullname">Name</Label>
         <Input
           id="fullname"
           type="text"
           name="fullname"
           className="mt-1 block w-full"
           value={data.name}
+          disabled={processing}
           onChange={e => setData('name', e.target.value)}
         />
-        <InputError message={errors.name} className="mt-2" />
+        <InputError message={errors.name} />
       </div>
 
       <div className="space-y-2">
@@ -93,18 +95,19 @@ export function ProfileInformation({ data, setData, errors }: ProfileInformation
           name="email"
           className="mt-1 block w-full"
           value={data.email}
+          disabled={processing}
           onChange={e => setData('email', e.target.value)}
         />
         {!errors.email ? (
           <p className="text-muted-foreground text-xs">This public email address will be used for sending and receiving documents.</p>
         ) : (
-          <InputError message={errors.email} className="mt-2" />
+          <InputError message={errors.email} />
         )}
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="department">Department</Label>
-        <Select value={data.department} onValueChange={value => setData('department', value)}>
+        <Select value={data.department} onValueChange={value => setData('department', value)} disabled={processing}>
           <SelectTrigger id="department" name="department" className="mt-1 w-full">
             <SelectValue placeholder="Select a department" />
           </SelectTrigger>
@@ -130,9 +133,10 @@ export function ProfileInformation({ data, setData, errors }: ProfileInformation
           name="signatures"
           accept="image/png, image/jpg, image/jpeg"
           className="mt-1 block w-full"
+          disabled={processing}
           onChange={handleFileChange}
         />
-        <InputError message={errors.signatures} className="mt-2" />
+        <InputError message={errors.signatures} />
         {data.signatures &&
           data.signatures.map((file, index) => {
             const error = getSignatureError(index);
@@ -144,7 +148,7 @@ export function ProfileInformation({ data, setData, errors }: ProfileInformation
                     <X className="text-red-500" />
                   </Button>
                 </div>
-                {error && <InputError message={error} className="text-xs" />}
+                {error && <InputError message={error} />}
               </div>
             );
           })}
