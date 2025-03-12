@@ -2,7 +2,13 @@
 
 namespace App\Services;
 
+use App\Models\User;
 use App\Models\Document;
+use App\Models\DocumentType;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Storage;
 
 class DocumentService
 {
@@ -14,8 +20,59 @@ class DocumentService
         //
     }
 
-    public function isSignatory(Document $document, $userId)
+    public function isSignatory(Document $document, $userId): bool
     {
         return $document->signatories()->where('user_id', $userId)->exists();
+    }
+
+    public function getDocumentCreationOptions(): array
+    {
+        $types = DocumentType::with(['categories' => fn($query) => $query->select('id', 'name', 'type')])
+            ->select('id', 'name')
+            ->get();
+
+        return [
+            'types' => $types->map(function ($type) {
+                return [
+                    'id' => $type->id,
+                    'name' => $type->name,
+                    'categories' => $type->categories->map(function ($category) {
+                        return [
+                            'id' => $category->id,
+                            'name' => $category->name
+                        ];
+                    })
+                ];
+            })
+        ];
+    }
+
+    public function getPaginatedDocuments(?string $search = null): LengthAwarePaginator
+    {
+        return Document::query()
+            ->when($search, function ($query, $search) {
+                $query->where('title', 'like', "%{$search}%");
+            })
+            ->with(['creator:id,name', 'category:id,name'])
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+    }
+
+
+    /**
+     * 
+     * ! Important !
+     * TODO: Figure out where to put this and what is the best approach
+     * 
+     */
+    public function download(Document $document)
+    {
+        return Storage::download("documents/{$document->title}");
+    }
+
+    public function documentExists(Document $document): bool
+    {
+        return Storage::exists("documents/{$document}");
     }
 }

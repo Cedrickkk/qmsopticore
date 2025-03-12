@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use Inertia\Inertia;
 use App\Services\UserService;
 use App\Http\Requests\StoreUserRequest;
-use Inertia\Inertia;
 
 class UserController extends Controller
 {
-    public function __construct(private UserService $service) {}
+    public function __construct(private readonly UserService $service) {}
 
     public function index()
     {

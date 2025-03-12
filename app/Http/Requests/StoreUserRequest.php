@@ -10,6 +10,16 @@ class StoreUserRequest extends FormRequest
     /**
      * Determine if the user is authorized to make this request.
      */
+
+
+    /**
+     * 
+     * !! Implement RBA
+     * 
+     * TODO: Check if the user is admin
+     * 
+     */
+
     public function authorize(): bool
     {
         return true;

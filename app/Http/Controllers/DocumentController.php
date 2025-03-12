@@ -2,32 +2,29 @@
 
 namespace App\Http\Controllers;
 
+use Inertia\Inertia;
 use App\Models\Document;
-use App\Services\DocumentService;
 use Illuminate\Http\Request;
+use App\Services\DocumentService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Inertia\Inertia;
+use App\Http\Requests\StoreDocumentRequest;
 
 class DocumentController extends Controller
 {
-    public function __construct(protected DocumentService  $service) {}
+    public function __construct(private readonly DocumentService  $service) {}
 
     public function index(Request $request)
     {
-        $query = Document::query()
-            ->with('creator:id,name')
-            ->with('category:id,name');
-
-        if ($request->has('search') && $request->search !== null) {
-            $search = $request->search;
-            $query->where('title', 'like', "{$search}");
-        }
-
-        $documents = $query->paginate(10)->appends($request->all());
-
         return Inertia::render('documents', [
-            'documents' => $documents,
+            'documents' => $this->service->getPaginatedDocuments($request->search),
+        ]);
+    }
+
+    public function create()
+    {
+        return Inertia::render('documents/create', [
+            'options' => $this->service->getDocumentCreationOptions(),
         ]);
     }
 
@@ -35,12 +32,20 @@ class DocumentController extends Controller
     {
         $user = Auth::user();
 
-        $filePath = Storage::url("documents/many_pages.pdf");
+        $filePath = Storage::url("documents/sample_document.pdf");
 
         return Inertia::render('documents/show', [
             'document' => $document->load(['creator:id,name', 'category:id,name']),
             'file' => $filePath,
             'signatory' => $this->service->isSignatory($document, $user->id),
         ]);
+    }
+
+    public function store(StoreDocumentRequest $request) {}
+
+
+    public function history()
+    {
+        dd("Iam here");
     }
 }

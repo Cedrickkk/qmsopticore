@@ -2,9 +2,11 @@
 
 namespace App\Providers;
 
-use App\Services\DashboardService;
-use App\Services\DocumentService;
+use App\Models\Document;
 use App\Services\UserService;
+use App\Services\DocumentService;
+use App\Services\DashboardService;
+use App\Observers\DocumentObserver;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -24,6 +26,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Document::observe(DocumentObserver::class);
     }
 }

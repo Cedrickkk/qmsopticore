@@ -18,7 +18,6 @@ class UserService
      */
     public function __construct() {}
 
-
     public function createUser(StoreUserRequest $request): User
     {
         $departmentId = Department::where('name', $request->department)->value('id');
@@ -61,8 +60,13 @@ class UserService
         return basename($path);
     }
 
+
     public function getUserCreationOptions(): array
     {
+        /**
+         * TODO: Send roles here
+         */
+
         return [
             'departments' => $this->getDepartments(),
         ];
@@ -73,5 +77,12 @@ class UserService
         return Department::select('id', 'name')
             ->orderBy('name')
             ->get();
+    }
+
+    public function findByEmail(string $email): ?User
+    {
+        return User::where('email', 'like', "%{$email}%")
+            ->select('id', 'name', 'email')
+            ->first();
     }
 }
