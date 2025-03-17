@@ -1,4 +1,4 @@
-import { flaskApi } from '@/services/api';
+import { flaskApi } from '@/lib/api';
 import { AxiosError } from 'axios';
 
 interface Signature {

@@ -1,4 +1,4 @@
-import { laravelApi } from '@/services/api';
+import { laravelApi } from '@/lib/api';
 import { User } from '@/types';
 import { Document } from '@/types/document';
 import { AxiosError } from 'axios';
@@ -10,7 +10,7 @@ import { AxiosError } from 'axios';
 
 interface UserSearchResponse {
   user?: User;
-  message?: string;
+  error?: string;
 }
 
 interface DownloadResponse {
@@ -19,17 +19,20 @@ interface DownloadResponse {
 }
 
 export const UserServiceApi = {
-  async searchByEmail(email: string) {
+  async searchByEmail(email: string): Promise<UserSearchResponse> {
     try {
       const { data } = await laravelApi.get<UserSearchResponse>('/api/users/search', {
         params: { email },
       });
-      return data;
+
+      return { user: data.user };
     } catch (error: unknown) {
-      if (error instanceof AxiosError && error.response?.data?.message) {
-        throw new Error(error.response.data.message);
+      if (error instanceof AxiosError) {
+        if (error.response?.data?.message) {
+          return { error: error.response.data.message };
+        }
       }
-      throw error;
+      return { error: 'Something went wrong. Please try again.' };
     }
   },
 };
@@ -37,10 +40,10 @@ export const UserServiceApi = {
 export const DocumentServiceApi = {
   async download(document: Document): Promise<DownloadResponse> {
     try {
-      const response = await laravelApi.get(`/api/documents/${document.id}/download`, {
+      const { data } = await laravelApi.get(`/api/documents/${document.id}/download`, {
         responseType: 'blob',
       });
-      return { data: response.data };
+      return { data };
     } catch (error) {
       if (error instanceof AxiosError) {
         if (error.response?.data instanceof Blob) {
