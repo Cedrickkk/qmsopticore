@@ -1,15 +1,13 @@
 import { PDFViewer } from '@/components/document-viewer';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
+import { type Document } from '@/types/document';
 import { Head, usePage } from '@inertiajs/react';
 import { File } from 'react-pdf/dist/esm/shared/types.js';
 
 type PageProps = {
   file: File;
-  document: {
-    title: string;
-    code: string;
-  };
+  document: Document;
 };
 
 export default function Show() {
@@ -22,7 +20,7 @@ export default function Show() {
     },
     {
       title: document.title,
-      href: window.location.pathname,
+      href: `/documents/${document.id}`,
     },
   ];
 

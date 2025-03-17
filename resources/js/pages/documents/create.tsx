@@ -8,13 +8,6 @@ import { BreadcrumbItem } from '@/types';
 import { CreateDocumentFormData, DocumentType } from '@/types/document';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
-import { pdfjs } from 'react-pdf';
-
-/**
- * TODO: Create a setup configuration for pdfjs
- */
-
-pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
 
 const breadcrumbs: BreadcrumbItem[] = [
   {

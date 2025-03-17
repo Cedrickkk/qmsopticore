@@ -32,6 +32,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
     e.preventDefault();
     post(route('login'), {
       onFinish: () => reset('password'),
+      showProgress: false,
     });
   };
 
