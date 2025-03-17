@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Constants\DepartmentEnum;
 use App\Models\Department;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Enums\DepartmentEnum;
 use Illuminate\Database\Seeder;
 
 class DepartmentSeeder extends Seeder
