@@ -78,7 +78,7 @@ class DashboardService
                     $query->where('user_id', $user->id);
                 });
             })
-            ->with('creator:id,name,email')
+            ->with('createdBy:id,name,email')
             ->with('category:id,name')
             ->latest()
             ->take(10)

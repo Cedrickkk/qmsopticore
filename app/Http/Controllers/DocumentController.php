@@ -35,7 +35,7 @@ class DocumentController extends Controller
         $filePath = Storage::url("documents/sample_document.pdf");
 
         return Inertia::render('documents/show', [
-            'document' => $document->load(['creator:id,name', 'category:id,name']),
+            'document' => $document->load(['createdBy:id,name', 'category:id,name']),
             'file' => $filePath,
             'signatory' => $this->service->isSignatory($document, $user->id),
         ]);

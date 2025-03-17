@@ -13,7 +13,7 @@ class Document extends Model
     protected $fillable = [
         'code',
         'title',
-        'creator',
+        'created_by',
         'status',
         'category',
         'version',
@@ -25,9 +25,9 @@ class Document extends Model
         return $this->belongsTo(DocumentCategory::class, 'category');
     }
 
-    public function creator(): BelongsTo
+    public function createdBy(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'creator');
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     public function recipients(): HasMany

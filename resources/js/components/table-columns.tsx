@@ -56,9 +56,9 @@ export const documentColumns: ColumnDef<Document>[] = [
     cell: ({ row }) => <div>{row.original.category.name}</div>,
   },
   {
-    accessorKey: 'creator.name',
+    accessorKey: 'created_by.name',
     header: ({ column }) => <TableHeaderButton column={column}>Created by</TableHeaderButton>,
-    cell: ({ row }) => <div>{row.original.creator.name}</div>,
+    cell: ({ row }) => <div>{row.original.created_by.name}</div>,
   },
   {
     accessorKey: 'status',
@@ -101,9 +101,9 @@ export const archiveColumns: ColumnDef<ArchivedDocument>[] = [
     cell: ({ row }) => <div>{row.original.category.name}</div>,
   },
   {
-    accessorKey: 'creator.name',
+    accessorKey: 'created_by.name',
     header: ({ column }) => <TableHeaderButton column={column}>Created by</TableHeaderButton>,
-    cell: ({ row }) => <div>{row.original.creator.name}</div>,
+    cell: ({ row }) => <div>{row.original.created_by.name}</div>,
   },
   {
     accessorKey: 'status',

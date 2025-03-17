@@ -51,7 +51,7 @@ class DocumentService
             ->when($search, function ($query, $search) {
                 $query->where('title', 'like', "%{$search}%");
             })
-            ->with(['creator:id,name', 'category:id,name'])
+            ->with(['createdBy:id,name', 'category:id,name'])
             ->where('is_archived', false)
             ->latest()
             ->paginate(10)
@@ -65,7 +65,7 @@ class DocumentService
             ->when($search, function ($query, $search) {
                 $query->where('title', 'like', "%{$search}%");
             })
-            ->with(['creator:id,name', 'category:id,name'])
+            ->with(['createdBy:id,name', 'category:id,name'])
             ->join('archived_documents', 'documents.id', '=', 'archived_documents.document_id')
             ->select('documents.*', 'archived_documents.created_at as archived_at')
             ->whereIn('documents.id', ArchivedDocument::pluck('document_id'))

@@ -8,7 +8,7 @@ export interface Document {
   id: number;
   code: string;
   title: string;
-  creator: {
+  created_by: {
     id: number;
     name: string;
     email: string;

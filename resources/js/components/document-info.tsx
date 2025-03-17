@@ -27,7 +27,7 @@ export function DocumentInfo({ document }: DocumentInfoProps) {
       <div className="text-muted-foreground flex flex-col gap-3 text-sm">
         <div className="flex items-center gap-2">
           <span>Created by:</span>
-          <span className="text-foreground font-medium">{document.creator.name}</span>
+          <span className="text-foreground font-medium">{document.created_by.name}</span>
         </div>
         <div className="flex items-center gap-2">
           <span>Category:</span>

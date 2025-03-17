@@ -38,8 +38,8 @@ export default function RecentDocuments({ documents }: RecentDocumentsProps) {
             {documents?.map(document => (
               <TableRow key={document.id} onClick={() => handleShow(document)} className="cursor-pointer">
                 <TableCell>
-                  <div className="font-medium">{document.creator.name}</div>
-                  <div className="text-muted-foreground hidden text-sm md:inline">{document.creator.email}</div>
+                  <div className="font-medium">{document.created_by.name}</div>
+                  <div className="text-muted-foreground hidden text-sm md:inline">{document.created_by.email}</div>
                 </TableCell>
                 <TableCell>
                   <div className="text-muted-foreground hidden text-sm md:inline">{document.category.name}</div>
