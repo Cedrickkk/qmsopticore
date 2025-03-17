@@ -44,8 +44,15 @@ class DocumentController extends Controller
     public function store(StoreDocumentRequest $request) {}
 
 
-    public function history()
+    public function history(Document $document)
     {
-        dd("Iam here");
+        return Inertia::render('documents/history', [
+            'document' => $document,
+        ]);
+    }
+
+    public function archive(Document $document)
+    {
+        $this->service->archive($document);
     }
 }

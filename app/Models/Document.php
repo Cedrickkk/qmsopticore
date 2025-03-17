@@ -17,6 +17,7 @@ class Document extends Model
         'status',
         'category',
         'version',
+        'is_archived',
     ];
 
     public function category(): BelongsTo
@@ -37,5 +38,10 @@ class Document extends Model
     public function signatories(): HasMany
     {
         return $this->hasMany(DocumentSignatory::class);
+    }
+
+    public function archivedDocument()
+    {
+        return $this->hasOne(ArchivedDocument::class);
     }
 }

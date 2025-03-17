@@ -2,13 +2,11 @@
 
 namespace App\Services;
 
-use App\Models\User;
 use App\Models\Document;
 use App\Models\DocumentType;
-use Illuminate\Http\Exceptions\HttpResponseException;
-use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
+use App\Models\ArchivedDocument;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class DocumentService
 {
@@ -54,25 +52,57 @@ class DocumentService
                 $query->where('title', 'like', "%{$search}%");
             })
             ->with(['creator:id,name', 'category:id,name'])
+            ->where('is_archived', false)
             ->latest()
             ->paginate(10)
             ->withQueryString();
     }
 
 
+    public function getPaginatedArchivedDocuments(?string $search = null)
+    {
+        return Document::query()
+            ->when($search, function ($query, $search) {
+                $query->where('title', 'like', "%{$search}%");
+            })
+            ->with(['creator:id,name', 'category:id,name'])
+            ->join('archived_documents', 'documents.id', '=', 'archived_documents.document_id')
+            ->select('documents.*', 'archived_documents.created_at as archived_at')
+            ->whereIn('documents.id', ArchivedDocument::pluck('document_id'))
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+    }
+
     /**
      * 
-     * ! Important !
+     * ! Important
      * TODO: Figure out where to put this and what is the best approach
      * 
      */
     public function download(Document $document)
     {
-        return Storage::download("documents/{$document->title}");
+        return Storage::download("documents/sample_document.pdf");
     }
 
     public function documentExists(Document $document): bool
     {
-        return Storage::exists("documents/{$document}");
+        return Storage::exists("documents/sample_document.pdf");
+    }
+
+    public function archive(Document $document)
+    {
+        $document->update(['is_archived' => true]);
+
+        ArchivedDocument::create([
+            'document_id' => $document->id,
+        ]);
+    }
+
+    public function unarchive(Document $document)
+    {
+        $document->update(['is_archived' => false]);
+
+        $document->archivedDocument()->delete();
     }
 }
