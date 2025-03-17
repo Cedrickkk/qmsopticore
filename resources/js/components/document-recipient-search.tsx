@@ -21,26 +21,23 @@ export function RecipientSearch({ onAddUser }: RecipientSearchProps) {
     setIsLoading(true);
     setError(null);
 
-    try {
-      const response = await UserServiceApi.searchByEmail(email);
+    const { user, error } = await UserServiceApi.searchByEmail(email);
 
-      if (response.user) {
-        const documentUser: DocumentUser = {
-          id: response.user.id,
-          name: response.user.name,
-          email: response.user.email,
-          signatory: false,
-        };
+    if (user) {
+      const documentUser: DocumentUser = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        signatory: false,
+      };
 
-        onAddUser(documentUser);
-        setEmail('');
-      } else if (response.message) {
-        setError(response.message);
-      }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
-      setError('Failed to search user. Please try again.');
-    } finally {
+      onAddUser(documentUser);
+      setEmail('');
+      setIsLoading(false);
+    }
+
+    if (error) {
+      setError(error);
       setIsLoading(false);
     }
   };
