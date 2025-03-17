@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { useDebouncedSearch } from '@/hooks/use-search';
 import { PaginatedData } from '@/types';
 import { Link } from '@inertiajs/react';
 import {
@@ -16,7 +15,6 @@ import {
   useReactTable,
   VisibilityState,
 } from '@tanstack/react-table';
-import { LoaderCircle } from 'lucide-react';
 import { useState } from 'react';
 
 interface DataTableProps<TData, TValue> {
@@ -24,19 +22,13 @@ interface DataTableProps<TData, TValue> {
   data: PaginatedData<TData>;
 }
 
-/**
- *
- * TODO: Figure out what is the best approach for live search with the current tech stack.
- *
- */
-
-export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
+export function TableData<TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 
   /**
    *
-   * Global filtering only on current page
+   * ! Global filtering only on current page
    *
    */
 
@@ -44,10 +36,30 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
 
   /**
    *
-   * Debouncing approach for documents search
+   * * NOTE: To enable debouncing search approach with a specific resource
+   * * Use useSearch() hook and pass in the resource
+   * * -> const { search, handleSearch, isProcessing } = useDebouncedSearch({ resource: "resource" });
+   *
+   * * Enable manualFiltering option from tanstack-table
+   * * -> manualFiltering: true
+   * *
+   *
+   * * Replace the input element to use debounce search
+   * * -> <Input placeholder="Search documents..." value={search} onChange={event => handleSearch(event.target.value)} className="max-w-lg" />
+   *
+   * * Also add this component to the table row for a loading feedback
+   * * -> isProcessing ? (
+   * *      <TableRow>
+   * *        <TableCell colSpan={columns.length} className="h-16">
+   * *        <div className="flex items-center justify-center gap-2">
+   * *          <LoaderCircle className="text-muted-foreground h-6 w-6 animate-spin" />
+   * *          <p className="text-muted-foreground text-sm">Searching documents...</p>
+   * *        </div>
+   * *       </TableCell>
+   * *     </TableRow>
+   * *    )
    *
    */
-  const { search, handleSearch, isProcessing } = useDebouncedSearch();
 
   const table = useReactTable({
     state: {
@@ -58,7 +70,6 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
     columns,
     data: data.data,
     manualPagination: true,
-    manualFiltering: true,
     pageCount: data.last_page,
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
@@ -74,16 +85,13 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
     <>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          {/** Debounce search input */}
-          <Input placeholder="Search documents..." value={search} onChange={event => handleSearch(event.target.value)} className="max-w-lg" />
-
           {/** Global filtering input */}
-          {/* <Input
+          <Input
             placeholder="Filter documents..."
             value={globalFilter ?? ''}
             onChange={event => setGlobalFilter(event.target.value)}
             className="max-w-lg"
-          /> */}
+          />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="ml-auto rounded-sm">
@@ -131,16 +139,7 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
             ))}
           </TableHeader>
           <TableBody>
-            {isProcessing ? (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-16">
-                  <div className="flex items-center justify-center gap-2">
-                    <LoaderCircle className="text-muted-foreground h-6 w-6 animate-spin" />
-                    <p className="text-muted-foreground text-sm">Searching documents...</p>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ) : table.getRowModel().rows.length ? (
+            {table.getRowModel().rows.length ? (
               table.getRowModel().rows.map(row => (
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map(cell => (

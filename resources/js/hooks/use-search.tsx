@@ -6,10 +6,11 @@ interface UseSearchOptions {
   preserveState?: boolean;
   preserveScroll?: boolean;
   prefetch?: boolean;
+  resource?: string;
 }
 
 export function useDebouncedSearch(options: UseSearchOptions = {}) {
-  const { delay = 500, preserveState = true, preserveScroll = true, prefetch } = options;
+  const { delay = 500, preserveState = true, preserveScroll = true, prefetch, resource } = options;
   const [search, setSearch] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
@@ -19,7 +20,7 @@ export function useDebouncedSearch(options: UseSearchOptions = {}) {
 
       const timeoutId = setTimeout(() => {
         router.get(
-          '/documents',
+          `/${resource}`,
           { search: value },
           {
             preserveState,
@@ -34,7 +35,7 @@ export function useDebouncedSearch(options: UseSearchOptions = {}) {
 
       return () => clearTimeout(timeoutId);
     },
-    [delay, preserveScroll, preserveState, prefetch]
+    [delay, preserveScroll, preserveState, prefetch, resource]
   );
 
   return {
