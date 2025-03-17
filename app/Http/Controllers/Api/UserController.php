@@ -16,6 +16,8 @@ class UserController extends Controller
 
     public function search(Request $request): JsonResponse
     {
+        $request->validate(rules: ['email' => 'required|email|ends_with:@plpasig.edu.ph']);
+
         $user = $this->service->findByEmail($request->query('email'));
 
         if (!$user) {
