@@ -16,7 +16,7 @@ class UserSeeder extends Seeder
         User::create(
             [
                 'name' => 'User Test',
-                'email' => 'user@gmail.com',
+                'email' => 'user@plpasig.edu.ph',
                 'email_verified_at' => now(),
                 'password' => 'user12345',
                 'remember_token' => Str::random(10),
