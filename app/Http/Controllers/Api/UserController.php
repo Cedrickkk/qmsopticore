@@ -23,17 +23,17 @@ class UserController extends Controller
         if (!$user) {
             return response()->json([
                 'message' => 'User not found.'
-            ]);
+            ], 404);
         }
 
         if ($user->id === Auth::user()->id) {
             return response()->json([
                 'message' => "You cannot add yourself as a recipient."
-            ]);
+            ], 400);
         }
 
         return response()->json([
             'user' => $user
-        ]);
+        ], 200);
     }
 }
