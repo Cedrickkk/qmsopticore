@@ -28,11 +28,16 @@ class DocumentController extends Controller
         ]);
     }
 
+
+
+
     public function show(Document $document)
     {
         $user = Auth::user();
 
-        $filePath = Storage::url("documents/sample_document.pdf");
+        $filePath = Storage::url("documents/many_pages.pdf");
+
+        $this->service->updateVersion($document, '5.0.1');
 
         return Inertia::render('documents/show', [
             'document' => $document->load(['createdBy:id,name', 'category:id,name']),

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use setasign\Fpdi\Fpdi;
 use App\Models\Document;
 use App\Models\DocumentType;
 use App\Models\ArchivedDocument;
@@ -74,12 +75,6 @@ class DocumentService
             ->withQueryString();
     }
 
-    /**
-     * 
-     * ! Important
-     * TODO: Figure out where to put this and what is the best approach
-     * 
-     */
     public function download(Document $document)
     {
         return Storage::download("documents/sample_document.pdf");
@@ -88,6 +83,39 @@ class DocumentService
     public function documentExists(Document $document): bool
     {
         return Storage::exists("documents/sample_document.pdf");
+    }
+
+    public function updateVersion(Document $document, string $version)
+    {
+        // TODO: Reference to document_title
+        $existingPdfPath = Storage::path("documents/many_pages.pdf");
+
+        $pdf = new Fpdi();
+
+        $pageCount = $pdf->setSourceFile($existingPdfPath);
+
+        for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+            $pdf->AddPage();
+
+            $templateId = $pdf->importPage($pageNo);
+
+            $pdf->useImportedPage($templateId);
+
+            $footerX = 23;
+            $footerY = 275;
+
+            $pdf->SetFillColor(255, 255, 255);
+            $pdf->Rect($footerX, $footerY - 5, 100, 50, 'F');
+
+            $pdf->SetFont('Helvetica', '', 6);
+            $pdf->SetTextColor(128, 128, 128);
+            $footerText = "VERSION: " . $version;
+
+            $pdf->SetXY($footerX, $footerY);
+            $pdf->Write(0, $footerText);
+        }
+
+        $pdf->Output($existingPdfPath, 'F');
     }
 
     public function archive(Document $document)
