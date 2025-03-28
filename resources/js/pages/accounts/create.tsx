@@ -18,7 +18,16 @@ const breadcrumbs: BreadcrumbItem[] = [
   },
 ];
 
+/**
+ * TODO: Fix type clutter here
+ */
+
 export type Department = {
+  id: number;
+  name: string;
+};
+
+export type Roles = {
   id: number;
   name: string;
 };
@@ -31,6 +40,7 @@ export type CreateAccountFormData = {
   department: string;
   image: File | null;
   signatures: File[];
+  role: string;
 };
 
 export default function Create() {
@@ -42,6 +52,7 @@ export default function Create() {
     department: '',
     image: null as File | null,
     signatures: [] as File[],
+    role: '',
   });
 
   const handleSubmit = (e: React.FormEvent) => {

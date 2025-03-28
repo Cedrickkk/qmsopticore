@@ -41,11 +41,28 @@ export type DocumentUser = {
   signatory: boolean;
 };
 
+export type DocumentPermission = {
+  userId: number;
+  permissions: {
+    view: boolean;
+    edit: boolean;
+    download: boolean;
+    delete: boolean;
+  };
+};
+
 export type CreateDocumentFormData = {
   file: File | null;
-  type: Omit<DocumentType, 'categories'>;
-  category: DocumentCategory;
+  type: {
+    id: number | null;
+    name: string;
+  };
+  category: {
+    id: number | null;
+    name: string;
+  };
   users: DocumentUser[];
+  permissions: DocumentPermission[];
 };
 
 export type DocumentPageProps = {

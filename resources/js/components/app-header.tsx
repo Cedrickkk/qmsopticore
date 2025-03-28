@@ -18,31 +18,37 @@ const mainNavItems: NavItem[] = [
     title: 'Dashboard',
     url: '/dashboard',
     icon: LayoutGrid,
+    requiredRoles: ['super_admin', 'department_admin'],
   },
   {
     title: 'Documents',
     url: '/documents',
     icon: FolderRoot,
+    requiredRoles: ['super_admin', 'department_admin', 'regular_user'],
   },
   {
     title: 'Departments',
     url: '/departments',
     icon: LayoutPanelTop,
+    requiredRoles: ['super_admin', 'department_admin'],
   },
   {
     title: 'Accounts',
     url: '/accounts',
     icon: Users,
+    requiredRoles: ['super_admin', 'department_admin'],
   },
   {
     title: 'Archives',
     url: '/archives',
     icon: FileArchive,
+    requiredRoles: ['super_admin', 'department_admin'],
   },
   {
     title: 'System Settings',
     url: '/system-settings',
     icon: FileArchive,
+    requiredRoles: ['super_admin'],
   },
 ];
 
@@ -55,11 +61,18 @@ interface AppHeaderProps {
 export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
   const page = usePage<SharedData>();
   const { auth } = page.props;
+  const userRoles = auth.user.roles || [];
   const getInitials = useInitials();
 
   const isActiveRoute = (url: string) => {
     return page.url.startsWith(url);
   };
+
+  const filteredNavItems = mainNavItems.filter(({ requiredRoles }) => {
+    if (!requiredRoles) return false;
+
+    return requiredRoles.some(requiredRole => (userRoles.includes(requiredRole) ? true : false));
+  });
 
   return (
     <>
@@ -75,15 +88,18 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
               </SheetTrigger>
               <SheetContent side="left" className="bg-sidebar flex h-full w-64 flex-col items-stretch justify-between p-4">
                 <SheetTitle className="sr-only">Quality Management System Menu</SheetTitle>
-                <SheetHeader className="flex justify-start gap-3 text-left">
+                <SheetHeader className="flex justify-start gap-3 px-0 py-3 text-left">
                   {/* <AppLogoIcon className="h-6 w-6 fill-current text-black dark:text-white" /> */}
                   <img src="/images/plp.png" alt="Pamantasan ng Lungsod ng Pasig Logo" className="size-9 scale-125 rounded-full dark:bg-white" />
-                  <span className="text-sm">Quality Management System</span>
+                  <span className="text-sm">
+                    <span className="text-muted-foreground max-w-full text-xs text-nowrap">Pamantasan ng Lungsod ng Pasig</span> <br />
+                    <span className="mt-1 block font-semibold text-nowrap">Quality Management System</span>
+                  </span>
                 </SheetHeader>
                 <div className="mt-6 flex h-full flex-1 flex-col space-y-4">
                   <div className="flex h-full flex-col justify-between text-sm">
                     <div className="flex flex-col space-y-4">
-                      {mainNavItems.map(item => (
+                      {filteredNavItems.map(item => (
                         <Link key={item.title} href={item.url} className="flex items-center space-x-2 font-medium">
                           {item.icon && <Icon iconNode={item.icon} className="h-5 w-5" />}
                           <span>{item.title}</span>
@@ -96,7 +112,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
             </Sheet>
           </div>
 
-          <Link href="/dashboard" prefetch className="flex items-center space-x-2">
+          <Link href={userRoles.includes('super_admin') ? '/dashboard' : '/documents'} className="flex items-center space-x-2" prefetch>
             <AppLogo />
           </Link>
 
@@ -104,7 +120,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
           <div className="ml-6 hidden h-full items-center space-x-6 lg:flex">
             <NavigationMenu className="flex h-full items-stretch">
               <NavigationMenuList className="flex h-full items-stretch space-x-2">
-                {mainNavItems.map((item, index) => (
+                {filteredNavItems.map((item, index) => (
                   <NavigationMenuItem key={index} className="relative flex h-full items-center">
                     <Link
                       href={item.url}

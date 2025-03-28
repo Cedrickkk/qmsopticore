@@ -33,10 +33,12 @@ export function RecipientSearch({ onAddUser }: RecipientSearchProps) {
 
       onAddUser(documentUser);
       setEmail('');
+      setError(null);
       setIsLoading(false);
     }
 
     if (error) {
+      setEmail('');
       setError(error);
       setIsLoading(false);
     }

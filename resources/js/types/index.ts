@@ -19,6 +19,7 @@ export interface NavItem {
   url: string;
   icon?: LucideIcon | null;
   isActive?: boolean;
+  requiredRoles?: UserRole[];
 }
 
 export interface SharedData {
@@ -29,15 +30,24 @@ export interface SharedData {
   [key: string]: unknown;
 }
 
+export interface UserPermissions {
+  view: boolean;
+  edit: boolean;
+  download: boolean;
+  delete: boolean;
+}
+
 export interface User {
   id: number;
   name: string;
   email: string;
   avatar?: string;
+  roles?: UserRole[];
   email_verified_at: string | null;
+  defaultPermissions: UserPermissions;
   created_at: string;
   updated_at: string;
-  [key: string]: unknown; // This allows for additional properties...
+  [key: string]: unknown;
 }
 
 export type PaginatedData<T> = {
@@ -60,3 +70,5 @@ export type Links = {
   label: string;
   active: boolean;
 };
+
+export type UserRole = 'super_admin' | 'department_admin' | 'regular_user';
