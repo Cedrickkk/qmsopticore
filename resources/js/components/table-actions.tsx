@@ -1,4 +1,3 @@
-import DocumentArchiveForm from '@/components/document-archive-form';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -14,6 +13,7 @@ import { Link } from '@inertiajs/react';
 import { Row } from '@tanstack/react-table';
 import { ArchiveX, Download, Eye, History, MoreHorizontal, Send } from 'lucide-react';
 import { useState } from 'react';
+import DocumentArchiveForm from './document-archive-form';
 
 interface TableActionsProps {
   row: Row<Document>;
@@ -55,8 +55,8 @@ export default function TableActions({ row }: TableActionsProps) {
             <span>Share Document</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem className="text-destructive" onClick={() => setIsOpen(open => !open)}>
-            <ArchiveX className="text-destructive" />
+          <DropdownMenuItem className="text-destructive dark:bg-destructive dark:text-white" onClick={() => setIsOpen(open => !open)}>
+            <ArchiveX className="text-destructive dark:text-white" />
             <span>Archive Document</span>
           </DropdownMenuItem>
         </DropdownMenuContent>

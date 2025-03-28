@@ -2,7 +2,7 @@ import TableActions from '@/components/table-actions';
 import { TableHeaderButton } from '@/components/table-header-button';
 import { Badge } from '@/components/ui/badge';
 import { type Document } from '@/types/document';
-import { ColumnDef } from '@tanstack/react-table';
+import { ColumnDef, Row } from '@tanstack/react-table';
 import { format } from 'date-fns';
 
 import {
@@ -15,6 +15,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Link } from '@inertiajs/react';
 import { Download, Eye, History, MoreHorizontal, RotateCcw } from 'lucide-react';
+import { useState } from 'react';
+import RestoreArchivedDocumentForm from './document-restore-form';
 import { Button } from './ui/button';
 
 /**
@@ -126,7 +128,24 @@ export const archiveColumns: ColumnDef<ArchivedDocument>[] = [
   {
     id: 'actions',
     enableHiding: false,
-    cell: ({ row }) => (
+    cell: ({ row }) => <RestoreDocumentActions row={row} />,
+  },
+];
+
+/**
+ *
+ * TODO: Refactor table-actions for archived_column
+ *
+ *
+ */
+
+interface RestorDocumentActionsProps {
+  row: Row<ArchivedDocument>;
+}
+export default function RestoreDocumentActions({ row }: RestorDocumentActionsProps) {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  return (
+    <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="h-8 w-8 p-0">
@@ -151,11 +170,12 @@ export const archiveColumns: ColumnDef<ArchivedDocument>[] = [
             <Download /> <span>Download PDF </span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setIsOpen(open => !open)}>
             <RotateCcw /> <span>Restore </span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-    ),
-  },
-];
+      <RestoreArchivedDocumentForm document={row.original} onOpenChange={setIsOpen} open={isOpen} />
+    </>
+  );
+}

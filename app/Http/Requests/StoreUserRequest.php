@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Enums\PermissionEnum;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class StoreUserRequest extends FormRequest
 {
@@ -11,18 +13,9 @@ class StoreUserRequest extends FormRequest
      * Determine if the user is authorized to make this request.
      */
 
-
-    /**
-     * 
-     * !! Implement RBA
-     * 
-     * TODO: Check if the user is admin
-     * 
-     */
-
     public function authorize(): bool
     {
-        return true;
+        return Auth::user()->hasPermissionTo(PermissionEnum::USER_CREATE->value);
     }
 
     /**
@@ -62,6 +55,7 @@ class StoreUserRequest extends FormRequest
                 'mimes:jpg,jpeg,png',
                 'max:1024',
             ],
+            'role' => ['required', 'string', 'in:super_admin,department_admin,regular_user']
         ];
     }
 
@@ -72,7 +66,7 @@ class StoreUserRequest extends FormRequest
 
             'department.required' => 'The department is required.',
 
-            'image.max' => 'The profile image must not exceed 2MB.',
+            'image.max' => 'The profile image must not exceed 1MB.',
             'image.mimes' => 'The profile image must be a file of type: jpg, jpeg, png.',
             'image.required' => 'A profile image is required.',
 
