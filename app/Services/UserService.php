@@ -2,10 +2,11 @@
 
 namespace App\Services;
 
-use App\Models\Signature;
 use App\Models\User;
+use App\Models\Signature;
 use App\Models\Department;
 use Illuminate\Support\Arr;
+use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\StoreUserRequest;
@@ -63,12 +64,9 @@ class UserService
 
     public function getUserCreationOptions(): array
     {
-        /**
-         * TODO: Send roles here
-         */
-
         return [
             'departments' => $this->getDepartments(),
+            'roles' => $this->getRoles()
         ];
     }
 
@@ -76,6 +74,13 @@ class UserService
     {
         return Department::select('id', 'name')
             ->orderBy('name')
+            ->get();
+    }
+
+    private function getRoles()
+    {
+        return Role::select('id', 'name')
+            ->orderBy('name', 'asc')
             ->get();
     }
 
