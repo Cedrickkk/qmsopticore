@@ -8,8 +8,8 @@ Route::inertia('/', 'auth/login');
 /**
  * 
  * ! TODO: IMPORTANT
- * * Organize routes based on their permissions & roles.
- * * Use 
+ * * Organize routes based on their roles.
+ * * Use Model Policy to authorize actions
  * 
  */
 
@@ -19,6 +19,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     require __DIR__ . '/departments.php';
     require __DIR__ . '/users.php';
     require __DIR__ . '/archives.php';
+    require __DIR__ . '/system.php';
 });
 
 require __DIR__ . '/api.php';

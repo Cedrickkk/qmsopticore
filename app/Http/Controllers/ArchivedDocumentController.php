@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Inertia\Inertia;
+use App\Models\Document;
 use Illuminate\Http\Request;
 use App\Services\DocumentService;
 
@@ -16,5 +17,10 @@ class ArchivedDocumentController extends Controller
         return Inertia::render('archives', [
             'archives' => $this->service->getPaginatedArchivedDocuments($request->search),
         ]);
+    }
+
+    public function unarchive(Document $document)
+    {
+        return $this->service->unarchive($document);
     }
 }
