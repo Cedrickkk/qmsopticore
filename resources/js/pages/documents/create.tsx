@@ -40,6 +40,7 @@ export default function Create() {
       name: '',
     },
     users: [],
+    permissions: [],
   });
 
   const selectedTypeCategories = options.types.find(type => type.name === data.type.name)?.categories || [];

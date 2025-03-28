@@ -31,7 +31,7 @@ export function DocumentUpload({ file, onChange, error }: DocumentUploadProps) {
         <>
           <FolderUp size={56} className="text-primary" />
           <p className="tracking-tsight text-primary font-medium">Select a PDF file to upload</p>
-          <small className="text-muted-foreground text-sm leading-none font-medium">Maximum file size 2mb</small>
+          <small className="text-muted-foreground text-xs leading-none">Maximum file size 2mb</small>
         </>
       )}
 

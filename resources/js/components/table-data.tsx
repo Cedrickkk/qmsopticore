@@ -15,6 +15,7 @@ import {
   useReactTable,
   VisibilityState,
 } from '@tanstack/react-table';
+import { FilePlus2, Settings2 } from 'lucide-react';
 import { useState } from 'react';
 
 interface DataTableProps<TData, TValue> {
@@ -33,7 +34,6 @@ export function TableData<TData, TValue>({ columns, data }: DataTableProps<TData
    */
 
   const [globalFilter, setGlobalFilter] = useState<string>('');
-
   /**
    *
    * * NOTE: To enable debouncing search approach with a specific resource
@@ -87,7 +87,7 @@ export function TableData<TData, TValue>({ columns, data }: DataTableProps<TData
         <div className="flex items-center gap-3">
           {/** Global filtering input */}
           <Input
-            placeholder="Filter documents..."
+            placeholder={'Search document...'}
             value={globalFilter ?? ''}
             onChange={event => setGlobalFilter(event.target.value)}
             className="max-w-lg"
@@ -95,7 +95,7 @@ export function TableData<TData, TValue>({ columns, data }: DataTableProps<TData
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="ml-auto rounded-sm">
-                Columns
+                <Settings2 /> Filter Columns
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -122,7 +122,10 @@ export function TableData<TData, TValue>({ columns, data }: DataTableProps<TData
           </DropdownMenu>
         </div>
         <Button asChild>
-          <Link href="/documents/create">Create New Document</Link>
+          <Link href="/documents/create" className="items-center">
+            <FilePlus2 />
+            Create New Document
+          </Link>
         </Button>
       </div>
       <div className="rounded-sm">

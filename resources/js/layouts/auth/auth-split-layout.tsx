@@ -34,11 +34,10 @@ export default function AuthSplitLayout({ children, title, description }: AuthLa
           <Link href={route('login')} className="relative z-20 flex items-center justify-center lg:hidden">
             <img src="/images/plp.png" alt="Pamantasan ng Lungsod ng Pasig Logo" className="size-12 scale-150" />
           </Link>
-          <div className="flex flex-col items-start gap-2 text-left sm:items-center sm:text-center">
+          <div className="text-cente flex flex-col items-center gap-2">
             <h1 className="text-xl font-medium">{title}</h1>
-            <p className="text-muted-foreground text-sm text-balance">{description}</p>
+            <p className="text-muted-foreground text-sm text-nowrap">{description}</p>
           </div>
-
           {children}
         </div>
       </div>

@@ -58,7 +58,7 @@ export function PDFViewer({ file, className, showThumbnails = false }: PDFViewer
     <div className={cn('flex flex-col gap-6', className)}>
       <div className="my-4 flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:gap-6">
         <Document
-          className="bg-muted relative flex justify-center rounded-sm border shadow-sm transition-colors"
+          className="bg-primary/10 border-primary relative flex justify-center rounded-sm border shadow-sm transition-colors"
           file={file}
           loading={
             <div className="flex h-[700px] items-center justify-center">

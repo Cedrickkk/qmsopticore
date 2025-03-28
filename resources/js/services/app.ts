@@ -24,7 +24,6 @@ export const UserServiceApi = {
       const { data } = await laravelApi.get<UserSearchResponse>('/api/users/search', {
         params: { email },
       });
-
       return { user: data.user };
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
