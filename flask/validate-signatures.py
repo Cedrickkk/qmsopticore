@@ -38,11 +38,23 @@ def validate_signatures(signature_paths):
         average_similarity = float(np.mean(similarities)) * 50
         is_match = average_similarity >= 90
 
-        return {
-            "is_match": is_match,
-            "average_similarity": average_similarity
+        result = {
+            "isMatch": is_match,
+            "averageSimilarity": float(average_similarity),
+            "success": True
         }
 
+        print(json.dumps(result))
+        sys.stdout.flush()
+
+        return result
+
     except Exception as e:
-        return {"error": str(e)}
+        error_result = {
+            "success": False,
+            "error": str(e)
+        }
+        print(json.dumps(error_result))
+        sys.stdout.flush()
+        return error_result
 

@@ -33,7 +33,7 @@ class StoreUserRequest extends FormRequest
                 'email',
                 'max:255',
                 'unique:users',
-                'ends_with:@plasig.edu.ph'
+                'ends_with:@plpasig.edu.ph'
             ],
             'password' => ['required', 'string', 'min:8', Password::defaults(), 'confirmed'],
             'department' => ['required', 'string', 'max:255'],
@@ -62,7 +62,7 @@ class StoreUserRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'email.ends_with' => 'The email must end with @plasig.edu.ph domain.',
+            'email.ends_with' => 'The email must end with @plpasig.edu.ph domain.',
 
             'department.required' => 'The department is required.',
 
