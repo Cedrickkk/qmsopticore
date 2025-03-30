@@ -6,8 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CreateAccountFormData, Department } from '@/pages/accounts/create';
 import { usePage } from '@inertiajs/react';
-import { X } from 'lucide-react';
 import { useState } from 'react';
+import { SignatureUpload } from './signature-upload';
 
 /**
  *
@@ -20,18 +20,14 @@ interface ProfileInformationProps {
   errors: Partial<Record<keyof CreateAccountFormData | `signatures.${number}`, string>>;
   setData: (key: keyof CreateAccountFormData, value: string | File | File[] | null) => void;
   processing: boolean;
+  onSignaturesValidated: () => void;
+  onSignaturesChanged: () => void;
 }
 
-export function ProfileInformation({ data, setData, errors, processing }: ProfileInformationProps) {
+export function ProfileInformation({ data, setData, errors, processing, onSignaturesChanged, onSignaturesValidated }: ProfileInformationProps) {
   const [profileImageUrl, setProfileImageUrl] = useState<string>('');
-  const { departments } = usePage<{ departments: Department[] }>().props;
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newFiles = Array.from(e.target.files || []);
-    const existingFiles = data.signatures ? Array.from(data.signatures) : [];
-    const uniqueNewFiles = newFiles.filter(newFile => !existingFiles.some(existingFile => existingFile.name === newFile.name));
-    setData('signatures', [...existingFiles, ...uniqueNewFiles]);
-  };
+  const { departments } = usePage<{ departments: Department[] }>().props;
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -40,17 +36,6 @@ export function ProfileInformation({ data, setData, errors, processing }: Profil
       const imageUrl = URL.createObjectURL(file);
       setProfileImageUrl(imageUrl);
     }
-  };
-
-  const filterSignature = (name: string) => {
-    const filteredSignatures = data.signatures?.filter(signature => signature.name !== name);
-
-    if (!filteredSignatures) return;
-    setData('signatures', [...filteredSignatures]);
-  };
-
-  const getSignatureError = (index: number) => {
-    return errors[`signatures.${index}`];
   };
 
   return (
@@ -96,6 +81,7 @@ export function ProfileInformation({ data, setData, errors, processing }: Profil
           className="mt-1 block w-full"
           value={data.email}
           disabled={processing}
+          autoComplete="email"
           onChange={e => setData('email', e.target.value)}
         />
         {!errors.email ? (
@@ -124,35 +110,14 @@ export function ProfileInformation({ data, setData, errors, processing }: Profil
         </Select>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="signatures">Signatures</Label>
-        <Input
-          id="signatures"
-          multiple
-          type="file"
-          name="signatures"
-          accept="image/png, image/jpg, image/jpeg"
-          className="mt-1 block w-full"
-          disabled={processing}
-          onChange={handleFileChange}
-        />
-        <InputError message={errors.signatures} />
-        {data.signatures &&
-          data.signatures.map((file, index) => {
-            const error = getSignatureError(index);
-            return (
-              <div className="ring-offset-background mt-1 space-y-1" key={file.name}>
-                <div className="flex h-10 w-full items-center justify-between rounded-md bg-gray-100 px-3 py-2 text-sm">
-                  <p>{file.name}</p>
-                  <Button variant="ghost" size="icon" type="button" onClick={() => filterSignature(file.name)} className="cursor-pointer">
-                    <X className="text-red-500" />
-                  </Button>
-                </div>
-                {error && <InputError message={error} />}
-              </div>
-            );
-          })}
-      </div>
+      <SignatureUpload
+        signatures={data.signatures}
+        onChange={files => setData('signatures', files)}
+        errors={errors}
+        disabled={processing}
+        onChanged={onSignaturesChanged}
+        onValidated={onSignaturesValidated}
+      />
     </div>
   );
 }

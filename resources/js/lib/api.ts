@@ -1,10 +1,10 @@
 import axios from 'axios';
 
 export const laravelApi = axios.create({
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true,
 });
 
 export const flaskApi = axios.create({
@@ -12,5 +12,4 @@ export const flaskApi = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true,
 });

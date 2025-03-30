@@ -99,18 +99,21 @@ def validate_signatures():
 
         average_similarity = np.mean(similarities) 
         
-        average_similarity = float(average_similarity) * 50
+        average_similarity = average_similarity * 50
 
-        is_match = average_similarity >= 90
+        is_match = bool(average_similarity >= 85)
 
         return jsonify({
-            "is_match": is_match,
-            "average_similarity": average_similarity
+            "isMatch": is_match,
+            "averageSimilarity": round(average_similarity, 2),
+            "rawSimilarity": round(average_similarity, 4),
+            "confidence": "high" if average_similarity >= 85 
+                        else "medium" if average_similarity >= 75 
+                        else "low"
         })
 
     except Exception as e:
         print(f"Error: {e}")
-        print(model.summary())
         return jsonify({"error": f"An error occurred: {str(e)}"}), 200
 
 if __name__ == '__main__':    

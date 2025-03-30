@@ -19,13 +19,14 @@ interface SignDocumentResponse {
 interface VerifySignaturesResponse {
   isMatch: boolean;
   averageSimilarity: number;
+  confidence: 'high' | 'low' | 'medium';
   error?: string;
 }
 
 export const FlaskServiceApi = {
   async signDocument(payload: SignDocumentPayload) {
     try {
-      const { data } = await flaskApi.post<SignDocumentResponse>('/flask/api/sign', payload);
+      const { data } = await flaskApi.post<SignDocumentResponse>('/api/sign', payload);
       return data;
     } catch (error: unknown) {
       if (error instanceof AxiosError && error.response?.data?.error) {
@@ -34,9 +35,10 @@ export const FlaskServiceApi = {
       throw error;
     }
   },
-  async verifySignatures(formData: FormData) {
+  async validateSignatures(formData: FormData) {
     try {
-      const { data } = await flaskApi.post<VerifySignaturesResponse>('/flask/api/verify-signatures', formData, {
+      const { data } = await flaskApi.post<VerifySignaturesResponse>('/api/validate-signatures', formData, {
+        withCredentials: true,
         headers: {
           'Content-Type': 'multipart/form-data',
         },

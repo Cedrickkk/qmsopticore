@@ -26,7 +26,7 @@ class UserService
         $image = $this->uploadImage($request->file('image'));
 
         return User::create(attributes: [
-            'name' => $request->fullname,
+            'name' => $request->name,
             'email' => $request->email,
             'img' => $image,
             'password' => Hash::make($request->password),

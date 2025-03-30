@@ -167,3 +167,6 @@ cython_debug/
 
 # Machine Learning Model
 model.keras
+
+# Signatures training files
+sign_data/
