@@ -2,12 +2,21 @@
 
 namespace App\Services;
 
+use App\Enums\DocumentStatusEnum;
 use setasign\Fpdi\Fpdi;
 use App\Models\Document;
 use App\Models\DocumentType;
 use App\Models\ArchivedDocument;
+use App\Models\DocumentWorkflowLog;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Pagination\LengthAwarePaginator;
+use App\Http\Requests\StoreDocumentRequest;
+use App\Models\DocumentRecipient;
+use App\Models\DocumentSignatory;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class DocumentService
 {
@@ -53,7 +62,6 @@ class DocumentService
                 $query->where('title', 'like', "%{$search}%");
             })
             ->with(['createdBy:id,name', 'category:id,name'])
-            ->where('is_archived', false)
             ->latest()
             ->paginate(10)
             ->withQueryString();
@@ -132,5 +140,167 @@ class DocumentService
         $document->update(['is_archived' => false]);
 
         $document->archivedDocument()->delete();
+    }
+
+    public function getDocumentHistoryLogs(Document $document)
+    {
+        return DocumentWorkflowLog::with('user:id,name')
+            ->where('document_id', $document->id)
+            ->latest()
+            ->get()
+            ->map(function ($log) {
+                return [
+                    'id' => $log->id,
+                    'action' => $log->action,
+                    'fromStatus' => $log->from_status,
+                    'toStatus' => $log->to_status,
+                    'notes' => $log->notes,
+                    'createdAt' => $log->created_at->toISOString(),
+                    'user' => [
+                        'id' => $log->user->id,
+                        'name' => $log->user->name,
+                        'avatar' => null,
+                    ],
+                ];
+            });
+    }
+
+
+    public function store(StoreDocumentRequest $request)
+    {
+        $user = Auth::user();
+        $users = collect($request->input('users', []));
+
+        $document = $this->createDocument(
+            $this->handleFileUpload($request->file('file')),
+            $request->input('description'),
+            $request->input('category'),
+            $user
+        );
+
+        $this->createWorkflowLog(
+            $document,
+            $user,
+            'created',
+            null,
+            'draft',
+            'Document created'
+        );
+
+        $signatories = $users->filter(fn($user) => $user['signatory'] === '1')
+            ->values();
+
+        if ($signatories->isNotEmpty()) {
+            $signatories->each(function ($signatory, $index) use ($document, $user) {
+                $docSignatory = DocumentSignatory::create([
+                    'document_id' => $document->id,
+                    'user_id' => $signatory['id'],
+                    'signatory_order' => $index + 1,
+                    'status' => 'pending'
+                ]);
+
+                $this->createWorkflowLog(
+                    $document,
+                    $user,
+                    'signatory_added',
+                    'draft',
+                    'draft',
+                    "Added {$signatory['name']} as signatory #{$docSignatory->signatory_order}"
+                );
+            });
+
+            $document->update(['status' => 'in_review']);
+
+            $this->createWorkflowLog(
+                $document,
+                $user,
+                'status_changed',
+                'draft',
+                'in_review',
+                'Document sent for review'
+            );
+        }
+    }
+
+
+    public function handleFileUpload($file)
+    {
+        $documentName = $file->getClientOriginalName();
+
+        Storage::putFileAs('documents', $file, $documentName);
+
+        return $documentName;
+    }
+
+
+    public function handleRecipients($users, $document)
+    {
+        $users->each(function ($recipient) use ($document) {
+            DocumentRecipient::create([
+                'document_id' => $document->id,
+                'user_id' => $recipient['id'],
+            ]);
+        });
+    }
+
+    public function handleSignatories($signatories, $document)
+    {
+        $signatories->each(function ($signatory) use ($document) {
+            DocumentSignatory::create([
+                'document_id' => $document->id,
+                'user_id' => $signatory['id'],
+                'signatory_order' => $signatory['signatory_order'],
+                'status' => 'pending',
+            ]);
+        });
+    }
+
+    public function createDocument(
+        string $title,
+        string $description,
+        array $category,
+        User $user
+    ): Document {
+        return Document::create([
+            'code' => $this->generateDocumentCode(),
+            'title' => $title,
+            'description' => $description,
+            'created_by' => $user->id,
+            'status' => DocumentStatusEnum::DRAFT->value,
+            'category' => $category['id'],
+            'version' => '1.0.0',
+        ]);
+    }
+
+    private function generateDocumentCode(): string
+    {
+        $prefix = 'DOC';
+        $timestamp = now()->format('Ymd');
+        $random = strtoupper(Str::random(4));
+
+        return "{$prefix}-{$timestamp}-{$random}";
+    }
+
+    private function createWorkflowLog(
+        Document $document,
+        User $user,
+        string $action,
+        ?string $fromStatus = null,
+        ?string $toStatus = 'draft',
+        ?string $notes = null
+    ): void {
+        DocumentWorkflowLog::create([
+            'document_id' => $document->id,
+            'user_id' => $user->id,
+            'action' => $action,
+            'from_status' => $fromStatus,
+            'to_status' => $toStatus,
+            'notes' => $notes ?? match ($action) {
+                'created' => 'Document created',
+                'signatories_assigned' => 'Signatories assigned to document',
+                default => null
+            },
+            'created_at' => now(),
+        ]);
     }
 }
