@@ -41,6 +41,7 @@ export type CreateAccountFormData = {
   password: string;
   password_confirmation: string;
   department: string;
+  position: string;
   image: File | null;
   signatures: File[];
   role: string;
@@ -53,6 +54,7 @@ export default function Create() {
     email: '',
     password: '',
     password_confirmation: '',
+    position: '',
     department: '',
     image: null as File | null,
     signatures: [] as File[],

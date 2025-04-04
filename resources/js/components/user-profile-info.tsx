@@ -92,6 +92,20 @@ export function ProfileInformation({ data, setData, errors, processing, onSignat
       </div>
 
       <div className="space-y-2">
+        <Label htmlFor="position">Position</Label>
+        <Input
+          id="position"
+          type="text"
+          name="position"
+          className="mt-1 block w-full"
+          value={data.name}
+          disabled={processing}
+          onChange={e => setData('position', e.target.value)}
+        />
+        <InputError message={errors.position} />
+      </div>
+
+      <div className="space-y-2">
         <Label htmlFor="department">Department</Label>
         <Select value={data.department} onValueChange={value => setData('department', value)} disabled={processing}>
           <SelectTrigger id="department" name="department" className="mt-1 w-full">
