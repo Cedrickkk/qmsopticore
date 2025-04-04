@@ -2,21 +2,22 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class DocumentSignatory extends Model
+class DocumentWorkflowLog extends Model
 {
+
     use HasFactory;
 
     protected $fillable = [
         'document_id',
         'user_id',
-        'signatory_order',
-        'status',
-        'comment',
-        'signed_at',
+        'action',
+        'from_status',
+        'to_status',
+        'notes',
     ];
 
     public function document(): BelongsTo
