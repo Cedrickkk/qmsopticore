@@ -4,7 +4,10 @@ namespace Database\Seeders;
 
 use App\Models\Document;
 use App\Models\DocumentCategory;
+use App\Models\DocumentSignatory;
 use App\Models\DocumentType;
+use App\Models\DocumentWorkflowLog;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class DocumentSeeder extends Seeder
@@ -52,8 +55,118 @@ class DocumentSeeder extends Seeder
             }
         }
 
+        $users = User::all();
+
         Document::factory(20)
             ->recycle(DocumentCategory::all())
-            ->create();
+            ->create()
+            ->each(function (Document $document) use ($users) {
+                // Create initial workflow log for document creation
+                DocumentWorkflowLog::factory()
+                    ->creation()
+                    ->create([
+                        'document_id' => $document->id,
+                        'user_id' => $document->createdBy->id,
+                        'created_at' => $document->created_at,
+                    ]);
+
+                // Generate 3-5 signatories per document
+                $signatoriesCount = fake()->numberBetween(3, 5);
+                $documentSignatories = $users->random($signatoriesCount);
+
+                // Track document status
+                $currentStatus = 'draft';
+                $document->update(['status' => $currentStatus]);
+
+                // Create signatories and their corresponding workflow logs
+                foreach ($documentSignatories as $index => $user) {
+                    // Create signatory
+                    $signatory = DocumentSignatory::factory()
+                        ->for($document)
+                        ->for($user)
+                        ->create([
+                            'signatory_order' => $index + 1,
+                            'status' => $this->determineSignatoryStatus($index)
+                        ]);
+
+                    // Create workflow log for signatory assignment
+                    DocumentWorkflowLog::factory()->create([
+                        'document_id' => $document->id,
+                        'user_id' => $document->createdBy->id,
+                        'action' => 'signatory_added',
+                        'from_status' => $currentStatus,
+                        'to_status' => $currentStatus,
+                        'notes' => "Added {$user->name} as signatory #{$signatory->signatory_order}",
+                        'created_at' => fake()->dateTimeBetween($document->created_at, 'now'),
+                    ]);
+
+                    // If signatory has taken action, create workflow log for it
+                    if ($signatory->status !== 'pending') {
+                        $newStatus = $this->determineDocumentStatus($document, $signatory->status);
+
+                        DocumentWorkflowLog::factory()->create([
+                            'document_id' => $document->id,
+                            'user_id' => $document->createdBy->id,
+                            'action' => $signatory->status === 'approved' ? 'approved' : 'rejected',
+                            'from_status' => $currentStatus,
+                            'to_status' => $newStatus,
+                            'notes' => $signatory->status === 'approved'
+                                ? "Approved the document"
+                                : "Rejected the document: " . fake()->sentence(),
+                            'created_at' => $signatory->signed_at,
+                        ]);
+
+                        $currentStatus = $newStatus;
+                        $document->update(['status' => $currentStatus]);
+                    }
+                }
+
+                // If all approved, create published workflow log
+                if ($currentStatus === 'approved') {
+                    DocumentWorkflowLog::factory()->create([
+                        'document_id' => $document->id,
+                        'user_id' =>  $user->id,
+                        'action' => 'published',
+                        'from_status' => 'approved',
+                        'to_status' => 'published',
+                        'notes' => 'Document published after all approvals received',
+                        'created_at' => fake()->dateTimeBetween($document->created_at, 'now'),
+                    ]);
+
+                    $document->update(['status' => 'published']);
+                }
+            });
+    }
+
+    private function determineSignatoryStatus(int $index): string
+    {
+        // First signatory more likely to have acted
+        if ($index === 0) {
+            return fake()->randomElement(['approved', 'approved', 'rejected', 'pending']);
+        }
+
+        // Subsequent signatories more likely to be pending
+        return fake()->randomElement(['pending', 'pending', 'approved', 'rejected']);
+    }
+
+    private function determineDocumentStatus(Document $document, string $signatoryAction): string
+    {
+        if ($signatoryAction === 'rejected') {
+            return 'rejected';
+        }
+
+        $signatories = $document->signatories;
+        $allApproved = $signatories->every(fn($s) => $s->status === 'approved');
+        $anyPending = $signatories->contains(fn($s) => $s->status === 'pending');
+
+        if ($allApproved) {
+            return 'approved';
+        }
+
+        if ($anyPending) {
+            return 'in_review';
+        }
+
+        return 'pending';
     }
 }

@@ -21,8 +21,16 @@ class DocumentFactory extends Factory
         return [
             'code' => $this->faker->unique()->regexify('[A-Z]{3}-[0-9]{4}'),
             'title' => $this->faker->sentence(4),
+            'description' => $this->faker->sentence(15),
             'created_by' => User::all()->random(),
-            'status' => $this->faker->randomElement(['approved', 'rejected', 'pending', 'updated']),
+            'status' => $this->faker->randomElement([
+                'draft',
+                'in_review',
+                'approved',
+                'rejected',
+                'published',
+                'archived'
+            ]),
             'category' => DocumentCategory::all()->random(),
             'version' => $this->faker->numerify('#.#.#'),
         ];
