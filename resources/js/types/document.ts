@@ -8,6 +8,7 @@ export interface Document {
   id: number;
   code: string;
   title: string;
+  description: string;
   created_by: {
     id: number;
     name: string;
@@ -62,6 +63,7 @@ export type CreateDocumentFormData = {
     name: string;
   };
   users: DocumentUser[];
+  description: string;
   permissions: DocumentPermission[];
 };
 
