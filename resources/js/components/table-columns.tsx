@@ -28,17 +28,21 @@ import { Button } from './ui/button';
  */
 
 const DocumentStatus = {
+  DRAFT: 'draft',
+  IN_REVIEW: 'in_review',
   APPROVED: 'approved',
-  PENDING: 'pending',
-  UPDATED: 'updated',
   REJECTED: 'rejected',
+  PUBLISHED: 'published',
+  ARCHIVED: 'archived',
 } as const;
 
 export const statusConfig = {
-  [DocumentStatus.APPROVED]: { variant: 'default', priority: 1 },
-  [DocumentStatus.PENDING]: { variant: 'secondary', priority: 2 },
-  [DocumentStatus.UPDATED]: { variant: 'outline', priority: 3 },
-  [DocumentStatus.REJECTED]: { variant: 'destructive', priority: 4 },
+  [DocumentStatus.DRAFT]: { variant: 'outline', priority: 5, label: 'Draft' },
+  [DocumentStatus.IN_REVIEW]: { variant: 'secondary', priority: 4, label: 'In Review' },
+  [DocumentStatus.APPROVED]: { variant: 'default', priority: 3, label: 'Approved' },
+  [DocumentStatus.PUBLISHED]: { variant: 'success', priority: 1, label: 'Published' },
+  [DocumentStatus.REJECTED]: { variant: 'destructive', priority: 6, label: 'Rejected' },
+  [DocumentStatus.ARCHIVED]: { variant: 'outline', priority: 2, label: 'Archived' },
 } as const;
 
 export const documentColumns: ColumnDef<Document>[] = [
@@ -67,7 +71,13 @@ export const documentColumns: ColumnDef<Document>[] = [
     header: ({ column }) => <TableHeaderButton column={column}>Status</TableHeaderButton>,
     cell: ({ row }) => {
       const status = row.getValue('status') as keyof typeof statusConfig;
-      return <Badge variant={statusConfig[status].variant}>{status.toLowerCase()}</Badge>;
+
+      // Handle status that might not be in the config (fallback)
+      if (!statusConfig[status]) {
+        return <Badge variant="outline">{String(status).toLowerCase()}</Badge>;
+      }
+
+      return <Badge variant={statusConfig[status].variant}>{statusConfig[status].label || String(status).toLowerCase()}</Badge>;
     },
     sortingFn: (rowA, rowB, columnId) => {
       const a = rowA.getValue(columnId) as keyof typeof statusConfig;

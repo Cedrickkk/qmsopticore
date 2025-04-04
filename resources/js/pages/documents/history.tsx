@@ -1,14 +1,35 @@
+import LogIcon from '@/components/document-log-icon';
+import StatusChange from '@/components/document-status-change';
+import { statusConfig } from '@/components/table-columns';
+import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { getActionTitle } from '@/hooks/use-action-title';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { type Document } from '@/types/document';
 import { Head, usePage } from '@inertiajs/react';
+import { formatDistanceToNow } from 'date-fns';
+import { User } from 'lucide-react';
 
 type PageProps = {
   document: Document;
+  workflowLogs: Array<{
+    id: number;
+    action: string;
+    fromStatus: string | null;
+    toStatus: string | null;
+    notes: string | null;
+    createdAt: string;
+    user: {
+      id: number;
+      name: string;
+      avatar: string | null;
+    };
+  }>;
 };
 
-export default function History() {
-  const { document } = usePage<PageProps>().props;
+export default function DocumentHistory() {
+  const { document, workflowLogs } = usePage<PageProps>().props;
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -28,77 +49,45 @@ export default function History() {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Documents" />
-      <ol className="relative m-4 border-s border-gray-200 dark:border-gray-700">
-        <li className="ms-6 mb-10">
-          <span className="absolute -start-3 flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 ring-8 ring-white dark:bg-blue-900 dark:ring-gray-900">
-            <svg
-              className="h-2.5 w-2.5 text-blue-800 dark:text-blue-300"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
-            </svg>
-          </span>
-          <h3 className="mb-1 flex items-center text-lg font-semibold text-gray-900 dark:text-white">
-            Flowbite Application UI v2.0.0{' '}
-            <span className="ms-3 me-2 rounded-sm bg-blue-100 px-2.5 py-0.5 text-sm font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300">
-              Latest
-            </span>
-          </h3>
-          <time className="mb-2 block text-sm leading-none font-normal text-gray-400 dark:text-gray-500">Released on January 13th, 2022</time>
-          <p className="mb-4 text-base font-normal text-gray-500 dark:text-gray-400">
-            Get access to over 20+ pages including a dashboard layout, charts, kanban board, calendar, and pre-order E-commerce & Marketing pages.
-          </p>
-          <a
-            href="#"
-            className="inline-flex items-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:text-blue-700 focus:ring-4 focus:ring-gray-100 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
-          >
-            <svg className="me-2.5 h-3.5 w-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M14.707 7.793a1 1 0 0 0-1.414 0L11 10.086V1.5a1 1 0 0 0-2 0v8.586L6.707 7.793a1 1 0 1 0-1.414 1.414l4 4a1 1 0 0 0 1.416 0l4-4a1 1 0 0 0-.002-1.414Z" />
-              <path d="M18 12h-2.55l-2.975 2.975a3.5 3.5 0 0 1-4.95 0L4.55 12H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2Zm-3 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z" />
-            </svg>{' '}
-            Download ZIP
-          </a>
-        </li>
-        <li className="ms-6 mb-10">
-          <span className="absolute -start-3 flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 ring-8 ring-white dark:bg-blue-900 dark:ring-gray-900">
-            <svg
-              className="h-2.5 w-2.5 text-blue-800 dark:text-blue-300"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
-            </svg>
-          </span>
-          <h3 className="mb-1 text-lg font-semibold text-gray-900 dark:text-white">Flowbite Figma v1.3.0</h3>
-          <time className="mb-2 block text-sm leading-none font-normal text-gray-400 dark:text-gray-500">Released on December 7th, 2021</time>
-          <p className="text-base font-normal text-gray-500 dark:text-gray-400">
-            All of the pages and components are first designed in Figma and we keep a parity between the two versions even as we update the project.
-          </p>
-        </li>
-        <li className="ms-6">
-          <span className="absolute -start-3 flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 ring-8 ring-white dark:bg-blue-900 dark:ring-gray-900">
-            <svg
-              className="h-2.5 w-2.5 text-blue-800 dark:text-blue-300"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
-            </svg>
-          </span>
-          <h3 className="mb-1 text-lg font-semibold text-gray-900 dark:text-white">Flowbite Library v1.2.2</h3>
-          <time className="mb-2 block text-sm leading-none font-normal text-gray-400 dark:text-gray-500">Released on December 2nd, 2021</time>
-          <p className="text-base font-normal text-gray-500 dark:text-gray-400">
-            Get started with dozens of web components and interactive elements built on top of Tailwind CSS.
-          </p>
-        </li>
-      </ol>
+      <div className="p-6">
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="text-xl font-semibold">Document History</h2>
+        </div>
+
+        <ScrollArea className="h-[700px] pr-4">
+          <ol className="relative ml-4 border-l border-gray-200 dark:border-gray-700">
+            {workflowLogs.map(log => (
+              <li key={log.id} className="mb-8 ml-8">
+                <LogIcon action={log.action} />
+                <div className="space-y-3">
+                  <div>
+                    <h3 className="flex items-center text-lg font-semibold text-gray-900 dark:text-white">
+                      {getActionTitle(log.action)}
+                      {log.toStatus && typeof log.toStatus === 'string' && log.toStatus in statusConfig && (
+                        <Badge variant={statusConfig[log.toStatus as keyof typeof statusConfig].variant} className="ml-2">
+                          {statusConfig[log.toStatus as keyof typeof statusConfig].label}
+                        </Badge>
+                      )}
+                    </h3>
+                    <div className="mb-2 flex items-center space-x-2 text-sm text-gray-500">
+                      <User className="h-4 w-4" />
+                      <span>{log.user.name}</span>
+                      <span>•</span>
+                      <time className="font-normal">{formatDistanceToNow(new Date(log.createdAt), { addSuffix: true })}</time>
+                    </div>
+                  </div>
+
+                  {(log.fromStatus || log.toStatus) && log.fromStatus !== log.toStatus && <StatusChange from={log.fromStatus} to={log.toStatus} />}
+
+                  {log.notes && (
+                    <div className="rounded-md bg-gray-50 p-3 text-sm text-gray-600 dark:bg-gray-800 dark:text-gray-300">{log.notes}</div>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ol>
+        </ScrollArea>
+      </div>
     </AppLayout>
   );
 }

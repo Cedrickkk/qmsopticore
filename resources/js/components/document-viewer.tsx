@@ -1,9 +1,6 @@
-import { DocumentInfo } from '@/components/document-info';
 import { PDFControls } from '@/components/document-viewer-controls';
 import { PDFThumbnails } from '@/components/document-viewer-thumbnails';
 import { cn } from '@/lib/utils';
-import { type Document as TDocument } from '@/types/document';
-import { usePage } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 import { useState } from 'react';
 import { Document, Page } from 'react-pdf';
@@ -23,8 +20,6 @@ interface PDFViewerProps {
 }
 
 export function PDFViewer({ file, className, showThumbnails = false }: PDFViewerProps) {
-  const { document } = usePage<{ document: TDocument }>().props;
-
   const [pdfState, setPdfState] = useState<PDFPageState>({
     numPages: 0,
     currentPage: 1,
@@ -58,7 +53,7 @@ export function PDFViewer({ file, className, showThumbnails = false }: PDFViewer
     <div className={cn('flex flex-col gap-6', className)}>
       <div className="my-4 flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:gap-6">
         <Document
-          className="bg-primary/10 border-primary relative flex justify-center rounded-sm border shadow-sm transition-colors"
+          className="bg-primary/10 border-primary relative flex h-fit justify-center rounded-sm border shadow-sm transition-colors"
           file={file}
           loading={
             <div className="flex h-[700px] items-center justify-center">
@@ -84,9 +79,7 @@ export function PDFViewer({ file, className, showThumbnails = false }: PDFViewer
           </div>
         </Document>
 
-        <div className="flex flex-col justify-between gap-4">
-          <DocumentInfo document={document} />
-
+        <div className="flex flex-col gap-4">
           {showThumbnails && (
             <PDFThumbnails file={file} numPages={pdfState.numPages} currentPage={pdfState.currentPage} onPageChange={handlePageChange} />
           )}

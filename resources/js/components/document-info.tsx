@@ -1,51 +1,150 @@
-import { statusConfig } from '@/components/table-columns';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import { type Document } from '@/types/document';
+import { Link } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { Download, PenLine } from 'lucide-react';
+import { CalendarDays, CheckCircle, Clock, FileText, Users, XCircle } from 'lucide-react';
+
+const documentStatusConfig = {
+  draft: { variant: 'outline', label: 'Draft' },
+  in_review: { variant: 'secondary', label: 'In Review' },
+  approved: { variant: 'default', label: 'Approved' },
+  rejected: { variant: 'destructive', label: 'Rejected' },
+  published: { variant: 'success', label: 'Published' },
+  archived: { variant: 'outline', label: 'Archived' },
+} as const;
+
+export interface DocumentSignatory {
+  id: number;
+  user: {
+    id: number;
+    name: string;
+    position: string;
+    avatar: string | null;
+  };
+  status: 'pending' | 'approved' | 'rejected';
+  signed_at: string | null;
+  signatory_order: number;
+}
 
 interface DocumentInfoProps {
-  document: Document;
+  document: Document & {
+    signatories: DocumentSignatory[];
+  };
 }
 
 export function DocumentInfo({ document }: DocumentInfoProps) {
+  console.log(document);
   return (
-    <div className="space-y-4 border-b pb-4">
-      <div className="flex items-start justify-between">
-        <div className="space-y-1">
-          <h2 className="text-2xl font-semibold tracking-tight">{document.title}</h2>
-          <p className="text-muted-foreground text-xs">
-            Code No: <span className="font-medium">{document.code}</span>
-          </p>
-          <p className="text-muted-foreground text-xs">
-            Version No: <span className="font-medium">{document.version}</span>
-          </p>
-        </div>
-        <Badge variant={statusConfig[document.status].variant}>{document.status.toLowerCase()}</Badge>
+    <>
+      <div className="space-y-4 border-b pb-4 lg:col-span-2">
+        <Card className="rounded-xs">
+          <CardHeader>
+            <div className="flex items-start justify-between">
+              <div>
+                <CardTitle className="text-xl font-bold">{document.title}</CardTitle>
+                <CardDescription className="mt-1 flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  <span>{document.category.name}</span>
+                  <span>•</span>
+                  <span>v{document.version}</span>
+                </CardDescription>
+              </div>
+              <Badge
+                variant={documentStatusConfig[document.status as keyof typeof documentStatusConfig]?.variant || 'outline'}
+                className="rounded-sm px-2 py-1"
+              >
+                {documentStatusConfig[document.status as keyof typeof documentStatusConfig]?.label || document.status}
+              </Badge>
+            </div>
+          </CardHeader>
+
+          <CardContent className="space-y-6">
+            <div>
+              <h3 className="text-muted-foreground mb-2 text-sm font-medium">Document Information</h3>
+              <div className="rounded-xs border p-3 text-sm">
+                <div className="grid gap-2">
+                  <div className="flex items-center gap-2">
+                    <Users className="text-muted-foreground h-4 w-4" />
+                    <span className="font-medium">Created by:</span> {document.created_by.name}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CalendarDays className="text-muted-foreground h-4 w-4" />
+                    <span className="font-medium">Created:</span> {format(new Date(document.created_at), 'MMMM d, yyyy')}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="text-muted-foreground h-4 w-4" />
+                    <span className="font-medium">Last updated:</span>
+                    {format(new Date(document.updated_at), 'MMMM d, yyyy')}
+                  </div>
+                </div>
+                <Separator className="my-3" />
+                <p className="text-muted-foreground">{document.description}</p>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-muted-foreground mb-2 text-sm font-medium">Signatories</h3>
+              <div className="rounded-xs border">
+                <div className="divide-y">
+                  {document.signatories.length === 0 ? (
+                    <p className="text-muted-foreground p-3 text-sm">No signatories assigned</p>
+                  ) : (
+                    document.signatories
+                      .sort((a, b) => a.signatory_order - b.signatory_order)
+                      .map(signatory => (
+                        <Link
+                          href={`/documents/${document.id}/history`}
+                          key={signatory.id}
+                          className="flex items-center justify-between p-3"
+                          prefetch
+                        >
+                          <div className="flex items-center gap-3">
+                            <Avatar>
+                              <AvatarImage src={signatory.user.avatar || undefined} />
+                              <AvatarFallback>
+                                {signatory.user.name
+                                  .split(' ')
+                                  .map(n => n[0])
+                                  .join('')}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="font-medium">{signatory.user.name}</p>
+                              <p className="text-muted-foreground text-sm">{signatory.user.position}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {signatory.status === 'approved' ? (
+                              <Badge variant="outline" className="border-green-500 text-green-600">
+                                <CheckCircle className="mr-1 h-3 w-3" />
+                                Approved
+                              </Badge>
+                            ) : signatory.status === 'rejected' ? (
+                              <Badge variant="outline" className="border-red-500 text-red-600">
+                                <XCircle className="mr-1 h-3 w-3" />
+                                Rejected
+                              </Badge>
+                            ) : (
+                              <Badge variant="outline" className="border-yellow-500 text-yellow-600">
+                                Pending
+                              </Badge>
+                            )}
+                            {signatory.signed_at && (
+                              <span className="text-muted-foreground text-xs">{format(new Date(signatory.signed_at), 'MMM d, yyyy')}</span>
+                            )}
+                          </div>
+                        </Link>
+                      ))
+                  )}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
-      <div className="text-muted-foreground flex flex-col gap-3 text-sm">
-        <div className="flex items-center gap-2">
-          <span>Created by:</span>
-          <span className="text-foreground font-medium">{document.created_by.name}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span>Category:</span>
-          <span className="text-foreground font-medium">{document.category.name}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span>Updated:</span>
-          <time className="text-foreground font-medium">{format(new Date(document.updated_at), 'MMMM d, yyyy')}</time>
-        </div>
-        <div className="mt-4 flex items-center gap-3">
-          <Button className="flex cursor-pointer items-center rounded-sm leading-relaxed uppercase" size="lg">
-            <PenLine /> Sign Document
-          </Button>
-          <Button className="flex cursor-pointer items-center rounded-sm leading-relaxed uppercase" size="lg" variant="ghost">
-            <Download /> Download
-          </Button>
-        </div>
-      </div>
-    </div>
+    </>
   );
 }

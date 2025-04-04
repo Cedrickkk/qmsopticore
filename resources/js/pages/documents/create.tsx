@@ -3,6 +3,8 @@ import { Recipients } from '@/components/document-recipient';
 import { DocumentTypeField } from '@/components/document-type-field';
 import { DocumentUpload } from '@/components/document-upload';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { CreateDocumentFormData, DocumentType } from '@/types/document';
@@ -29,7 +31,7 @@ type PageProps = {
 export default function Create() {
   const { options } = usePage<PageProps>().props;
 
-  const { data, setData, errors, post, processing } = useForm<CreateDocumentFormData>({
+  const { data, setData, errors, post, processing, reset } = useForm<CreateDocumentFormData>({
     file: null,
     type: {
       id: null,
@@ -39,6 +41,7 @@ export default function Create() {
       id: null,
       name: '',
     },
+    description: '',
     users: [],
     permissions: [],
   });
@@ -52,6 +55,7 @@ export default function Create() {
       preserveScroll: true,
       preserveState: true,
       showProgress: false,
+      onSuccess: () => reset(),
     });
   };
 
@@ -69,6 +73,10 @@ export default function Create() {
               categories={selectedTypeCategories}
               errors={errors}
             />
+            <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
+              <Textarea id="description" className="rounded-sm" value={data.description} onChange={e => setData('description', e.target.value)} />
+            </div>
             <Recipients users={data.users} onChange={users => setData('users', users)} errors={errors} />
             <Button className="w-full" disabled={processing}>
               {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
