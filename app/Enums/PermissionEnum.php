@@ -5,7 +5,7 @@ namespace App\Enums;
 enum PermissionEnum: string
 {
 
-    /**
+/**
      * 
      * Document Permissions
      * 
@@ -21,7 +21,7 @@ enum PermissionEnum: string
     case DOCUMENT_ARCHIVE = 'document:archive';
     case DOCUMENT_REVOKE_ACCESS = 'document:revoke_access';
 
-    /**
+/**
      * 
      * User Permissions
      * 
@@ -32,7 +32,7 @@ enum PermissionEnum: string
     case USER_EDIT = 'user:edit';
     case USER_DELETE = 'user:delete';
 
-    /**
+/**
      * 
      * Department Permissions
      * 
