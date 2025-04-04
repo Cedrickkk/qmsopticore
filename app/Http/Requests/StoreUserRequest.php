@@ -37,6 +37,7 @@ class StoreUserRequest extends FormRequest
             ],
             'password' => ['required', 'string', 'min:8', Password::defaults(), 'confirmed'],
             'department' => ['required', 'string', 'max:255'],
+            'position' => ['required', 'string', 'max:255'],
             'image' => [
                 'required',
                 'file',
@@ -65,6 +66,8 @@ class StoreUserRequest extends FormRequest
             'email.ends_with' => 'The email must end with @plpasig.edu.ph domain.',
 
             'department.required' => 'The department is required.',
+
+            'position.required' => 'The position field is required',
 
             'image.max' => 'The profile image must not exceed 1MB.',
             'image.mimes' => 'The profile image must be a file of type: jpg, jpeg, png.',

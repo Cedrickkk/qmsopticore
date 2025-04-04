@@ -2,17 +2,16 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Document;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Gate;
 
 class StoreDocumentRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
 
     public function authorize(): bool
     {
-        return true;
+        return Gate::allows('create', Document::class);
     }
 
     /**
@@ -34,11 +33,11 @@ class StoreDocumentRequest extends FormRequest
                 'exists:document_categories,id,type,' . $this->input('type.id'),
             ],
             'category.name' => ['required', 'string'],
-            'users' => ['present', 'array'],
-            'users.*.id' => ['sometimes', 'exists:users,id'],
-            'users.*.name' => ['sometimes', 'string'],
-            'users.*.email' => ['sometimes', 'email'],
-            'users.*.signatory' => ['sometimes', 'boolean'],
+            'users' => ['required', 'array'],
+            'users.*.id' => ['required', 'exists:users,id'],
+            'users.*.name' => ['required', 'string'],
+            'users.*.email' => ['required', 'email'],
+            'users.*.signatory' => ['required', 'boolean'],
         ];
     }
 
