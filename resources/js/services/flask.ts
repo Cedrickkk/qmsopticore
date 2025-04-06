@@ -6,7 +6,7 @@ interface Signature {
 }
 
 interface SignDocumentPayload {
-  document: File;
+  pdf: File;
   signatory: string;
   signatures: Signature[];
 }
@@ -26,7 +26,7 @@ interface VerifySignaturesResponse {
 export const FlaskServiceApi = {
   async signDocument(payload: SignDocumentPayload) {
     try {
-      const { data } = await flaskApi.post<SignDocumentResponse>('/api/sign', payload);
+      const { data } = await flaskApi.post<SignDocumentResponse>('/api/sign', payload, { withCredentials: true });
       return data;
     } catch (error: unknown) {
       if (error instanceof AxiosError && error.response?.data?.error) {

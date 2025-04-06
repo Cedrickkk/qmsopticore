@@ -43,7 +43,11 @@ export type DocumentUser = {
 };
 
 export type DocumentPermission = {
-  userId: number;
+  user: {
+    id: number;
+    name: string;
+    email: string;
+  };
   permissions: {
     view: boolean;
     edit: boolean;

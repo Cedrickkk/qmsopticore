@@ -170,3 +170,4 @@ model.keras
 
 # Signatures training files
 sign_data/
+.flaskenv

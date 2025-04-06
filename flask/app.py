@@ -10,7 +10,8 @@ from similarities import calculate_similarity
 from augmented import create_augmented_signature
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__)) 
-LARAVEL_BASE_DIR = os.path.join(BASE_DIR, '..', "private") 
+LARAVEL_BASE_DIR = os.path.join(BASE_DIR, '..')
+LARAVEL_STORAGE_DIR = os.path.join(LARAVEL_BASE_DIR, "storage/app/private")
 
 app = Flask(__name__)
 CORS(app, 
@@ -36,14 +37,17 @@ def sign():
     if not data or 'pdf' not in data or 'signatory' not in data or 'signatures' not in data:
         return jsonify({"error": "PDF file path, signatory, and signature images are required."}), 400
 
-    pdf_file = os.path.join(LARAVEL_BASE_DIR, data['pdf'].lstrip('/'))
-    signatory = data['signatory']
+    pdf_file = os.path.join(LARAVEL_STORAGE_DIR, data['pdf'].replace('/storage', '').lstrip('/'))
+
+    signatory = data['signatory'] 
+
     signature_paths = data['signatures']
     
     signature_full_paths = [
-    os.path.join(LARAVEL_BASE_DIR, 'storage', 'signatures', sig_path.split('/')[-1])
+    os.path.join(LARAVEL_STORAGE_DIR, sig_path.replace('/storage', '').lstrip('/'))
         for sig_path in signature_paths
     ]
+
     if not os.path.exists(pdf_file):
         return jsonify({"error": f"Document file not found: {os.path.basename(pdf_file)}"}), 400
 
@@ -65,8 +69,6 @@ def validate_signatures():
         return jsonify({"error": "No files uploaded"}), 400
 
     files = request.files.getlist('signatures')
-
-    print(f'files: {files}')
 
     try:
         model = tf.keras.models.load_model('model.keras')
