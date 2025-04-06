@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Contracts\DocumentRepositoryInterface;
-use App\Contracts\WorkflowServiceInterface;
+use App\Contracts\Repositories\DocumentRepositoryInterface;
+use App\Contracts\Services\WorkflowServiceInterface;
 use App\Models\User;
 use App\Models\Document;
 use Illuminate\Support\Str;
@@ -15,7 +15,6 @@ use App\Http\Requests\StoreDocumentRequest;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Http\Requests\UpdateDocumentAccessRequest;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth as FacadesAuth;
 
 class DocumentService
 {
@@ -131,7 +130,7 @@ class DocumentService
 
     public function getDocumentCreationOptions(): array
     {
-        return $this->repository->getCreationOptions();
+        return $this->repository->getDocumentCreationOptions();
     }
 
     public function getDocumentHistoryLogs(Document $document)
@@ -141,14 +140,17 @@ class DocumentService
 
     public function handleSignatories(Document $document, Collection $users, User $creator)
     {
-        $signatories = $users->filter(fn($user) => isset($user['signatory_order']))
-            ->sortBy('signatory_order');
+        $signatories = $users->filter(fn($user) => $user['signatory'] === '1')->values()->map(function ($user, $index) {
+            $user['signatory_order'] = $index + 1;
+            return $user;
+        });
 
         if ($signatories->isEmpty()) {
             return;
         }
 
         $signatories->each(function ($signatory) use ($document, $creator) {
+
             $this->repository->addSignatory($document, [
                 'user_id' => $signatory['id'],
                 'signatory_order' => $signatory['signatory_order'],
@@ -164,7 +166,7 @@ class DocumentService
                 "Added signatory #{$signatory['signatory_order']}"
             );
 
-            $document->repository->update(['status' => 'in_review']);
+            $document->update(['status' => 'in_review']);
 
             $this->workflowService->log(
                 $document,
@@ -184,7 +186,7 @@ class DocumentService
 
     public function handleRecipients(Collection $users, Document $document)
     {
-        $recipients = $users->filter(fn($user) => !isset($user['signatory_order']));
+        $recipients = $users->reject(fn($user) => $user['signatory'] == '1')->values();
 
         $recipients->each(function ($recipient) use ($document) {
             DocumentRecipient::create([
@@ -205,7 +207,7 @@ class DocumentService
         });
     }
 
-    private function getUser()
+    public function getUser()
     {
         return User::where('id', Auth::user()->id)->first();
     }

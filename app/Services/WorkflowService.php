@@ -6,8 +6,8 @@ use App\Models\User;
 use App\Models\Document;
 use Illuminate\Support\Facades\DB;
 use App\Models\DocumentWorkflowLog;
-use App\Contracts\WorkflowServiceInterface;
-use App\Contracts\DocumentRepositoryInterface;
+use App\Contracts\Services\WorkflowServiceInterface;
+use App\Contracts\Repositories\DocumentRepositoryInterface;
 
 class WorkflowService implements WorkflowServiceInterface
 {
@@ -75,9 +75,7 @@ class WorkflowService implements WorkflowServiceInterface
 
     public function reject(Document $document, User $user, string $reason, ?string $comment = null)
     {
-        $signatory = $document->signatories()
-            ->where('user_id', $user->id)
-            ->first();
+        $signatory = $this->getDocumentSignatory($document, $user);
 
         $isSuperAdmin = $user->hasRole('super_admin');
 
@@ -89,7 +87,7 @@ class WorkflowService implements WorkflowServiceInterface
 
         $currentStatus = $document->status;
 
-        $document->repository->update(['status' => 'rejected']);
+        $document->update(['status' => 'rejected']);
 
         if ($signatory && $signatory->status === 'pending') {
             $this->updateSignatoryStatus($signatory, 'rejected', $comment);
@@ -124,11 +122,18 @@ class WorkflowService implements WorkflowServiceInterface
         return $isAdmin || ($signatory && $signatory->status === 'pending' && $signatory->id === $nextSignatory?->id);
     }
 
-    private function getNextSignatory(Document $document)
+    public function getNextSignatory(Document $document)
     {
         return $document->signatories()
             ->where('status', 'pending')
             ->orderBy('signatory_order')
+            ->first();
+    }
+
+    private function getDocumentSignatory(Document $document, User $user)
+    {
+        return $document->signatories()
+            ->where('user_id', $user->id)
             ->first();
     }
 
@@ -150,7 +155,7 @@ class WorkflowService implements WorkflowServiceInterface
 
     private function handleFullApproval(Document $document, User $user, string $currentStatus): void
     {
-        $document->repository->update(['status' => 'approved']);
+        $document->update(['status' => 'approved']);
 
         $this->log(
             $document,
@@ -184,7 +189,7 @@ class WorkflowService implements WorkflowServiceInterface
 
     public function publish(Document $document, User $user): void
     {
-        $document->repository->update(['status' => 'published']);
+        $document->update(['status' => 'published']);
 
         $this->log(
             $document,

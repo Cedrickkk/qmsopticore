@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Services\SignatureValidationService;
-use Illuminate\Support\Facades\Log;
 
 class SignatureController extends Controller
 {

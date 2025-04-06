@@ -4,90 +4,54 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\Signature;
-use App\Models\Department;
-use Illuminate\Support\Arr;
-use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\StoreUserRequest;
-use Illuminate\Database\Eloquent\Collection;
+use App\Contracts\Services\UserServiceInterface;
+use App\Contracts\Repositories\DepartmentRepositoryInterface;
+use App\Contracts\Repositories\SignatureRepositoryInterface;
 
 class UserService
 {
     /**
      * Create a new class instance.
      */
-    public function __construct() {}
+    public function __construct(
+        private readonly FileService $fileService,
+        private readonly UserServiceInterface $userRepository,
+        private readonly DepartmentRepositoryInterface $departmentRepository,
+        private readonly SignatureRepositoryInterface $signatureRepository
+    ) {}
 
-    public function createUser(StoreUserRequest $request): User
+    public function create(StoreUserRequest $request): User
     {
-        $departmentId = Department::where('name', $request->department)->value('id');
+        $data = $request->validated();
 
-        $image = $this->uploadImage($request->file('image'));
+        $departmentId = $this->departmentRepository->findIdByName($data['department']);
 
-        return User::create(attributes: [
-            'name' => $request->name,
-            'email' => $request->email,
-            'img' => $image,
-            'password' => Hash::make($request->password),
+        $image = $this->fileService->upload($data['image'], 'avatars');
+
+        return $this->userRepository->create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'avatar' => $image,
+            'position' => $data['position'],
+            'password' => Hash::make($request['password']),
             'department_id' => $departmentId,
-        ]);
+        ])->assignRole($data['role']);
     }
-
-    public function createSignature(string $id, string $fileName): Signature
-    {
-        return Signature::create([
-            'user_id' => $id,
-            'file_name' => $fileName,
-        ]);
-    }
-
-    public function uploadSignatures(array $files): array
-    {
-        $signatures = [];
-
-        foreach (Arr::get($files, 'signatures') as $signature) {
-            $path = Storage::putFile('signatures', $signature);
-            $signatures[] = basename($path);
-        }
-
-        return $signatures;
-    }
-
-    public function uploadImage(string $image)
-    {
-        $path = Storage::putFile('user_img', $image);
-
-        return basename($path);
-    }
-
 
     public function getUserCreationOptions(): array
     {
-        return [
-            'departments' => $this->getDepartments(),
-            'roles' => $this->getRoles()
-        ];
+        return $this->userRepository->getUserCreationOptions();
     }
 
-    private function getDepartments(): Collection
+    public function createSignature(User $user, Signature $signature)
     {
-        return Department::select('id', 'name')
-            ->orderBy('name')
-            ->get();
-    }
-
-    private function getRoles()
-    {
-        return Role::select('id', 'name')
-            ->orderBy('name', 'asc')
-            ->get();
+        return $this->signatureRepository->create($user, $signature);
     }
 
     public function findByEmail(string $email): ?User
     {
-        return User::where('email', 'like', "%{$email}%")
-            ->select('id', 'name', 'email')
-            ->first();
+        return $this->userRepository->findByEmail($email);
     }
 }

@@ -3,14 +3,19 @@
 namespace App\Policies;
 
 use App\Models\User;
-use App\Models\Document;
 use App\Enums\RoleEnum;
-use Illuminate\Auth\Access\Response;
+use App\Models\Document;
+use App\Enums\PermissionEnum;
+use App\Services\DocumentPermissionService;
+use App\Services\DocumentService;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class DocumentPolicy
 {
     use HandlesAuthorization;
+
+
+    public function __construct(private readonly DocumentPermissionService $permissionService) {}
 
     /**
      * Determine whether the user can view any documents.
@@ -57,7 +62,7 @@ class DocumentPolicy
         return $user->hasAnyRole([
             RoleEnum::SUPER_ADMIN->value,
             RoleEnum::DEPARTMENT_ADMIN->value
-        ]) || $user->hasPermissionTo('create documents');
+        ]) || $user->hasPermissionTo(PermissionEnum::DOCUMENT_CREATE->value);
     }
 
     /**
@@ -136,5 +141,27 @@ class DocumentPolicy
     public function forceDelete(User $user, Document $document): bool
     {
         return $user->hasRole(RoleEnum::SUPER_ADMIN->value);
+    }
+
+    public function download(User $user, Document $document): bool
+    {
+        return $this->permissionService->canUserAccess($document, $user, 'download');
+    }
+
+    /**
+     * Determine if the user can share the document.
+     */
+    public function share(User $user, Document $document): bool
+    {
+        return $this->permissionService->canUserAccess($document, $user, 'share');
+    }
+
+    /**
+     * Determine if the user can manage permissions.
+     * Only document owners and admins can manage permissions.
+     */
+    public function managePermissions(User $user, Document $document): bool
+    {
+        return $document->created_by === $user->id || $user->hasRole('admin');
     }
 }

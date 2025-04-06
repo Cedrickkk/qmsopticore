@@ -4,7 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Document;
 use App\Models\ArchivedDocument;
-use App\Contracts\DocumentRepositoryInterface;
+use App\Contracts\Repositories\DocumentRepositoryInterface;
 use App\Models\DocumentSignatory;
 use App\Models\DocumentType;
 use App\Models\DocumentWorkflowLog;
@@ -16,9 +16,9 @@ class DocumentRepository implements DocumentRepositoryInterface
         return Document::find($id);
     }
 
-    public function create(array $data)
+    public function create(array $attributes)
     {
-        return Document::create($data);
+        return Document::create($attributes);
     }
 
     public function update(Document $document, array $data): bool
@@ -98,7 +98,7 @@ class DocumentRepository implements DocumentRepositoryInterface
             });
     }
 
-    public function getCreationOptions()
+    public function getDocumentCreationOptions()
     {
         $types = DocumentType::with(['categories' => fn($query) => $query->select('id', 'name', 'type')])
             ->select('id', 'name')

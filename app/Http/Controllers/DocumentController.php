@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\PermissionEnum;
 use Inertia\Inertia;
 use App\Models\Document;
 use Illuminate\Http\Request;
@@ -10,11 +11,16 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\StoreDocumentRequest;
-use Illuminate\Support\Facades\Log;
+use App\Services\DocumentPermissionService;
+use App\Services\DocumentViewService;
 
 class DocumentController extends Controller
 {
-    public function __construct(private readonly DocumentService  $service) {}
+    public function __construct(
+        private readonly DocumentService  $service,
+        private readonly DocumentPermissionService $permissionService,
+        private readonly DocumentViewService $documentViewService
+    ) {}
 
     public function index(Request $request)
     {
@@ -27,43 +33,22 @@ class DocumentController extends Controller
     {
         return Inertia::render('documents/create', [
             'options' => $this->service->getDocumentCreationOptions(),
+            'permission' => [
+                'canManageAccess' => Auth::user()->hasRole('super_admin') || Auth::user()->can(PermissionEnum::DOCUMENT_REVOKE_ACCESS->value)
+            ]
         ]);
     }
 
     public function show(Document $document)
     {
-        Gate::authorize('view', $document);
-
-        $user = Auth::user();
-
-        $filePath = Storage::url("documents/many_pages.pdf");
-
-        $this->service->updateVersion($document, '5.0.1');
-
-        $nextSignatory = $document->signatories
-            ->where('status', 'pending')
-            ->sortBy('signatory_order')
-            ->first();
-
-        $document->load([
-            'createdBy:id,name',
-            'category:id,name',
-            'signatories' => function ($query) {
-                $query->orderBy('signatory_order', 'asc')
-                    ->select('id', 'document_id', 'user_id', 'status', 'signed_at', 'signatory_order');
-            },
-            'signatories.user:id,name,position,avatar'
-        ]);
+        $viewData = $this->documentViewService->prepareDocumentForView($document, $this->service->getUser());
 
         return Inertia::render('documents/show', [
-            'document' => $document,
-            'file' => $filePath,
-            'signatory' => $this->service->isSignatory($document, $user->id),
-            'canSign' => $nextSignatory && $nextSignatory->user_id === $user->id,
-            'isNextSignatory' => $nextSignatory ? [
-                'order' => $nextSignatory->signatory_order,
-                'name' => $nextSignatory->user->name
-            ] : null
+            'document' => $viewData['document'],
+            'file' => $viewData['file'],
+            'canSign' => $viewData['canSign'],
+            'signatures' => $viewData['signatures'],
+            'isNextSignatory' => $viewData['isNextSignatory']
         ]);
     }
 
@@ -75,16 +60,24 @@ class DocumentController extends Controller
 
     public function history(Document $document)
     {
-        $workflowLogs = $this->service->getDocumentHistoryLogs($document);
-
         return Inertia::render('documents/history', [
             'document' => $document,
-            'workflowLogs' => $workflowLogs,
+            'workflowLogs' => $this->service->getDocumentHistoryLogs($document)
         ]);
     }
 
     public function archive(Document $document)
     {
         $this->service->archive($document);
+    }
+
+    public function approve(Document $document, Request $request,)
+    {
+        $this->service->approve($document,  $request->comment);
+    }
+
+    public function reject(Document $document, Request $request)
+    {
+        $this->service->reject($document, 'Test $reason', $request->comment);
     }
 }

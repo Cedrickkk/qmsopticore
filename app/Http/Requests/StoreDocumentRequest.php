@@ -3,8 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Models\Document;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Foundation\Http\FormRequest;
 
 class StoreDocumentRequest extends FormRequest
 {
@@ -32,6 +32,7 @@ class StoreDocumentRequest extends FormRequest
                 'exists:document_categories,id',
                 'exists:document_categories,id,type,' . $this->input('type.id'),
             ],
+            'description' => ['required', 'string'],
             'category.name' => ['required', 'string'],
             'users' => ['required', 'array'],
             'users.*.id' => ['required', 'exists:users,id'],
@@ -49,6 +50,7 @@ class StoreDocumentRequest extends FormRequest
             'file.mimes' => 'The document must be a PDF file.',
             'type.id' => 'The document type is required.',
             'type.id.exists' => 'The selected document type is invalid.',
+            'description.required' => 'The description field is required.',
             'category.id' => 'The document category is required.',
             'category.id.exists' => 'The selected category is invalid.',
             'category.id.exists_type' => 'The selected category does not belong to the selected document type.',

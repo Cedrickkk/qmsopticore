@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Contracts;
+namespace App\Contracts\Repositories;
 
 use App\Models\Document;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface DocumentRepositoryInterface
 {
     public function find(int $id);
-    public function create(array $data);
+    public function create(array $attributes);
     public function update(Document $document, array $data);
     public function delete(Document $document);
     public function paginate(?string $search = null);
@@ -16,6 +15,6 @@ interface DocumentRepositoryInterface
     public function archive(Document $document);
     public function unarchive(Document $document);
     public function addSignatory(Document $document, array $data);
-    public function getCreationOptions();
+    public function getDocumentCreationOptions();
     public function getHistoryLogs(Document $document);
 }

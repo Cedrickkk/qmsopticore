@@ -11,9 +11,6 @@ use Illuminate\Support\Facades\DB;
 
 class DocumentPermissionService
 {
-    /**
-     * Convert permission names between our enum and database fields
-     */
     protected $permissionFieldMap = [
         'view' => 'can_view',
         'edit' => 'can_edit',
@@ -21,23 +18,13 @@ class DocumentPermissionService
         'share' => 'can_share',
     ];
 
-    /**
-     * Map between permission keys and enum values
-     */
     protected $permissionEnumMap = [
         'view' => PermissionEnum::DOCUMENT_VIEW,
         'edit' => PermissionEnum::DOCUMENT_EDIT,
         'download' => PermissionEnum::DOCUMENT_DOWNLOAD,
-        'share' => PermissionEnum::DOCUMENT_REVOKE_ACCESS, // Using as proxy for sharing
+        'share' => PermissionEnum::DOCUMENT_REVOKE_ACCESS,
     ];
 
-    /**
-     * Update permissions for a document
-     * 
-     * @param Document $document The document to update
-     * @param array $userPermissions Array of user permissions [user_id => [permission => value]]
-     * @return bool
-     */
     public function updatePermissions(Document $document, array $userPermissions): bool
     {
         DB::beginTransaction();
@@ -73,9 +60,6 @@ class DocumentPermissionService
         }
     }
 
-    /**
-     * Get all users with their permissions for a document
-     */
     public function getUsersWithPermissions(Document $document): Collection
     {
         // Get all permissions for this document
@@ -96,15 +80,6 @@ class DocumentPermissionService
         });
     }
 
-    /**
-     * Check if a user can perform an action on a document by checking document-specific
-     * permissions or global permissions from the PermissionEnum
-     * 
-     * @param Document $document The document to check against
-     * @param User $user The user to check permissions for
-     * @param string $permission The permission key to check (view, edit, download, share)
-     * @return bool Whether the user has the requested permission
-     */
     public function canUserAccess(Document $document, User $user, string $permission): bool
     {
         // Document owner has all permissions
