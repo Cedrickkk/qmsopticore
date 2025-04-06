@@ -5,7 +5,8 @@ import { Separator } from '@/components/ui/separator';
 import { type Document } from '@/types/document';
 import { Link } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { CalendarDays, CheckCircle, Clock, FileText, Users, XCircle } from 'lucide-react';
+import { CalendarDays, CheckCircle, Clock, FileText, History, Users, XCircle } from 'lucide-react';
+import { Button } from './ui/button';
 
 const documentStatusConfig = {
   draft: { variant: 'outline', label: 'Draft' },
@@ -23,6 +24,7 @@ export interface DocumentSignatory {
     name: string;
     position: string;
     avatar: string | null;
+    email: string;
   };
   status: 'pending' | 'approved' | 'rejected';
   signed_at: string | null;
@@ -36,7 +38,6 @@ interface DocumentInfoProps {
 }
 
 export function DocumentInfo({ document }: DocumentInfoProps) {
-  console.log(document);
   return (
     <>
       <div className="space-y-4 border-b pb-4 lg:col-span-2">
@@ -52,12 +53,20 @@ export function DocumentInfo({ document }: DocumentInfoProps) {
                   <span>v{document.version}</span>
                 </CardDescription>
               </div>
-              <Badge
-                variant={documentStatusConfig[document.status as keyof typeof documentStatusConfig]?.variant || 'outline'}
-                className="rounded-sm px-2 py-1"
-              >
-                {documentStatusConfig[document.status as keyof typeof documentStatusConfig]?.label || document.status}
-              </Badge>
+              <div className="flex items-center gap-2">
+                <Link href={`/documents/${document.id}/history`}>
+                  <Button variant="outline" size="sm" className="flex items-center gap-1">
+                    <History className="h-3.5 w-3.5" />
+                    <span>History</span>
+                  </Button>
+                </Link>
+                <Badge
+                  variant={documentStatusConfig[document.status as keyof typeof documentStatusConfig]?.variant || 'outline'}
+                  className="rounded-sm px-2 py-1"
+                >
+                  {documentStatusConfig[document.status as keyof typeof documentStatusConfig]?.label || document.status}
+                </Badge>
+              </div>
             </div>
           </CardHeader>
 
@@ -95,12 +104,7 @@ export function DocumentInfo({ document }: DocumentInfoProps) {
                     document.signatories
                       .sort((a, b) => a.signatory_order - b.signatory_order)
                       .map(signatory => (
-                        <Link
-                          href={`/documents/${document.id}/history`}
-                          key={signatory.id}
-                          className="flex items-center justify-between p-3"
-                          prefetch
-                        >
+                        <div key={signatory.id} className="flex items-center justify-between p-3">
                           <div className="flex items-center gap-3">
                             <Avatar>
                               <AvatarImage src={signatory.user.avatar || undefined} />
@@ -136,7 +140,7 @@ export function DocumentInfo({ document }: DocumentInfoProps) {
                               <span className="text-muted-foreground text-xs">{format(new Date(signatory.signed_at), 'MMM d, yyyy')}</span>
                             )}
                           </div>
-                        </Link>
+                        </div>
                       ))
                   )}
                 </div>

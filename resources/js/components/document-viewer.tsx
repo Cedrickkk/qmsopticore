@@ -1,10 +1,13 @@
 import { PDFControls } from '@/components/document-viewer-controls';
 import { PDFThumbnails } from '@/components/document-viewer-thumbnails';
-import { cn } from '@/lib/utils';
-import { LoaderCircle } from 'lucide-react';
+import { useDownloadDocument } from '@/hooks/use-download-document';
+import { type Document as TDocument } from '@/types/document';
+import { usePage } from '@inertiajs/react';
+import { Download, LoaderCircle } from 'lucide-react';
 import { useState } from 'react';
 import { Document, Page } from 'react-pdf';
 import { File } from 'react-pdf/dist/esm/shared/types.js';
+import { Button } from './ui/button';
 
 interface PDFPageState {
   numPages: number;
@@ -15,11 +18,16 @@ interface PDFPageState {
 
 interface PDFViewerProps {
   file: File;
-  className?: string;
   showThumbnails?: boolean;
 }
 
-export function PDFViewer({ file, className, showThumbnails = false }: PDFViewerProps) {
+type PageProps = {
+  document: TDocument;
+};
+
+export function PDFViewer({ file, showThumbnails = false }: PDFViewerProps) {
+  const { handleDownload } = useDownloadDocument();
+  const { document } = usePage<PageProps>().props;
   const [pdfState, setPdfState] = useState<PDFPageState>({
     numPages: 0,
     currentPage: 1,
@@ -50,8 +58,8 @@ export function PDFViewer({ file, className, showThumbnails = false }: PDFViewer
   };
 
   return (
-    <div className={cn('flex flex-col gap-6', className)}>
-      <div className="my-4 flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:gap-6">
+    <div>
+      <div className="my-4 flex flex-col gap-4">
         <Document
           className="bg-primary/10 border-primary relative flex h-fit justify-center rounded-sm border shadow-sm transition-colors"
           file={file}
@@ -91,6 +99,10 @@ export function PDFViewer({ file, className, showThumbnails = false }: PDFViewer
             onPageChange={handlePageChange}
             onZoom={handleZoom}
           />
+          <Button variant="outline" className="flex items-center gap-2" onClick={() => handleDownload(document)}>
+            <Download className="h-4 w-4" />
+            Download
+          </Button>
         </div>
       </div>
     </div>
