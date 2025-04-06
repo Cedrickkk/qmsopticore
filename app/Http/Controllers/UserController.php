@@ -35,7 +35,7 @@ class UserController extends Controller
         $this->fileService->upload($signatures, 'signatures');
 
         foreach ($signatures as $signature) {
-            $this->service->createSignature($user->id, $signature);
+            $this->userService->createSignature($user, $signature);
         }
     }
 }
