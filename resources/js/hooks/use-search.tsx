@@ -20,7 +20,7 @@ export function useDebouncedSearch(options: UseSearchOptions = {}) {
 
       const timeoutId = setTimeout(() => {
         router.get(
-          `/${resource}`,
+          `/api/${resource}`,
           { search: value },
           {
             preserveState,

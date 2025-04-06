@@ -98,7 +98,7 @@ export function ProfileInformation({ data, setData, errors, processing, onSignat
           type="text"
           name="position"
           className="mt-1 block w-full"
-          value={data.name}
+          value={data.position}
           disabled={processing}
           onChange={e => setData('position', e.target.value)}
         />

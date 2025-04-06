@@ -63,7 +63,6 @@ export function SignatureUpload({ signatures, onChange, errors, disabled, onVali
 
       const { isMatch, averageSimilarity, confidence, error } = await FlaskServiceApi.validateSignatures(formData);
 
-      console.log(error);
       if (error) {
         toast(
           <Alert className="border-none p-0 font-sans">
