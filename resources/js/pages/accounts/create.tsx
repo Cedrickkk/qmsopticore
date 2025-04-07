@@ -97,7 +97,7 @@ export default function Create() {
             onSignaturesChanged={() => setIsSignaturesValidated(false)}
           />
           <AccountInformation data={data} errors={errors} setData={setData} processing={processing} />
-          <Button disabled={processing}>
+          <Button disabled={processing} tabIndex={6}>
             {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
             Create account
           </Button>

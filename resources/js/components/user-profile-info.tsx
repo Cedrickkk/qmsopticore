@@ -122,6 +122,7 @@ export function ProfileInformation({ data, setData, errors, processing, onSignat
             </SelectGroup>
           </SelectContent>
         </Select>
+        <InputError message={errors.department} />
       </div>
 
       <SignatureUpload

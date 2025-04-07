@@ -84,9 +84,27 @@ export function SignatureUpload({ signatures, onChange, errors, disabled, onVali
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast(
-        <Alert className="border-none p-0 font-sans">
-          <AlertTitle>System Error</AlertTitle>
-          <AlertDescription>An unexpected error occurred. Please try again later.</AlertDescription>
+        <Alert variant="destructive" className="border-none p-0 font-sans">
+          <AlertTitle className="flex items-center gap-1.5">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="lucide lucide-alert-circle"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            Connection Error
+          </AlertTitle>
+          <AlertDescription>There was a problem connecting to signature service. Please try again.</AlertDescription>
         </Alert>
       );
       setIsValidated(false);

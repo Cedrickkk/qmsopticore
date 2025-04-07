@@ -54,7 +54,7 @@ export default function AccountInformation({ data, errors, setData, processing }
           <SelectTrigger id="role" name="role" className="mt-1 w-full">
             <SelectValue placeholder="Select a role" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent tabIndex={5}>
             <SelectGroup>
               {roles &&
                 roles.map(role => (

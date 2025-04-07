@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { FlaskServiceApi } from '@/services/flask';
 import { SharedData } from '@/types';
 import { useForm, usePage } from '@inertiajs/react';
+import { AxiosError } from 'axios';
 import { LoaderCircle } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -112,9 +113,18 @@ export function ApproveDocumentDialog({ isOpen, onClose, documentId }: ApproveDo
         setSigningInProgress(false);
         return;
       }
-
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (err) {
+    } catch (error: unknown) {
+      // TODO: Fix error message
+      if (error instanceof AxiosError && error.response?.data.error) {
+        toast(
+          <Alert variant="destructive" className="border-none p-0 font-sans">
+            <AlertTitle>Failed to add signatures</AlertTitle>
+            <AlertDescription>
+              {error.response.data.error ? error.response.data.error : 'There was a problem signing the file. Please try again.'}
+            </AlertDescription>
+          </Alert>
+        );
+      }
       toast(
         <Alert variant="destructive" className="border-none p-0 font-sans">
           <AlertTitle>Connection Error</AlertTitle>
