@@ -64,7 +64,7 @@ export default function Create() {
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Documents" />
       <form onSubmit={handleSubmit}>
-        <div className="my-4 flex gap-4 lg:grid lg:grid-cols-2 lg:gap-6">
+        <div className="my-4 flex gap-4 md:grid lg:grid-cols-2 lg:gap-6">
           <DocumentUpload file={data.file} onChange={file => setData('file', file)} error={errors.file} />
           <div className="space-y-5">
             <DocumentTypeField value={data.type} onChange={type => setData('type', type)} types={options.types} errors={errors} />
