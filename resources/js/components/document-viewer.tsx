@@ -1,6 +1,7 @@
 import { PDFControls } from '@/components/document-viewer-controls';
 import { PDFThumbnails } from '@/components/document-viewer-thumbnails';
 import { useDownloadDocument } from '@/hooks/use-download-document';
+import '@/lib/pdfjs';
 import { type Document as TDocument } from '@/types/document';
 import { usePage } from '@inertiajs/react';
 import { Download, LoaderCircle } from 'lucide-react';

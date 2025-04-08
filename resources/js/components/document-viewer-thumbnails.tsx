@@ -1,3 +1,4 @@
+import '@/lib/pdfjs';
 import { cn } from '@/lib/utils';
 import { LoaderCircle } from 'lucide-react';
 import { Document, Page } from 'react-pdf';
