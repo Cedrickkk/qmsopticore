@@ -10,7 +10,7 @@ export const laravelApi = axios.create({
 console.log(import.meta.env.VITE_APP_URL);
 
 export const flaskApi = axios.create({
-  baseURL: import.meta.env.PROD ? `${import.meta.env.VITE_APP_URL}/flask` : 'http://localhost:5000',
+  baseURL: 'https://qmsopticore.com/flask',
   headers: {
     'Content-Type': 'application/json',
   },
