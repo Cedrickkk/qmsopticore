@@ -86,6 +86,7 @@ class DocumentRepository implements DocumentRepositoryInterface
             ->orderBy('created_at', 'asc')
             ->get()
             ->map(function ($log) {
+                dd($log);
                 return [
                     'id' => $log->id,
                     'action' => $log->action,
@@ -96,7 +97,7 @@ class DocumentRepository implements DocumentRepositoryInterface
                     'user' => [
                         'id' => $log->user->id,
                         'name' => $log->user->name,
-                        'avatar' => $this->fileService->getUrlPath($log->user->avatar, 'avatars'),
+                        'avatar' => null,
                     ],
                 ];
             });
