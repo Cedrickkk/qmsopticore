@@ -2,11 +2,15 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\FileService;
 use Inertia\Middleware;
 use Illuminate\Http\Request;
 
 class HandleInertiaRequests extends Middleware
 {
+
+    public function __construct(private readonly FileService $fileService) {}
+
     /**
      * The root template that's loaded on the first page visit.
      *
@@ -48,7 +52,7 @@ class HandleInertiaRequests extends Middleware
                     'id' => $user->id,
                     'name' => $user->name,
                     'email' => $user->email,
-                    'avatar' => $user->avatar ?? null,
+                    'avatar' => $this->fileService->getUrlPath($user->avatar, 'avatars') ?? null,
                     'roles' => $user->getRoleNames()->toArray(),
                 ] : null,
             ],

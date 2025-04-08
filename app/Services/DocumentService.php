@@ -163,7 +163,7 @@ class DocumentService
                 'signatory_added',
                 'draft',
                 'draft',
-                "Added signatory #{$signatory['signatory_order']} - {$signatory->name}"
+                "Added signatory #{$signatory['signatory_order']}"
             );
 
             $document->update(['status' => 'in_review']);
