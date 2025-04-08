@@ -1,8 +1,7 @@
 /* prettier-ignore */
-import {
-createInertiaApp
+import '@/lib/pdfjs.ts';
 
-} from '@inertiajs/react';
+import { createInertiaApp } from '@inertiajs/react';
 import createServer from '@inertiajs/react/server';
 import ReactDOMServer from 'react-dom/server';
 
