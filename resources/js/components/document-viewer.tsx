@@ -68,6 +68,7 @@ export function PDFViewer({ file, showThumbnails = false }: PDFViewerProps) {
               <LoaderCircle className="text-muted-foreground animate-spin text-sm">Loading PDF...</LoaderCircle>
             </div>
           }
+          onError={error => console.log(error)}
           onLoadSuccess={handleDocumentLoadSuccess}
         >
           <div className="flex h-[700px] items-center justify-center overflow-y-auto p-4">
