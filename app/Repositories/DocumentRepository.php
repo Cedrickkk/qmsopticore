@@ -96,7 +96,7 @@ class DocumentRepository implements DocumentRepositoryInterface
                     'user' => [
                         'id' => $log->user->id,
                         'name' => $log->user->name,
-                        'avatar' => $this->fileService->getUrlPath($log->user->avatar, 'avatars'),
+                        'avatar' => null,
                     ],
                 ];
             });
