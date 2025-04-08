@@ -6,9 +6,10 @@ use App\Models\User;
 use App\Models\Signature;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\StoreUserRequest;
-use App\Contracts\Services\UserServiceInterface;
 use App\Contracts\Repositories\DepartmentRepositoryInterface;
 use App\Contracts\Repositories\SignatureRepositoryInterface;
+use App\Contracts\Repositories\UserRepositoryInterface;
+use Illuminate\Http\UploadedFile;
 
 class UserService
 {
@@ -17,7 +18,7 @@ class UserService
      */
     public function __construct(
         private readonly FileService $fileService,
-        private readonly UserServiceInterface $userRepository,
+        private readonly UserRepositoryInterface $userRepository,
         private readonly DepartmentRepositoryInterface $departmentRepository,
         private readonly SignatureRepositoryInterface $signatureRepository
     ) {}
@@ -45,7 +46,7 @@ class UserService
         return $this->userRepository->getUserCreationOptions();
     }
 
-    public function createSignature(User $user, Signature $signature)
+    public function createSignature(User $user, $signature)
     {
         return $this->signatureRepository->create($user, $signature);
     }

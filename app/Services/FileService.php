@@ -2,33 +2,52 @@
 
 namespace App\Services;
 
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
 class FileService
 {
-    public function upload(UploadedFile $file, string $directory = 'documents'): string
+    public function upload($file, string $directory = 'documents'): string
     {
-        $fileName = $file->getClientOriginalName();
+        $filename = $this->generateUniqueFilename($file);
 
-        Storage::putFileAs($directory, $file, $fileName);
+        Storage::putFileAs($directory, $file, $filename);
 
-        return $fileName;
+        return $filename;
+    }
+
+    public function uploadMultiple(array $files, string $directory = 'signatures'): array
+    {
+        $filenames = [];
+
+        foreach ($files as $file) {
+            $filename = $this->generateUniqueFilename($file);
+            Storage::putFileAs($directory, $file, $filename);
+            $filenames[] = $filename;
+        }
+
+        return $filenames;
     }
 
 
-    public function download(string $fileName, string $directory = 'documents')
+    public function download(string $filename, string $directory = 'documents')
     {
-        return Storage::download("$directory/$fileName");
+        return Storage::download("$directory/$filename");
     }
 
-    public function exists(string $fileName, string $directory = 'documents'): bool
+    public function exists(string $filename, string $directory = 'documents'): bool
     {
-        return Storage::exists("$directory/$fileName");
+        return Storage::exists("$directory/$filename");
     }
 
-    public function getUrlPath(string $fileName, string $directory = 'documents'): string
+    public function getUrlPath(string $filename, string $directory = 'documents'): string
     {
-        return Storage::url("$directory/$fileName");
+        return Storage::url("$directory/$filename");
+    }
+
+    private function generateUniqueFilename($file)
+    {
+        $extension = $file->getClientOriginalExtension();
+        $filename = time() . '_' . uniqid() . '.' . $extension;
+        return $filename;
     }
 }

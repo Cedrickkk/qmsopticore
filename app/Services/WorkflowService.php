@@ -4,9 +4,8 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\Document;
-use Illuminate\Support\Facades\DB;
 use App\Models\DocumentWorkflowLog;
-use App\Contracts\Services\WorkflowServiceInterface;
+use App\Contracts\Repositories\WorkflowServiceInterface;
 use App\Contracts\Repositories\DocumentRepositoryInterface;
 
 class WorkflowService implements WorkflowServiceInterface
@@ -33,43 +32,31 @@ class WorkflowService implements WorkflowServiceInterface
         ]);
     }
 
-    public function approve(Document $document, User $user, ?string $comment = null): bool
+    public function approve(Document $document, User $user, ?string $comment = null)
     {
-        $signatory = $document->signatories()
-            ->where('user_id', $user->id)
-            ->first();
+        $signatory = $this->getDocumentSignatory($document, $user);
 
         if (!$this->canApprove($signatory, $document)) {
             return false;
         }
 
-        try {
-            DB::beginTransaction();
+        $currentStatus = $document->status;
 
-            $currentStatus = $document->status;
+        $this->updateSignatoryStatus($signatory, 'approved', $comment);
 
-            $this->updateSignatoryStatus($signatory, 'approved', $comment);
+        $this->log(
+            $document,
+            $user,
+            'approved',
+            $currentStatus,
+            $currentStatus,
+            $comment ?? 'Document approved'
+        );
 
-            $this->log(
-                $document,
-                $user,
-                'approved',
-                $currentStatus,
-                $currentStatus,
-                $comment ?? 'Document approved'
-            );
-
-            if ($this->allSignatoriesApproved($document)) {
-                $this->handleFullApproval($document, $user, $currentStatus);
-            } else {
-                $this->handlePartialApproval($document, $user, $currentStatus);
-            }
-
-            DB::commit();
-            return true;
-        } catch (\Exception $e) {
-            DB::rollback();
-            return false;
+        if ($this->allSignatoriesApproved($document)) {
+            $this->handleFullApproval($document, $user, $currentStatus);
+        } else {
+            $this->handlePartialApproval($document, $user, $currentStatus);
         }
     }
 
@@ -117,6 +104,7 @@ class WorkflowService implements WorkflowServiceInterface
         return $nextSignatory && $nextSignatory->id === $signatory->id;
     }
 
+    // TODO: Refactor this into document permission
     private function canReject($signatory, $nextSignatory, bool $isAdmin): bool
     {
         return $isAdmin || ($signatory && $signatory->status === 'pending' && $signatory->id === $nextSignatory?->id);

@@ -30,12 +30,12 @@ class UserController extends Controller
 
         $user = $this->userService->create($request);
 
-        $signatures = $data['signatures'];
-
-        $this->fileService->upload($signatures, 'signatures');
+        $signatures = $this->fileService->uploadMultiple($data['signatures'], 'signatures');
 
         foreach ($signatures as $signature) {
             $this->userService->createSignature($user, $signature);
         }
+
+        $user->sendEmailVerificationNotification();
     }
 }

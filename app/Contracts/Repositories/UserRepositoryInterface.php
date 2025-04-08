@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Contracts\Services;
+namespace App\Contracts\Repositories;
 
 
-interface UserServiceInterface
+interface UserRepositoryInterface
 {
     public function create(array $attributes);
     public function findByEmail(string $email);

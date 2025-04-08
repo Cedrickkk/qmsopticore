@@ -17,7 +17,7 @@ use App\Services\DocumentViewService;
 class DocumentController extends Controller
 {
     public function __construct(
-        private readonly DocumentService  $service,
+        private readonly DocumentService  $documentService,
         private readonly DocumentPermissionService $permissionService,
         private readonly DocumentViewService $documentViewService
     ) {}
@@ -25,14 +25,14 @@ class DocumentController extends Controller
     public function index(Request $request)
     {
         return Inertia::render('documents', [
-            'documents' => $this->service->getPaginatedDocuments($request->search),
+            'documents' => $this->documentService->getPaginatedDocuments($request->search),
         ]);
     }
 
     public function create()
     {
         return Inertia::render('documents/create', [
-            'options' => $this->service->getDocumentCreationOptions(),
+            'options' => $this->documentService->getDocumentCreationOptions(),
             'permission' => [
                 'canManageAccess' => Auth::user()->hasRole('super_admin') || Auth::user()->can(PermissionEnum::DOCUMENT_REVOKE_ACCESS->value)
             ]
@@ -41,7 +41,7 @@ class DocumentController extends Controller
 
     public function show(Document $document)
     {
-        $viewData = $this->documentViewService->prepareDocumentForView($document, $this->service->getUser());
+        $viewData = $this->documentViewService->prepareDocumentForView($document, $this->documentService->getUser());
 
         return Inertia::render('documents/show', [
             'document' => $viewData['document'],
@@ -54,7 +54,7 @@ class DocumentController extends Controller
 
     public function store(StoreDocumentRequest $request)
     {
-        $this->service->store($request);
+        $this->documentService->store($request);
     }
 
 
@@ -62,22 +62,22 @@ class DocumentController extends Controller
     {
         return Inertia::render('documents/history', [
             'document' => $document,
-            'workflowLogs' => $this->service->getDocumentHistoryLogs($document)
+            'workflowLogs' => $this->documentService->getDocumentHistoryLogs($document)
         ]);
     }
 
     public function archive(Document $document)
     {
-        $this->service->archive($document);
+        $this->documentService->archive($document);
     }
 
     public function approve(Document $document, Request $request,)
     {
-        $this->service->approve($document,  $request->comment);
+        $this->documentService->approve($document,  $request->comment);
     }
 
     public function reject(Document $document, Request $request)
     {
-        $this->service->reject($document, 'Test $reason', $request->comment);
+        $this->documentService->reject($document, 'Test reason', $request->comment);
     }
 }

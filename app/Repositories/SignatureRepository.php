@@ -8,11 +8,11 @@ use App\Contracts\Repositories\SignatureRepositoryInterface;
 
 class SignatureRepository implements SignatureRepositoryInterface
 {
-    public function create(User $user, Signature $document)
+    public function create(User $user,  $signature)
     {
         return Signature::create([
             'user_id' => $user->id,
-            'file_name' => $document->title,
+            'file_name' => $signature,
         ]);
     }
 }

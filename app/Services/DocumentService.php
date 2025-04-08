@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Contracts\Repositories\DocumentRepositoryInterface;
-use App\Contracts\Services\WorkflowServiceInterface;
+use App\Contracts\Repositories\WorkflowServiceInterface;
 use App\Models\User;
 use App\Models\Document;
 use Illuminate\Support\Str;
@@ -22,7 +22,7 @@ class DocumentService
      * Create a new class instance.
      */
     public function __construct(
-        private readonly DocumentRepositoryInterface $repository,
+        private readonly DocumentRepositoryInterface $documentRepository,
         private readonly WorkflowServiceInterface $workflowService,
         private readonly FileService $fileService,
         private readonly PdfService $pdfService,
@@ -37,7 +37,7 @@ class DocumentService
 
         $user = $this->getUser();
 
-        $document = $this->repository->create([
+        $document = $this->documentRepository->create([
             'code' => $this->generateDocumentCode(),
             'title' => $this->fileService->upload($data['file']),
             'description' => $data['description'],
@@ -69,8 +69,7 @@ class DocumentService
 
     public function approve(Document $document, ?string $comment = null)
     {
-        $user = User::where('id', Auth::user()->id)->first();
-        $this->workflowService->approve($document, $user, $comment);
+        $this->workflowService->approve($document, $this->getUser(), $comment);
     }
 
     public function reject(Document $document, string $reason, ?string $comment = null)
@@ -78,6 +77,7 @@ class DocumentService
         $this->workflowService->reject($document, $this->getUser(), $reason, $comment);
     }
 
+    // TODO: Extract this into DocumentPermission class
     public function updateAccess(UpdateDocumentAccessRequest $request, Document $document)
     {
         Gate::authorize('managePermissions', $document);
@@ -110,34 +110,35 @@ class DocumentService
 
     public function archive(Document $document)
     {
-        $this->repository->archive($document);
+        $this->documentRepository->archive($document);
     }
 
     public function unarchive(Document $document)
     {
-        $this->repository->unarchive($document);
+        $this->documentRepository->unarchive($document);
     }
 
     public function getPaginatedDocuments(?string $search = null): LengthAwarePaginator
     {
-        return $this->repository->paginate($search);
+        return $this->documentRepository->paginate($search);
     }
 
     public function getPaginatedArchivedDocuments(?string $search = null)
     {
-        return $this->repository->paginateArchived($search);
+        return $this->documentRepository->paginateArchived($search);
     }
 
     public function getDocumentCreationOptions(): array
     {
-        return $this->repository->getDocumentCreationOptions();
+        return $this->documentRepository->getDocumentCreationOptions();
     }
 
     public function getDocumentHistoryLogs(Document $document)
     {
-        return $this->repository->getHistoryLogs($document);
+        return $this->documentRepository->getHistoryLogs($document);
     }
 
+    // TODO: Extract this into signatory service class or interface
     public function handleSignatories(Document $document, Collection $users, User $creator)
     {
         $signatories = $users->filter(fn($user) => $user['signatory'] === '1')->values()->map(function ($user, $index) {
@@ -150,8 +151,7 @@ class DocumentService
         }
 
         $signatories->each(function ($signatory) use ($document, $creator) {
-
-            $this->repository->addSignatory($document, [
+            $this->documentRepository->addSignatory($document, [
                 'user_id' => $signatory['id'],
                 'signatory_order' => $signatory['signatory_order'],
                 'status' => 'pending'
@@ -163,7 +163,7 @@ class DocumentService
                 'signatory_added',
                 'draft',
                 'draft',
-                "Added signatory #{$signatory['signatory_order']}"
+                "Added signatory #{$signatory['signatory_order']} - {$signatory->name}"
             );
 
             $document->update(['status' => 'in_review']);

@@ -3,11 +3,11 @@
 namespace App\Repositories;
 
 use App\Models\User;
-use App\Contracts\Services\UserServiceInterface;
 use App\Contracts\Repositories\RoleRepositoryInterface;
 use App\Contracts\Repositories\DepartmentRepositoryInterface;
+use App\Contracts\Repositories\UserRepositoryInterface;
 
-class UserRepository implements UserServiceInterface
+class UserRepository implements UserRepositoryInterface
 {
 
     public function __construct(
