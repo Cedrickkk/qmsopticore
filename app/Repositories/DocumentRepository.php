@@ -8,9 +8,13 @@ use App\Contracts\Repositories\DocumentRepositoryInterface;
 use App\Models\DocumentSignatory;
 use App\Models\DocumentType;
 use App\Models\DocumentWorkflowLog;
+use App\Services\FileService;
 
 class DocumentRepository implements DocumentRepositoryInterface
 {
+
+    public function __construct(private readonly FileService $fileService) {}
+
     public function find(int $id)
     {
         return Document::find($id);
@@ -92,7 +96,7 @@ class DocumentRepository implements DocumentRepositoryInterface
                     'user' => [
                         'id' => $log->user->id,
                         'name' => $log->user->name,
-                        'avatar' => null,
+                        'avatar' => $this->fileService->getUrlPath($log->user->name, 'avatars'),
                     ],
                 ];
             });
