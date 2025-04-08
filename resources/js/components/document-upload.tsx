@@ -1,4 +1,5 @@
 import InputError from '@/components/input-error';
+import '@/lib/pdfjs';
 import { FolderUp } from 'lucide-react';
 import { Document, Page } from 'react-pdf';
 

@@ -1,4 +1,3 @@
-import '@/lib/pdfjs';
 import '../css/app.css';
 
 import { createInertiaApp } from '@inertiajs/react';
