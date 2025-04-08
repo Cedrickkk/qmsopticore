@@ -86,7 +86,6 @@ class DocumentRepository implements DocumentRepositoryInterface
             ->orderBy('created_at', 'asc')
             ->get()
             ->map(function ($log) {
-                dd($log);
                 return [
                     'id' => $log->id,
                     'action' => $log->action,
