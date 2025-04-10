@@ -13,6 +13,8 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 LARAVEL_BASE_DIR = os.path.join(BASE_DIR, '..')
 LARAVEL_STORAGE_DIR = os.path.join(LARAVEL_BASE_DIR, "storage/app/private")
 
+os.umask(0o002)
+
 app = Flask(__name__)
 CORS(app, 
      resources={

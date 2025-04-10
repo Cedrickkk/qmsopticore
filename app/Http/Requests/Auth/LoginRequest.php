@@ -65,7 +65,7 @@ class LoginRequest extends FormRequest
 
         event(new Lockout($this));
 
-        $seconds = RateLimiter::availableIn($this->throttleKey());
+        $seconds = RateLimiter::availableIn($this->throttleKey()) * 5;
 
         throw ValidationException::withMessages([
             'email' => __('auth.throttle', [
