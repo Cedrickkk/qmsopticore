@@ -214,6 +214,12 @@ class DocumentService
 
     private function generateDocumentCode(): string
     {
+        // TODO: Fix document code
+
+        /**
+         * convention
+         * DEPT -> COLLEGE (PROGRAM) -> YEAR -> TYPE
+         */
         return sprintf(
             'DOC-%s-%s',
             now()->format('Ymd'),

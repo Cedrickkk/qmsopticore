@@ -90,7 +90,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                 <SheetTitle className="sr-only">Quality Management System Menu</SheetTitle>
                 <SheetHeader className="flex justify-start gap-3 px-0 py-3 text-left">
                   {/* <AppLogoIcon className="h-6 w-6 fill-current text-black dark:text-white" /> */}
-                  <img src="/images/plp.png" alt="Pamantasan ng Lungsod ng Pasig Logo" className="size-9 scale-125 rounded-full dark:bg-white" />
+                  <img src="/images/plp-1.png" alt="Pamantasan ng Lungsod ng Pasig Logo" className="size-9 scale-125 rounded-full dark:bg-white" />
                   <span className="text-sm">
                     <span className="text-muted-foreground max-w-full text-xs text-nowrap">Pamantasan ng Lungsod ng Pasig</span> <br />
                     <span className="mt-1 block font-semibold text-nowrap">Quality Management System</span>

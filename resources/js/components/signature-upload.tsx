@@ -72,6 +72,7 @@ export function SignatureUpload({ signatures, onChange, errors, disabled, onVali
             </AlertDescription>
           </Alert>
         );
+        return;
       }
 
       if (isMatch) {

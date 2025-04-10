@@ -16,7 +16,7 @@ export default function AuthSplitLayout({ children, title, description }: AuthLa
         <div className="bg-primary/20 absolute inset-0 bg-[url('/images/home-img.jpg')] bg-cover bg-right bg-no-repeat" />\
         <div className="bg-primary/50 absolute inset-0" />
         <Link href={route('login')} className="relative z-20 flex items-center gap-4 text-lg font-medium">
-          <img src="/images/plp.png" alt="Pamantasan ng Lungsod ng Pasig Logo" className="size-12 scale-150" />
+          <img src="/images/plp-1.png" alt="Pamantasan ng Lungsod ng Pasig Logo" className="size-12 scale-150" />
           {name}
         </Link>
         {quote && (
@@ -32,7 +32,7 @@ export default function AuthSplitLayout({ children, title, description }: AuthLa
       <div className="w-full lg:p-8">
         <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
           <Link href={route('login')} className="relative z-20 flex items-center justify-center lg:hidden">
-            <img src="/images/plp.png" alt="Pamantasan ng Lungsod ng Pasig Logo" className="size-12 scale-150" />
+            <img src="/images/plp-1.png" alt="Pamantasan ng Lungsod ng Pasig Logo" className="size-12 scale-150" />
           </Link>
           <div className="text-cente flex flex-col items-center gap-2">
             <h1 className="text-xl font-medium">{title}</h1>
