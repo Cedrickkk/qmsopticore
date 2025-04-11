@@ -1,18 +1,17 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Documents;
 
-use App\Enums\PermissionEnum;
 use Inertia\Inertia;
 use App\Models\Document;
 use Illuminate\Http\Request;
+use App\Enums\PermissionEnum;
 use App\Services\DocumentService;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\Controller;
+use App\Services\DocumentViewService;
 use App\Http\Requests\StoreDocumentRequest;
 use App\Services\DocumentPermissionService;
-use App\Services\DocumentViewService;
 
 class DocumentController extends Controller
 {

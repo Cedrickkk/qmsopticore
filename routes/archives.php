@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ArchivedDocumentController;
+use App\Http\Controllers\Documents\ArchivedDocumentController;
 
 
 Route::group(['middleware' => ['role:super_admin|department_admin']], function () {

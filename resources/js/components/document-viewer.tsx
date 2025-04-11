@@ -63,6 +63,7 @@ export function PDFViewer({ file, showThumbnails = false }: PDFViewerProps) {
       <div className="my-4 flex flex-col gap-4">
         <Document
           className="bg-primary/10 border-primary relative flex h-fit justify-center rounded-sm border shadow-sm transition-colors"
+          key={document.status}
           file={file}
           loading={
             <div className="flex h-[700px] items-center justify-center">

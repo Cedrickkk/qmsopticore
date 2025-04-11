@@ -1,8 +1,8 @@
 <?php
 
-use App\Http\Controllers\ArchivedDocumentController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\Documents\DocumentController;
+use App\Http\Controllers\Documents\ArchivedDocumentController;
 
 Route::get('/documents', [DocumentController::class, 'index'])->name('documents');
 

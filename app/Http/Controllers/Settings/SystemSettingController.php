@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Settings;
 
-use App\Services\DocumentService;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Services\DocumentService;
+use App\Http\Controllers\Controller;
 
 class SystemSettingController extends Controller
 {

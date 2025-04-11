@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\Users\UserController;
 
 
 Route::group(['middleware' => ['role:super_admin|department_admin']], function () {

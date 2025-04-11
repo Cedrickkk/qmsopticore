@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Documents;
 
 use Inertia\Inertia;
 use App\Models\Document;
 use Illuminate\Http\Request;
 use App\Services\DocumentService;
+use App\Http\Controllers\Controller;
 
 class ArchivedDocumentController extends Controller
 {

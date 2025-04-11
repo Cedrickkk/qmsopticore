@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Users;
 
-use App\Services\FileService;
 use Inertia\Inertia;
+use App\Services\FileService;
 use App\Services\UserService;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreUserRequest;
 
 class UserController extends Controller
