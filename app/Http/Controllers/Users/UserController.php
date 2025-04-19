@@ -20,27 +20,7 @@ class UserController extends Controller
 
     public function index(Request $request)
     {
-        $currentUser = Auth::user();
-        $isDepartmentAdmin = $currentUser->hasRole('department_admin');
-        $isSuperAdmin = $currentUser->hasRole('super_admin');
-
-        $accountsQuery = User::query()
-            ->when($request->search, function ($query, $search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%")
-                        ->orWhere('email', 'like', "%{$search}%");
-                });
-            })
-            ->with('department');
-
-        if ($isDepartmentAdmin && !$isSuperAdmin) {
-            $accountsQuery->where('department_id', $currentUser->department_id);
-        }
-
-        $accounts = $accountsQuery
-            ->latest()
-            ->paginate(10)
-            ->withQueryString();
+        $accounts = $this->userService->getPaginatedUsers($request);
 
         return Inertia::render('accounts', [
             'accounts' => $accounts

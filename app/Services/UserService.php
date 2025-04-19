@@ -3,13 +3,14 @@
 namespace App\Services;
 
 use App\Models\User;
-use App\Models\Signature;
+use App\Enums\RoleEnum;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\StoreUserRequest;
 use App\Contracts\Repositories\DepartmentRepositoryInterface;
 use App\Contracts\Repositories\SignatureRepositoryInterface;
 use App\Contracts\Repositories\UserRepositoryInterface;
-use Illuminate\Http\UploadedFile;
 
 class UserService
 {
@@ -49,6 +50,19 @@ class UserService
     public function createSignature(User $user, $signature)
     {
         return $this->signatureRepository->create($user, $signature);
+    }
+
+    public function getPaginatedUsers(Request $request)
+    {
+        $currentUser = Auth::user();
+
+        $departmentId = null;
+
+        if ($currentUser->hasRole(RoleEnum::DEPARTMENT_ADMIN->value) && !$currentUser->hasRole(RoleEnum::SUPER_ADMIN->value)) {
+            $departmentId = $currentUser->department_id;
+        }
+
+        return $this->userRepository->paginate($request->search, $departmentId);
     }
 
     public function findByEmail(string $email): ?User

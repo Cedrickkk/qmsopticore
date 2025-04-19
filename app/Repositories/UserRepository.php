@@ -40,5 +40,20 @@ class UserRepository implements UserRepositoryInterface
         return $user->assignRole($role);
     }
 
-    public function paginate(?string $search = null) {}
+    public function paginate(?string $search = null, ?int $departmentId = null)
+    {
+        $query = User::query()
+            ->when($search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                });
+            })
+            ->when($departmentId, function ($query, $departmentId) {
+                $query->where('department_id', $departmentId);
+            })
+            ->with('department');
+
+        return $query->latest()->paginate(10)->withQueryString();
+    }
 }
