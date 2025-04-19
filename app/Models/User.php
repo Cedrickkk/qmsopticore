@@ -26,6 +26,7 @@ class User extends Authenticatable
         'password',
         'avatar',
         'position',
+        'department_id',
     ];
 
     /**
@@ -81,5 +82,10 @@ class User extends Authenticatable
         }
 
         return $signatureFilePaths;
+    }
+
+    public function department()
+    {
+        return $this->belongsTo(Department::class, 'department_id');
     }
 }

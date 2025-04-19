@@ -25,6 +25,7 @@ class UserSeeder extends Seeder
         User::create([
             'name' => 'User Test',
             'email' => 'user@plpasig.edu.ph',
+            'department_id' => 1,
             'email_verified_at' => now(),
             'avatar' => $this->faker->imageUrl(640, 480, 'people'),
             'password' => 'user12345',
@@ -35,6 +36,7 @@ class UserSeeder extends Seeder
         User::create([
             'name' => 'Admin Test',
             'email' => 'admin@plpasig.edu.ph',
+            'department_id' => 1,
             'avatar' => $this->faker->imageUrl(640, 480, 'people'),
             'email_verified_at' => now(),
             'position' => 'System Administrator',

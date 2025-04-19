@@ -22,7 +22,8 @@ enum RoleEnum: string
                 PermissionEnum::DOCUMENT_DOWNLOAD,
                 PermissionEnum::DOCUMENT_REJECT,
                 PermissionEnum::DOCUMENT_REVOKE_ACCESS,
-                PermissionEnum::USER_VIEW
+                PermissionEnum::USER_VIEW,
+                PermissionEnum::USER_CREATE
             ]),
 
             self::REGULAR_USER => array_map(fn($case) => $case->value, [
