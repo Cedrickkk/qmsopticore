@@ -65,13 +65,12 @@ export function SignatureUpload({ signatures, onChange, errors, disabled, onVali
 
       if (error) {
         toast(
-          <Alert className="border-none p-0 font-sans">
+          <Alert variant="destructive" className="border-none p-0 font-sans">
             <AlertTitle>Signatures Validation Failed</AlertTitle>
-            <AlertDescription className="text-muted-foreground text-sm">
-              Please ensure all uploaded files are valid signature images (PNG, JPG, JPEG) with clear signatures.
-            </AlertDescription>
+            <AlertDescription className="text-muted-foreground text-sm">{error}</AlertDescription>
           </Alert>
         );
+        setIsValidated(false);
         return;
       }
 
