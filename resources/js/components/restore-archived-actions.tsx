@@ -7,23 +7,19 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useDownloadDocument } from '@/hooks/use-download-document';
-import { Document } from '@/types/document';
+import { ArchivedDocument } from '@/pages/archives';
 import { Link } from '@inertiajs/react';
 import { Row } from '@tanstack/react-table';
-import { ArchiveX, Download, Eye, History, MoreHorizontal, Send } from 'lucide-react';
+import { Download, Eye, History, MoreHorizontal, RotateCcw } from 'lucide-react';
 import { useState } from 'react';
-import DocumentArchiveForm from './document-archive-form';
+import RestoreArchivedDocumentForm from './document-restore-form';
 
-interface TableActionsProps {
-  row: Row<Document>;
+interface RestorDocumentActionsProps {
+  row: Row<ArchivedDocument>;
 }
 
-export default function TableActions({ row }: TableActionsProps) {
+export default function RestoreDocumentActions({ row }: RestorDocumentActionsProps) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-
-  const { handleDownload } = useDownloadDocument();
-
   return (
     <>
       <DropdownMenu>
@@ -46,23 +42,16 @@ export default function TableActions({ row }: TableActionsProps) {
               <History /> <span>View History</span>
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => handleDownload(row.original)}>
+          <DropdownMenuItem>
             <Download /> <span>Download PDF </span>
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Send />
-            <span>Share Document</span>
-          </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem className="text-destructive dark:bg-destructive dark:text-white" onClick={() => setIsOpen(open => !open)}>
-            <ArchiveX className="text-destructive dark:text-white" />
-            <span>Archive Document</span>
+          <DropdownMenuItem onClick={() => setIsOpen(open => !open)}>
+            <RotateCcw /> <span>Restore </span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-
-      <DocumentArchiveForm open={isOpen} onOpenChange={setIsOpen} document={row.original} />
+      <RestoreArchivedDocumentForm document={row.original} onOpenChange={setIsOpen} open={isOpen} />
     </>
   );
 }

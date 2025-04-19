@@ -39,4 +39,6 @@ class UserRepository implements UserRepositoryInterface
     {
         return $user->assignRole($role);
     }
+
+    public function paginate(?string $search = null) {}
 }

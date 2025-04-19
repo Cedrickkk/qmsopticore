@@ -1,10 +1,10 @@
 import LogIcon from '@/components/document-log-icon';
 import StatusChange from '@/components/document-status-change';
-import { statusConfig } from '@/components/table-columns';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { getActionTitle } from '@/hooks/use-action-title';
 import AppLayout from '@/layouts/app-layout';
+import { statusConfig } from '@/pages/documents';
 import { BreadcrumbItem } from '@/types';
 import { type Document } from '@/types/document';
 import { Head, usePage } from '@inertiajs/react';

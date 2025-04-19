@@ -1,5 +1,5 @@
-import { statusConfig } from '@/components/table-columns';
 import { Badge } from '@/components/ui/badge';
+import { statusConfig } from '@/pages/documents';
 
 export default function StatusChange({ from, to }: { from: string | null; to: string | null }) {
   return (
