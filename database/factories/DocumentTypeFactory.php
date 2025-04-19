@@ -18,6 +18,7 @@ class DocumentTypeFactory extends Factory
     {
         return [
             'name' => $this->faker->word(),
+            'code' => $this->faker->countryCode(),
         ];
     }
 }

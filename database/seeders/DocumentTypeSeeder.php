@@ -13,19 +13,25 @@ class DocumentTypeSeeder extends Seeder
      */
     public function run(): void
     {
-        collect([
-            'Academic Documents',
-            'Administrative Records',
-            'Financial Records',
-            'Student Records',
-            'Faculty Documents',
-            'Extracurricular Activities',
-            'Curriculum Guides',
-            'Policy Manuals',
-            'Library Records',
-            'Research Papers',
-        ])->each(function ($typeName) {
-            DocumentType::factory()->create(['name' => $typeName]);
-        });
+        $documentTypes = [
+            ['name' => 'Academic Documents', 'code' => 'ACD'],
+            ['name' => 'Administrative Records', 'code' => 'ADM'],
+            ['name' => 'Financial Records', 'code' => 'FIN'],
+            ['name' => 'Student Records', 'code' => 'STD'],
+            ['name' => 'Faculty Documents', 'code' => 'FAC'],
+            ['name' => 'Extracurricular Activities', 'code' => 'EXT'],
+            ['name' => 'Curriculum Guides', 'code' => 'CUR'],
+            ['name' => 'Policy Manuals', 'code' => 'POL'],
+            ['name' => 'Library Records', 'code' => 'LIB'],
+            ['name' => 'Research Papers', 'code' => 'RES'],
+        ];
+
+        // Create or update each type with its code
+        foreach ($documentTypes as $type) {
+            DocumentType::updateOrCreate(
+                ['name' => $type['name']],
+                ['code' => $type['code']]
+            );
+        }
     }
 }

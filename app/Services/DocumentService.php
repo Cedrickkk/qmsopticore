@@ -4,17 +4,18 @@ namespace App\Services;
 
 use App\Contracts\Repositories\DocumentRepositoryInterface;
 use App\Contracts\Repositories\WorkflowServiceInterface;
+use App\Enums\DepartmentEnum;
 use App\Models\User;
 use App\Models\Document;
-use Illuminate\Support\Str;
+use App\Models\DocumentType;
 use App\Models\DocumentRecipient;
 use App\Enums\DocumentStatusEnum;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreDocumentRequest;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Http\Requests\UpdateDocumentAccessRequest;
-use Illuminate\Support\Collection;
 
 class DocumentService
 {
@@ -38,7 +39,7 @@ class DocumentService
         $user = $this->getUser();
 
         $document = $this->documentRepository->create([
-            'code' => $this->generateDocumentCode(),
+            'code' => $this->generateDocumentCode($data),
             'title' => $this->fileService->upload($data['file']),
             'description' => $data['description'],
             'created_by' => $user->id,
@@ -212,18 +213,52 @@ class DocumentService
         return User::where('id', Auth::user()->id)->first();
     }
 
-    private function generateDocumentCode(): string
+    private function generateDocumentCode($input): string
     {
-        // TODO: Fix document code
+        $user = $this->getUser();
+        $department = $user->department;
 
-        /**
-         * convention
-         * DEPT -> COLLEGE (PROGRAM) -> YEAR -> TYPE
-         */
+        if ($department) {
+            foreach (DepartmentEnum::cases() as $deptEnum) {
+                if (strtolower($deptEnum->label()) === strtolower($department->name)) {
+                    $departmentCode = $deptEnum->value;
+                    break;
+                }
+            }
+        }
+
+        $year = now()->format('Y');
+
+        $documentTypeId = $input['category']['id'] ?? null;
+
+        $documentCode = DocumentType::find($documentTypeId)->first()->code;
+
+        $sequence = $this->getNextSequenceNumber($departmentCode, $year, $documentCode);
+
         return sprintf(
-            'DOC-%s-%s',
-            now()->format('Ymd'),
-            strtoupper(Str::random(4))
+            '%s-%s-%s-%04d',
+            $departmentCode,
+            $year,
+            $documentCode,
+            $sequence
         );
+    }
+
+    private function getNextSequenceNumber(string $departmentCode, string $year, string $docType): int
+    {
+        $pattern = "{$departmentCode}-{$year}-{$docType}-%";
+
+        $lastDocument = Document::where('code', 'like', $pattern)
+            ->orderByRaw('CAST(SUBSTRING_INDEX(code, "-", -1) AS UNSIGNED) DESC')
+            ->first();
+
+        if (!$lastDocument) {
+            return 1;
+        }
+
+        $parts = explode('-', $lastDocument->code);
+        $lastSequence = (int) end($parts);
+
+        return $lastSequence + 1;
     }
 }
