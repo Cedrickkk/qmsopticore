@@ -8,6 +8,7 @@ enum DepartmentEnum: string
     case OfficeOfVicePresident = 'OVP';
     case HumanResource = 'HR';
     case Registrar = 'RR';
+    case QualityAssuranceOffice = 'QA';
     case CollegeOfComputerStudies = 'CCS';
     case CollegeOfNursing = 'CON';
     case CollegeOfEducation = 'COED';
@@ -21,8 +22,9 @@ enum DepartmentEnum: string
         return match ($this) {
             self::OfficeOfPresident => 'Office of the President',
             self::OfficeOfVicePresident => 'Office of the Vice President',
-            self::HumanResource => 'Human Resource Department',
+            self::HumanResource => 'Human Resources Department',
             self::Registrar => 'Registrar',
+            self::QualityAssuranceOffice => 'Quality Assurance Office',
             self::CollegeOfComputerStudies => 'College of Computer Studies',
             self::CollegeOfNursing => 'College of Nursing',
             self::CollegeOfEducation => 'College of Education',
