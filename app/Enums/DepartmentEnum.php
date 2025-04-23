@@ -4,6 +4,8 @@ namespace App\Enums;
 
 enum DepartmentEnum: string
 {
+    case OfficeOfPresident = 'OP';
+    case OfficeOfVicePresident = 'OVP';
     case HumanResource = 'HR';
     case Registrar = 'RR';
     case CollegeOfComputerStudies = 'CCS';
@@ -17,6 +19,8 @@ enum DepartmentEnum: string
     public function label(): string
     {
         return match ($this) {
+            self::OfficeOfPresident => 'Office of the President',
+            self::OfficeOfVicePresident => 'Office of the Vice President',
             self::HumanResource => 'Human Resource Department',
             self::Registrar => 'Registrar',
             self::CollegeOfComputerStudies => 'College of Computer Studies',
