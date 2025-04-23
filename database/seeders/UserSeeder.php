@@ -44,6 +44,6 @@ class UserSeeder extends Seeder
             'remember_token' => Str::random(10),
         ])->assignRole(RoleEnum::SUPER_ADMIN->value);
 
-        User::factory(5)->create();
+        // User::factory(5)->create();
     }
 }
