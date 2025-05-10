@@ -12,6 +12,7 @@ use App\Http\Controllers\Controller;
 use App\Services\DocumentViewService;
 use App\Http\Requests\StoreDocumentRequest;
 use App\Services\DocumentPermissionService;
+use Illuminate\Support\Facades\Gate;
 
 class DocumentController extends Controller
 {
@@ -59,6 +60,8 @@ class DocumentController extends Controller
 
     public function history(Document $document)
     {
+        Gate::authorize('view', $document);
+
         return Inertia::render('documents/history', [
             'document' => $document,
             'workflowLogs' => $this->documentService->getDocumentHistoryLogs($document)
