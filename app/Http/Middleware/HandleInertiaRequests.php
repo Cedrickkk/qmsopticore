@@ -52,7 +52,7 @@ class HandleInertiaRequests extends Middleware
                     'id' => $user->id,
                     'name' => $user->name,
                     'email' => $user->email,
-                    'avatar' => $this->fileService->getUrlPath($user->avatar, 'avatars') ?? null,
+                    'avatar' => $this->fileService->getUrlPath($user->avatar ?? "", 'avatars') ?? null,
                     'roles' => $user->getRoleNames()->toArray(),
                 ] : null,
             ],
