@@ -30,13 +30,15 @@ class DocumentViewService
             'signatories.user:id,name,position,avatar'
         ]);
 
+        $document->signatories->each(fn($signatory) => $signatory->user->avatar = $this->fileService->getUrlPath($signatory->user->avatar ?? "", 'avatars'));
+
         $nextSignatory = $this->workflowService->getNextSignatory($document);
 
         $isCurrentSignatory = $nextSignatory && $nextSignatory->user_id === $user->id;
 
         return [
             'document' => $document,
-            'file' => $this->fileService->getUrlPath($document->title,),
+            'file' => $this->fileService->getUrlPath($document->title ?? "", 'documents'),
             'canSign' => $isCurrentSignatory && $this->documentService->isSignatory($document, $user->id),
             'signatures' => $isCurrentSignatory ? $signatures : null,
             'isNextSignatory' => $nextSignatory ? [

@@ -8,7 +8,9 @@ use App\Contracts\Repositories\DocumentRepositoryInterface;
 use App\Models\DocumentSignatory;
 use App\Models\DocumentType;
 use App\Models\DocumentWorkflowLog;
+use App\Models\User;
 use App\Services\FileService;
+use Illuminate\Support\Facades\Auth;
 
 class DocumentRepository implements DocumentRepositoryInterface
 {
@@ -37,9 +39,24 @@ class DocumentRepository implements DocumentRepositoryInterface
 
     public function paginate(?string $search = null)
     {
+        $user = User::where('id', Auth::user()->id)->first();
+        $userId = $user->id;
+        $isSuperAdmin = $user->hasRole('super_admin');
+
         return Document::query()
             ->when($search, function ($query, $search) {
                 $query->where('title', 'like', "%{$search}%");
+            })
+            ->when(!$isSuperAdmin, function ($query) use ($userId) {
+                $query->where(function ($q) use ($userId) {
+                    $q->where('created_by', $userId)
+                        ->orWhereHas('signatories', function ($sq) use ($userId) {
+                            $sq->where('user_id', $userId);
+                        })
+                        ->orWhereHas('recipients', function ($rq) use ($userId) {
+                            $rq->where('user_id', $userId);
+                        });
+                });
             })
             ->with(['createdBy:id,name', 'category:id,name'])
             ->latest()
