@@ -2,6 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { useInitials } from '@/hooks/use-initials';
 import { type Document } from '@/types/document';
 import { Link } from '@inertiajs/react';
 import { format } from 'date-fns';
@@ -23,7 +24,7 @@ export interface DocumentSignatory {
     id: number;
     name: string;
     position: string;
-    avatar: string | null;
+    avatar: string | undefined;
     email: string;
   };
   status: 'pending' | 'approved' | 'rejected';
@@ -38,6 +39,7 @@ interface DocumentInfoProps {
 }
 
 export function DocumentInfo({ document }: DocumentInfoProps) {
+  const getInitials = useInitials();
   return (
     <>
       <div className="space-y-4 border-b pb-4 lg:col-span-2">
@@ -107,13 +109,8 @@ export function DocumentInfo({ document }: DocumentInfoProps) {
                         <div key={signatory.id} className="flex items-center justify-between p-3">
                           <div className="flex items-center gap-3">
                             <Avatar>
-                              <AvatarImage src={signatory.user.avatar || undefined} />
-                              <AvatarFallback>
-                                {signatory.user.name
-                                  .split(' ')
-                                  .map(n => n[0])
-                                  .join('')}
-                              </AvatarFallback>
+                              <AvatarImage src={signatory.user.avatar} />
+                              <AvatarFallback>{getInitials(signatory.user.name)}</AvatarFallback>
                             </Avatar>
                             <div>
                               <p className="font-medium">{signatory.user.name}</p>

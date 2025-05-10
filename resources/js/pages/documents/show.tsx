@@ -35,6 +35,7 @@ export default function Show() {
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [showAccessModal, setShowAccessModal] = useState(false);
+  const [tab, setActiveTab] = useState('document');
   const { handleDownload } = useDownloadDocument();
 
   const breadcrumbs: BreadcrumbItem[] = [
@@ -74,8 +75,8 @@ export default function Show() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <Tabs defaultValue="document" className="w-full rounded-xs">
+        <div className="w-full lg:col-span-3">
+          <Tabs defaultValue="document" className="w-full rounded-xs" onValueChange={setActiveTab}>
             <TabsList className="mb-4 rounded-xs">
               <TabsTrigger value="document" className="rounded-xs">
                 Document
@@ -85,7 +86,7 @@ export default function Show() {
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="document" className="mt-0">
+            <TabsContent value="document" className="mt-0" key={document.id} forceMount={true} hidden={'document' !== tab}>
               {canSign && (
                 <div className="mb-4 flex gap-2">
                   <Button variant="default" onClick={() => setShowApproveModal(true)}>
@@ -108,13 +109,13 @@ export default function Show() {
               </div>
             </TabsContent>
 
-            <TabsContent value="info" className="mt-0">
-              <DocumentInfo document={document} />
+            <TabsContent value="info" className="mt-0" forceMount={true} hidden={'info' !== tab}>
+              <DocumentInfo document={document} key={document.id} />
             </TabsContent>
           </Tabs>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-6 lg:col-span-full">
           <Card className="rounded-xs">
             <CardHeader className="pb-3">
               <CardTitle>Document Workflow</CardTitle>

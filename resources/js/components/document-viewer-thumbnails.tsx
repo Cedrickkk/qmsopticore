@@ -1,6 +1,7 @@
 import '@/lib/pdfjs';
 import { cn } from '@/lib/utils';
 import { LoaderCircle } from 'lucide-react';
+import { memo } from 'react';
 import { Document, Page } from 'react-pdf';
 import { File } from 'react-pdf/dist/esm/shared/types.js';
 
@@ -11,7 +12,7 @@ interface PDFThumbnailsProps {
   onPageChange: (page: number) => void;
 }
 
-export function PDFThumbnails({ file, numPages, currentPage, onPageChange }: PDFThumbnailsProps) {
+export const PDFThumbnails = memo(function PDFThumbnailsViewer({ file, numPages, currentPage, onPageChange }: PDFThumbnailsProps) {
   return (
     <div className="flex h-1/2 gap-2 overflow-y-auto rounded-sm border p-7">
       {Array.from({ length: numPages }, (_, i) => i + 1).map(pageNum => (
@@ -48,4 +49,4 @@ export function PDFThumbnails({ file, numPages, currentPage, onPageChange }: PDF
       ))}
     </div>
   );
-}
+});

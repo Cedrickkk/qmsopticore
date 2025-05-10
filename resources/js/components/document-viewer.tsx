@@ -5,7 +5,7 @@ import '@/lib/pdfjs';
 import { type Document as TDocument } from '@/types/document';
 import { usePage } from '@inertiajs/react';
 import { Download, LoaderCircle } from 'lucide-react';
-import { useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 import { Document, Page } from 'react-pdf';
 import { File } from 'react-pdf/dist/esm/shared/types.js';
 import { Button } from './ui/button';
@@ -25,8 +25,7 @@ interface PDFViewerProps {
 type PageProps = {
   document: TDocument;
 };
-
-export function PDFViewer({ file, showThumbnails = false }: PDFViewerProps) {
+export const PDFViewer = memo(function PDFViewerComponent({ file, showThumbnails = false }: PDFViewerProps) {
   const { handleDownload } = useDownloadDocument();
   const { document } = usePage<PageProps>().props;
   const [pdfState, setPdfState] = useState<PDFPageState>({
@@ -36,27 +35,31 @@ export function PDFViewer({ file, showThumbnails = false }: PDFViewerProps) {
     isLoading: true,
   });
 
-  const handleDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
+  const handleDocumentLoadSuccess = useCallback(({ numPages }: { numPages: number }) => {
     setPdfState(prev => ({
       ...prev,
       numPages,
       isLoading: false,
     }));
-  };
+  }, []);
 
-  const handlePageChange = (newPage: number) => {
+  const handlePageChange = useCallback((newPage: number) => {
     setPdfState(prev => ({
       ...prev,
-      currentPage: Math.max(1, Math.min(newPage, pdfState.numPages)),
+      currentPage: Math.max(1, Math.min(newPage, prev.numPages)),
     }));
-  };
+  }, []);
 
-  const handleZoom = (delta: number) => {
+  const handleZoom = useCallback((delta: number) => {
     setPdfState(prev => ({
       ...prev,
       scale: Math.max(0.5, Math.min(2, prev.scale + delta)),
     }));
-  };
+  }, []);
+
+  const handleDownloadClick = useCallback(() => {
+    handleDownload(document);
+  }, [document, handleDownload]);
 
   return (
     <div>
@@ -71,7 +74,6 @@ export function PDFViewer({ file, showThumbnails = false }: PDFViewerProps) {
             </div>
           }
           onLoadSuccess={handleDocumentLoadSuccess}
-          onLoadError={error => console.log(error)}
         >
           <div className="flex h-[700px] items-center justify-center overflow-y-auto p-4">
             <Page
@@ -92,7 +94,13 @@ export function PDFViewer({ file, showThumbnails = false }: PDFViewerProps) {
 
         <div className="flex flex-col gap-4">
           {showThumbnails && (
-            <PDFThumbnails file={file} numPages={pdfState.numPages} currentPage={pdfState.currentPage} onPageChange={handlePageChange} />
+            <PDFThumbnails
+              file={file}
+              numPages={pdfState.numPages}
+              currentPage={pdfState.currentPage}
+              onPageChange={handlePageChange}
+              key={document.id}
+            />
           )}
 
           <PDFControls
@@ -102,7 +110,7 @@ export function PDFViewer({ file, showThumbnails = false }: PDFViewerProps) {
             onPageChange={handlePageChange}
             onZoom={handleZoom}
           />
-          <Button variant="outline" className="flex items-center gap-2" onClick={() => handleDownload(document)}>
+          <Button variant="outline" className="flex items-center gap-2" onClick={handleDownloadClick}>
             <Download className="h-4 w-4" />
             Download
           </Button>
@@ -110,4 +118,4 @@ export function PDFViewer({ file, showThumbnails = false }: PDFViewerProps) {
       </div>
     </div>
   );
-}
+});
