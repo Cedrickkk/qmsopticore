@@ -8,7 +8,11 @@ enum DepartmentEnum: string
     case OfficeOfVicePresident = 'OVP';
     case HumanResource = 'HR';
     case Registrar = 'RR';
+    case AcademicAffairsOffice = 'AAO';
+    case AdministrativeOffice = 'AO';
     case QualityAssuranceOffice = 'QA';
+    case LifeLongLearnersOffice = 'LLO';
+    case ResearchDepartment = 'RD';
     case CollegeOfComputerStudies = 'CCS';
     case CollegeOfNursing = 'CON';
     case CollegeOfEducation = 'COED';
@@ -25,6 +29,10 @@ enum DepartmentEnum: string
             self::HumanResource => 'Human Resources Department',
             self::Registrar => 'Registrar',
             self::QualityAssuranceOffice => 'Quality Assurance Office',
+            self::AcademicAffairsOffice => 'Academics Affairs Office',
+            self::AdministrativeOffice => 'Administrative Office',
+            self::LifeLongLearnersOffice => 'Life Long Learners Office',
+            self::ResearchDepartment => 'Research Department',
             self::CollegeOfComputerStudies => 'College of Computer Studies',
             self::CollegeOfNursing => 'College of Nursing',
             self::CollegeOfEducation => 'College of Education',

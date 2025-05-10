@@ -18,6 +18,7 @@ class DepartmentController extends Controller
                 $query->where('title', 'like', "%{$search}%");
             })
             ->with('admins')
+            ->orderBy('name', 'asc')
             ->paginate(10)
             ->withQueryString();
 
