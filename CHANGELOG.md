@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/Cedrickkk/qmsopticore/compare/v1.0.1...v1.0.2) (2025-05-13)
+
+
+### Bug Fixes
+
+* update styling on auth-layout ([e1dc8d8](https://github.com/Cedrickkk/qmsopticore/commit/e1dc8d851d64bae6edd26f5a4b72525b78beff61))
+
 ## [1.0.1](https://github.com/Cedrickkk/qmsopticore/compare/v1.0.0...v1.0.1) (2025-05-13)
 
 
