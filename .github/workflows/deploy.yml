@@ -12,11 +12,48 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.3
+
+      - name: Update App Version
+        run: |
+          # Get current version from .env or version file
+          if [ -f "version.txt" ]; then
+            CURRENT_VERSION=$(cat version.txt)
+          else
+            CURRENT_VERSION=$(grep APP_VERSION .env | cut -d '=' -f2 || echo "1.0.0")
+          fi
+
+          # Parse and increment version
+          MAJOR=$(echo $CURRENT_VERSION | cut -d '.' -f1)
+          MINOR=$(echo $CURRENT_VERSION | cut -d '.' -f2)
+          PATCH=$(echo $CURRENT_VERSION | cut -d '.' -f3)
+
+          # Increment patch version
+          PATCH=$((PATCH + 1))
+          NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+
+          # Save new version
+          echo $NEW_VERSION > version.txt
+
+          # Update .env file if it exists
+          if [ -f ".env" ]; then
+            if grep -q "APP_VERSION" .env; then
+              sed -i "s/APP_VERSION=.*/APP_VERSION=$NEW_VERSION/" .env
+            else
+              echo "APP_VERSION=$NEW_VERSION" >> .env
+            fi
+          fi
+
+          # Ensure APP_ENV is set to production
+          if [ -f ".env" ]; then
+            sed -i "s/APP_ENV=.*/APP_ENV=production/" .env
+          fi
 
       - name: Install Composer Dependencies
         run: composer install --optimize-autoloader --no-dev --no-progress --no-interaction --prefer-dist
@@ -49,5 +86,8 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /var/www/html/qmsopticore
+            php artisan config:clear
             php artisan migrate --force
             php artisan optimize
+            # Uncomment below if you want to display the current version after deployment
+            # echo "Deployed version:" && cat version.txt
