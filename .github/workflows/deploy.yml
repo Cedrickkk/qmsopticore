@@ -12,14 +12,12 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
 
       - name: Semantic Release
         id: semantic-release
         uses: cycjimmy/semantic-release-action@v3
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
           extra_plugins: |
             @semantic-release/changelog
@@ -126,4 +124,3 @@ jobs:
             php artisan config:clear
             php artisan migrate --force
             php artisan optimize
-            echo "Deployed version: $(cat version.txt)"
