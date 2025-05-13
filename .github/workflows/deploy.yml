@@ -39,7 +39,7 @@ jobs:
           SOURCE: '.'
           REMOTE_HOST: ${{ secrets.VPS_HOST }}
           REMOTE_USER: 'root'
-          TARGET: '/var/www/html/qmsopticore.com'
+          TARGET: '/var/www/html/qmsopticore'
 
       - name: Run Remote/Artisan Commands
         uses: appleboy/ssh-action@v0.1.6
@@ -47,6 +47,6 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: cd /var/www/html/qmsopticore.com
+          script: cd /var/www/html/qmsopticore
             php artisan migrate --force
             php artisan optimize
