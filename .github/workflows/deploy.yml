@@ -15,28 +15,38 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+      - name: Semantic Release
+        id: semantic-release
+        uses: cycjimmy/semantic-release-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          php-version: 8.3
+          extra_plugins: |
+            @semantic-release/changelog
+            @semantic-release/git
 
       - name: Update App Version
         run: |
-          # Get current version from .env or version file
-          if [ -f "version.txt" ]; then
-            CURRENT_VERSION=$(cat version.txt)
+          # If semantic release published a new version, use it
+          if [ "${{ steps.semantic-release.outputs.new_release_published }}" = "true" ]; then
+            NEW_VERSION=${{ steps.semantic-release.outputs.new_release_version }}
           else
-            CURRENT_VERSION=$(grep APP_VERSION .env | cut -d '=' -f2 || echo "1.0.0")
+            # Otherwise use current version and increment patch
+            if [ -f "version.txt" ]; then
+              CURRENT_VERSION=$(cat version.txt)
+            else
+              CURRENT_VERSION=$(grep APP_VERSION .env | cut -d '=' -f2 || echo "1.0.0")
+            fi
+
+            # Parse and increment version
+            MAJOR=$(echo $CURRENT_VERSION | cut -d '.' -f1)
+            MINOR=$(echo $CURRENT_VERSION | cut -d '.' -f2)
+            PATCH=$(echo $CURRENT_VERSION | cut -d '.' -f3)
+
+            # Increment patch version
+            PATCH=$((PATCH + 1))
+            NEW_VERSION="$MAJOR.$MINOR.$PATCH"
           fi
-
-          # Parse and increment version
-          MAJOR=$(echo $CURRENT_VERSION | cut -d '.' -f1)
-          MINOR=$(echo $CURRENT_VERSION | cut -d '.' -f2)
-          PATCH=$(echo $CURRENT_VERSION | cut -d '.' -f3)
-
-          # Increment patch version
-          PATCH=$((PATCH + 1))
-          NEW_VERSION="$MAJOR.$MINOR.$PATCH"
 
           # Save new version
           echo $NEW_VERSION > version.txt
@@ -52,8 +62,17 @@ jobs:
 
           # Ensure APP_ENV is set to production
           if [ -f ".env" ]; then
-            sed -i "s/APP_ENV=.*/APP_ENV=production/" .env
+            if grep -q "APP_ENV" .env; then
+              sed -i "s/APP_ENV=.*/APP_ENV=production/" .env
+            else
+              echo "APP_ENV=production" >> .env
+            fi
           fi
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.3
 
       - name: Install Composer Dependencies
         run: composer install --optimize-autoloader --no-dev --no-progress --no-interaction --prefer-dist
@@ -86,8 +105,25 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /var/www/html/qmsopticore
+            # Update APP_VERSION in server's .env if needed
+            if [ -f ".env" ]; then
+              VERSION=$(cat version.txt)
+              
+              if grep -q "APP_VERSION" .env; then
+                sed -i "s/APP_VERSION=.*/APP_VERSION=$VERSION/" .env
+              else
+                echo "APP_VERSION=$VERSION" >> .env
+              fi
+              
+              # Ensure APP_ENV is production
+              if grep -q "APP_ENV" .env; then
+                sed -i "s/APP_ENV=.*/APP_ENV=production/" .env
+              else
+                echo "APP_ENV=production" >> .env
+              fi
+            fi
+
             php artisan config:clear
             php artisan migrate --force
             php artisan optimize
-            # Uncomment below if you want to display the current version after deployment
-            # echo "Deployed version:" && cat version.txt
+            echo "Deployed version: $(cat version.txt)"
