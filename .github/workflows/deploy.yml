@@ -38,7 +38,7 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           SOURCE: '.'
           REMOTE_HOST: ${{ secrets.VPS_HOST }}
-          REMOTE_USER: ${{ secrets.VPS_USER }}
+          REMOTE_USER: 'root'
           TARGET: '/var/www/html/qmsopticore.com'
 
       - name: Run Remote/Artisan Commands
