@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/Cedrickkk/qmsopticore/compare/v1.0.0...v1.0.1) (2025-05-13)
+
+
+### Bug Fixes
+
+* app config for versioning ([f21503c](https://github.com/Cedrickkk/qmsopticore/commit/f21503cdfcae0a28df7aa493b21e33798ce80b43))
+
 # 1.0.0 (2025-05-13)
 
 
