@@ -116,13 +116,6 @@ jobs:
               else
                 echo "APP_VERSION=$VERSION" >> .env
               fi
-              
-              # Ensure APP_ENV is production
-              if grep -q "APP_ENV" .env; then
-                sed -i "s/APP_ENV=.*/APP_ENV=production/" .env
-              else
-                echo "APP_ENV=production" >> .env
-              fi
             fi
 
             php artisan config:clear
