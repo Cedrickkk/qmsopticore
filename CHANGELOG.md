@@ -1,3 +1,10 @@
+## [1.0.3](https://github.com/Cedrickkk/qmsopticore/compare/v1.0.2...v1.0.3) (2025-05-14)
+
+
+### Bug Fixes
+
+* deploy.yml duplicate logic on setting env variable ([2b6fb69](https://github.com/Cedrickkk/qmsopticore/commit/2b6fb69a423489c506e10aeb62c2acfe7e998bd8))
+
 ## [1.0.2](https://github.com/Cedrickkk/qmsopticore/compare/v1.0.1...v1.0.2) (2025-05-13)
 
 
