@@ -193,17 +193,14 @@ export default function Register() {
               </div>
             </div>
 
-            <Button type="submit" className="mt-2 w-full" tabIndex={5} disabled={processing}>
+            <Button type="submit" className="mt-2 w-full" disabled={processing}>
               {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
               Create account
             </Button>
           </div>
 
           <div className="text-muted-foreground text-center text-sm">
-            Already have an account?{' '}
-            <TextLink href={route('login')} tabIndex={6}>
-              Log in
-            </TextLink>
+            Already have an account? <TextLink href={route('login')}>Log in</TextLink>
           </div>
         </form>
         <Dialog open={isTermsModalOpen} onOpenChange={setIsTermsModalOpen}>

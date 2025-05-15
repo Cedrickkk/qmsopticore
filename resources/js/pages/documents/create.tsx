@@ -2,6 +2,7 @@ import { DocumentCategoryField } from '@/components/document-category-field';
 import { Recipients } from '@/components/document-recipient';
 import { DocumentTypeField } from '@/components/document-type-field';
 import { DocumentUpload } from '@/components/document-upload';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -10,6 +11,7 @@ import { BreadcrumbItem } from '@/types';
 import { CreateDocumentFormData, DocumentType } from '@/types/document';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
+import { toast } from 'sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -56,7 +58,32 @@ export default function Create() {
       preserveScroll: true,
       preserveState: true,
       showProgress: false,
-      onSuccess: () => reset(),
+      onSuccess: () => {
+        reset();
+        toast(
+          <Alert className="border-none p-0 font-sans">
+            <AlertTitle className="flex items-center gap-1.5 font-medium text-green-600">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="lucide lucide-check-circle"
+              >
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+              Document Sent Successfully
+            </AlertTitle>
+            <AlertDescription> The document was sent successfully.</AlertDescription>
+          </Alert>
+        );
+      },
     });
   };
 

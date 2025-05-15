@@ -88,4 +88,9 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Department::class, 'department_id');
     }
+
+    public function documents()
+    {
+        return $this->hasMany(Document::class);
+    }
 }

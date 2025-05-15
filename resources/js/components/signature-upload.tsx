@@ -19,6 +19,8 @@ interface SignatureUploadProps {
   onChanged: () => void;
 }
 
+const MAX_SIGNATURES_UPLOAD = 7;
+
 export function SignatureUpload({ signatures, onChange, errors, disabled, onValidated, onChanged }: SignatureUploadProps) {
   const [isValidated, setIsValidated] = useState(false);
   const [isValidating, setIsValidating] = useState(false);
@@ -143,7 +145,7 @@ export function SignatureUpload({ signatures, onChange, errors, disabled, onVali
           </div>
         );
       })}
-      {signatures.length === 7 && !isValidated && (
+      {signatures.length === MAX_SIGNATURES_UPLOAD && !isValidated && (
         <Button onClick={handleValidate} disabled={isValidating} variant="outline">
           {isValidating && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
           Validate Signatures

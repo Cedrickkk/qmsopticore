@@ -23,7 +23,6 @@ export default function AccountInformation({ data, errors, setData, processing }
           id="password"
           type="password"
           className="mt-1"
-          tabIndex={3}
           autoComplete="new-password"
           value={data.password}
           onChange={e => setData('password', e.target.value)}
@@ -39,7 +38,6 @@ export default function AccountInformation({ data, errors, setData, processing }
           id="password_confirmation"
           type="password"
           className="mt-1"
-          tabIndex={4}
           autoComplete="new-password"
           value={data.password_confirmation}
           onChange={e => setData('password_confirmation', e.target.value)}
@@ -54,7 +52,7 @@ export default function AccountInformation({ data, errors, setData, processing }
           <SelectTrigger id="role" name="role" className="mt-1 w-full">
             <SelectValue placeholder="Select a role" />
           </SelectTrigger>
-          <SelectContent tabIndex={5}>
+          <SelectContent>
             <SelectGroup>
               {roles &&
                 roles.map(role => (

@@ -66,7 +66,7 @@ export default function Create() {
 
     if (!isSignaturesValidated && data.signatures.length >= 7) {
       toast(
-        <Alert className="border-none p-0 font-sans">
+        <Alert className="border-none p-0 font-sans" variant="destructive">
           <AlertTitle>Validated Signatures Required</AlertTitle>
           <AlertDescription>Please validate the signatures before creating the account.</AlertDescription>
         </Alert>
@@ -79,6 +79,7 @@ export default function Create() {
       preserveScroll: true,
       showProgress: false,
       onSuccess: () => {
+        setData('image', null);
         reset();
         toast(
           <Alert className="border-none p-0 font-sans">
@@ -122,7 +123,7 @@ export default function Create() {
             onSignaturesChanged={() => setIsSignaturesValidated(false)}
           />
           <AccountInformation data={data} errors={errors} setData={setData} processing={processing} />
-          <Button disabled={processing} tabIndex={6}>
+          <Button disabled={processing}>
             {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
             Create account
           </Button>
