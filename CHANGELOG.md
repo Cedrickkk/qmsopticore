@@ -1,3 +1,15 @@
+# [1.1.0](https://github.com/Cedrickkk/qmsopticore/compare/v1.0.3...v1.1.0) (2025-05-15)
+
+
+### Bug Fixes
+
+* resolve storage filename conflicts in document uploads ([399a9ce](https://github.com/Cedrickkk/qmsopticore/commit/399a9ce36d15a4c93e8ed2a6ea20b92a455ee297))
+
+
+### Features
+
+* improve document activity tracking and dashboard components ([aea082e](https://github.com/Cedrickkk/qmsopticore/commit/aea082ea51b65bec0b4692b87e06775970dad5d7))
+
 ## [1.0.3](https://github.com/Cedrickkk/qmsopticore/compare/v1.0.2...v1.0.3) (2025-05-14)
 
 
