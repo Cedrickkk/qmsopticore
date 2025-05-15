@@ -23,7 +23,7 @@ class DashboardService
             'totalUsers' => User::count(),
             'documentsGrowth' => $this->getDocumentGrowthPercentage(),
             'usersGrowth' => $this->getUserGrowthPercentage(),
-            'documentActivity' => $this->getDocumentActivity()
+            'documentActivity' => $this->getWeeklyDocumentActivity()
         ];
     }
 
@@ -37,7 +37,32 @@ class DashboardService
         return $this->calculateGrowthPercentage('User');
     }
 
-    public function getDocumentActivity()
+    public function getWeeklyDocumentActivity()
+    {
+        $endDate = now();
+        $startDate = now()->subWeeks(4);
+
+        return Document::selectRaw('
+        COUNT(*) as count,
+        YEARWEEK(created_at, 1) as yearWeek,
+        CONCAT("Week ", WEEK(created_at, 1) - WEEK(DATE_SUB(created_at, INTERVAL DAYOFMONTH(created_at)-1 DAY), 1) + 1, 
+               " (", DATE_FORMAT(created_at, "%b %d"), " - ", 
+               DATE_FORMAT(DATE_ADD(created_at, INTERVAL 6 - WEEKDAY(created_at) DAY), "%b %d"), ")") as weekLabel')
+            ->where('created_at', '>=', $startDate)
+            ->where('created_at', '<=', $endDate)
+            ->groupBy('yearWeek', 'weekLabel')
+            ->orderBy('yearWeek')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'week' => $item->weekLabel,
+                    'count' => $item->count,
+                    'yearWeek' => $item->yearWeek
+                ];
+            });
+    }
+
+    public function getMonthlyDocumentActivity()
     {
         $currentMonth = now();
         $lastMonth = now()->subMonth();
@@ -68,14 +93,14 @@ class DashboardService
             });
     }
 
-    public function getUserDocuments(User $user): Collection
+    public function getUserRecentDocuments(string $userId): Collection
     {
         return Document::query()
-            ->where(function ($query) use ($user) {
-                $query->whereHas('recipients', function ($query) use ($user) {
-                    $query->where('user_id', $user->id);
-                })->orWhereHas('signatories', function ($query) use ($user) {
-                    $query->where('user_id', $user->id);
+            ->where(function ($query) use ($userId) {
+                $query->whereHas('recipients', function ($query) use ($userId) {
+                    $query->where('user_id', $userId);
+                })->orWhereHas('signatories', function ($query) use ($userId) {
+                    $query->where('user_id', $userId);
                 });
             })
             ->with('createdBy:id,name,email')

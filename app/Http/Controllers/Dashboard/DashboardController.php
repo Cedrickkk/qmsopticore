@@ -14,16 +14,16 @@ class DashboardController extends Controller
 
     public function index()
     {
-        $user = User::find(Auth::user()->id)->first();
+        $userId = User::find(Auth::id())->id;
 
         $stats = $this->service->getDashboardStats();
 
-        $userDocuments = $this->service->getUserDocuments($user);
+        $userRecentDocuments = $this->service->getUserRecentDocuments($userId);
 
         return Inertia::render('dashboard', [
             'totalDocuments' => $stats['totalDocuments'],
             'totalUsers' => $stats['totalUsers'],
-            'userDocuments' => $userDocuments,
+            'userRecentDocuments' => $userRecentDocuments,
             'stats' => [
                 'documentsGrowth' => $stats['documentsGrowth'],
                 'usersGrowth' => $stats['usersGrowth'],

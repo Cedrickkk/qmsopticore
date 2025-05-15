@@ -9,33 +9,33 @@ import { FileText, Users } from 'lucide-react';
 type DashboardProps = {
   totalDocuments: number;
   totalUsers: number;
-  userDocuments: Document[];
+  userRecentDocuments: Document[];
   stats: {
     documentsGrowth: number;
     usersGrowth: number;
     documentActivity: Array<{
-      month: string;
+      week: string;
       count: number;
-      yearMonth: string;
+      yearWeek: string;
     }>;
   };
 };
 
 export default function Dashboard() {
-  const { totalDocuments, totalUsers, userDocuments, stats } = usePage<DashboardProps>().props;
+  const { totalDocuments, totalUsers, userRecentDocuments, stats } = usePage<DashboardProps>().props;
   return (
     <AppLayout>
       <Head title="Dashboard" />
       <div className="flex min-h-full flex-col gap-4 overflow-hidden scroll-smooth">
         <div className="flex flex-col-reverse gap-4 lg:grid lg:grid-cols-2">
           <div className="grid w-full grid-flow-row auto-rows-max gap-4 xl:grid-cols-2">
-            <StatsCard total={totalDocuments} growth={stats.documentsGrowth} title="Total Documents" icon={FileText} />
-            <StatsCard total={totalUsers} growth={stats.usersGrowth} title="Total Users" icon={Users} />
+            <StatsCard total={totalDocuments} growth={stats.documentsGrowth} title="Total Documents" icon={FileText} to={route('documents.index')} />
+            <StatsCard total={totalUsers} growth={stats.usersGrowth} title="Total Users" icon={Users} to={route('accounts.index')} />
             <div className="col-span-2 flex">
               <DocumentActivityChart data={stats.documentActivity} />
             </div>
           </div>
-          <RecentDocuments documents={userDocuments} />
+          <RecentDocuments documents={userRecentDocuments} />
         </div>
       </div>
     </AppLayout>

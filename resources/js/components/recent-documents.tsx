@@ -11,7 +11,7 @@ type RecentDocumentsProps = {
 
 export default function RecentDocuments({ documents }: RecentDocumentsProps) {
   const handleShow = (document: Document) => {
-    router.get(route('private.document.show', document.id));
+    router.get(route('documents.show', document.id));
   };
 
   return (

@@ -32,8 +32,8 @@ export function useDownloadDocument() {
 
       toast(
         <Alert className="border-none p-0 font-sans">
-          <FileDown className="h-4 w-4" />
-          <AlertTitle>Download Complete</AlertTitle>
+          <FileDown className="h-4 w-4" color="green" />
+          <AlertTitle className="flex items-center gap-1.5 font-medium text-green-600">Download Complete</AlertTitle>
           <AlertDescription>{documentData.title} has been downloaded.</AlertDescription>
         </Alert>
       );

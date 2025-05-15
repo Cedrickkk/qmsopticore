@@ -5,9 +5,9 @@ import { FileStack } from 'lucide-react';
 import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts';
 
 interface DocumentActivity {
-  month: string;
+  week: string;
   count: number;
-  yearMonth: string;
+  yearWeek: string;
 }
 
 interface DocumentActivityChartProps {
@@ -32,8 +32,8 @@ export default function DocumentActivityChart({ data }: DocumentActivityChartPro
   };
 
   const chartData = data.map(item => ({
-    month: `${item.month.slice(0, 3)}${
-      new Date(item.yearMonth).getFullYear() !== new Date().getFullYear() ? ' ' + new Date(item.yearMonth).getFullYear().toString().slice(2) : ''
+    month: `${item.week.slice(0, 3)}${
+      new Date(item.yearWeek).getFullYear() !== new Date().getFullYear() ? ' ' + new Date(item.yearWeek).getFullYear().toString().slice(2) : ''
     }`,
     documents: item.count,
   }));
@@ -47,7 +47,7 @@ export default function DocumentActivityChart({ data }: DocumentActivityChartPro
             <FileStack className="size-7" />
           </span>
         </CardTitle>
-        <CardDescription>Month-over-month document creation</CardDescription>
+        <CardDescription>Weekly document creation</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
@@ -63,9 +63,7 @@ export default function DocumentActivityChart({ data }: DocumentActivityChartPro
         <div className="flex w-full items-start gap-2 text-sm">
           <div className="grid gap-2">
             <div className="flex items-center gap-2 leading-none">
-              <span className="font-medium">
-                {currentMonth?.month} vs {previousMonth?.month}
-              </span>
+              <span className="font-medium">{currentMonth?.week}</span>
               <span className={cn('font-bold', calculateGrowth() >= 0 ? 'text-primary' : 'text-red-600')}>
                 {calculateGrowth() >= 0 ? '+' : ''}
                 {calculateGrowth()}%
