@@ -38,7 +38,7 @@ class DocumentViewService
 
         return [
             'document' => $document,
-            'file' => $this->fileService->getUrlPath($document->title ?? "", 'documents'),
+            'file' => $this->fileService->getUrlPath($document->filename ?? "", 'documents'),
             'canSign' => $isCurrentSignatory && $this->documentService->isSignatory($document, $user->id),
             'signatures' => $isCurrentSignatory ? $signatures : null,
             'isNextSignatory' => $nextSignatory ? [

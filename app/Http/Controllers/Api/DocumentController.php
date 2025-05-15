@@ -14,12 +14,13 @@ class DocumentController extends Controller
 
     public function download(Document $document)
     {
-        if (!$this->service->exists($document)) {
+        $filename = $document->filename;
+        if (!$this->service->exists($filename)) {
             return response()->json([
                 'error' => 'Document file not found.'
             ], 404);
         }
 
-        return $this->service->download($document);
+        return $this->service->download($filename);
     }
 }

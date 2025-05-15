@@ -6,10 +6,8 @@ use Illuminate\Support\Facades\Storage;
 
 class FileService
 {
-    public function upload($file, string $directory = 'documents'): string
+    public function upload($file, string $directory = 'documents', string $filename): string
     {
-        $filename = $this->generateUniqueFilename($file);
-
         Storage::putFileAs($directory, $file, $filename);
 
         return $filename;
@@ -21,7 +19,7 @@ class FileService
 
         foreach ($files as $file) {
             $filename = $this->generateUniqueFilename($file);
-            Storage::putFileAs($directory, $file, $filename);
+            Storage::putFileAs($directory, $file, name: $filename);
             $filenames[] = $filename;
         }
 
@@ -39,15 +37,18 @@ class FileService
         return Storage::exists("$directory/$filename");
     }
 
-    public function getUrlPath(string $filename, string $directory = 'documents'): string
+    public function getUrlPath(string $filename, string $directory = 'documents')
     {
+        if (!$filename) {
+            return null;
+        }
+
         return Storage::url("$directory/$filename");
     }
 
-    private function generateUniqueFilename($file)
+    public function generateUniqueFilename($file): string
     {
         $extension = $file->getClientOriginalExtension();
-        $filename = time() . '_' . uniqid() . '.' . $extension;
-        return $filename;
+        return time() . '_' . uniqid() . '.' . $extension;
     }
 }

@@ -38,15 +38,22 @@ class DocumentService
 
         $user = $this->getUser();
 
+        $file = $data['file'];
+
+        $filename = $this->fileService->generateUniqueFilename($file);
+
         $document = $this->documentRepository->create([
-            'code' => $this->generateDocumentCode($data),
-            'title' => $this->fileService->upload($data['file']),
+            'code' => $this->generateDocumentCode($data['type']['id']),
+            'title' => $file->getClientOriginalName(),
+            'filename' => $filename,
             'description' => $data['description'],
             'created_by' => $user->id,
             'status' => DocumentStatusEnum::DRAFT->value,
             'category' => $data['category']['id'],
             'version' => '1.0.0',
         ]);
+
+        $this->fileService->upload($file, 'documents', $filename);
 
         $this->workflowService->log(
             $document,
@@ -94,14 +101,14 @@ class DocumentService
         return $this->permissionService->updatePermissions($document, $userPermissions);
     }
 
-    public function download(Document $document)
+    public function download(string $filename)
     {
-        return $this->fileService->download($document->title);
+        return $this->fileService->download($filename);
     }
 
-    public function exists(Document $document)
+    public function exists(string $filename)
     {
-        return $this->fileService->exists($document->title);
+        return $this->fileService->exists($filename);
     }
 
     public function updateVersion(Document $document, string $version)
@@ -213,9 +220,10 @@ class DocumentService
         return User::where('id', Auth::user()->id)->first();
     }
 
-    private function generateDocumentCode($input): string
+    private function generateDocumentCode($documentTypeId = null): string
     {
         $user = $this->getUser();
+
         $department = $user->department;
 
         if ($department) {
@@ -229,9 +237,7 @@ class DocumentService
 
         $year = now()->format('Y');
 
-        $documentTypeId = $input['category']['id'] ?? null;
-
-        $documentCode = DocumentType::find($documentTypeId)->first()->code;
+        $documentCode = DocumentType::find($documentTypeId)->code;
 
         $sequence = $this->getNextSequenceNumber($departmentCode, $year, $documentCode);
 

@@ -14,6 +14,7 @@ class Document extends Model
     protected $fillable = [
         'code',
         'title',
+        'filename',
         'created_by',
         'status',
         'category',
