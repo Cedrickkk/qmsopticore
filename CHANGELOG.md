@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/Cedrickkk/qmsopticore/compare/v1.1.1...v1.1.2) (2025-05-15)
+
+
+### Bug Fixes
+
+* resolve file upload and user creation process ([5f42b0e](https://github.com/Cedrickkk/qmsopticore/commit/5f42b0eb37be2f36a2f3d8d50f0199dc523fd0df))
+
 ## [1.1.1](https://github.com/Cedrickkk/qmsopticore/compare/v1.1.0...v1.1.1) (2025-05-15)
 
 
