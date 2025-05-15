@@ -38,8 +38,6 @@ class UserController extends Controller
 
         $user = $this->userService->create($request);
 
-        $this->fileService->upload($data['image'], 'avatars', $data['image']->getClientOriginalName());
-
         $signatures = $this->fileService->uploadMultiple($data['signatures'], 'signatures');
 
         foreach ($signatures as $signature) {

@@ -6,9 +6,15 @@ use Illuminate\Support\Facades\Storage;
 
 class FileService
 {
-    public function upload($file, string $directory = 'documents', string $filename): string
+    public function upload($file, string $directory = 'documents', ?string $filename = null): string
     {
-        return Storage::putFileAs($directory, $file, $filename);
+        if (empty($filename)) {
+            $filename = $this->generateUniqueFilename($file);
+        }
+
+        Storage::putFileAs($directory, $file, $filename);
+
+        return $filename;
     }
 
     public function uploadMultiple(array $files, string $directory = 'signatures'): array
