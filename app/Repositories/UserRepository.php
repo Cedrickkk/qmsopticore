@@ -23,7 +23,7 @@ class UserRepository implements UserRepositoryInterface
     public function findByEmail(string $email)
     {
         return User::where('email', 'like', "%{$email}%")
-            ->select('id', 'name', 'email')
+            ->select('id', 'name', 'email', 'avatar')
             ->first();
     }
 

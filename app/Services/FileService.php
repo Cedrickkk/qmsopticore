@@ -8,9 +8,7 @@ class FileService
 {
     public function upload($file, string $directory = 'documents', string $filename): string
     {
-        Storage::putFileAs($directory, $file, $filename);
-
-        return $filename;
+        return Storage::putFileAs($directory, $file, $filename);
     }
 
     public function uploadMultiple(array $files, string $directory = 'signatures'): array
@@ -19,13 +17,12 @@ class FileService
 
         foreach ($files as $file) {
             $filename = $this->generateUniqueFilename($file);
-            Storage::putFileAs($directory, $file, name: $filename);
+            Storage::putFileAs($directory, $file, $filename);
             $filenames[] = $filename;
         }
 
         return $filenames;
     }
-
 
     public function download(string $filename, string $directory = 'documents')
     {
@@ -37,12 +34,8 @@ class FileService
         return Storage::exists("$directory/$filename");
     }
 
-    public function getUrlPath(string $filename, string $directory = 'documents')
+    public function getUrlPath(string $filename, string $directory = 'documents'): string
     {
-        if (!$filename) {
-            return null;
-        }
-
         return Storage::url("$directory/$filename");
     }
 

@@ -8,7 +8,7 @@ interface User {
   id: number;
   name: string;
   email: string;
-  image?: string;
+  avatar: string;
 }
 
 interface RecipientListProps {
@@ -34,7 +34,7 @@ export function RecipientList({ users, onSignatoryChange, onRemoveUser }: Recipi
           <div key={user.id} className="flex items-center justify-between gap-5 py-3">
             <div className="flex items-center space-x-4">
               <Avatar>
-                <AvatarImage src={user.image} />
+                <AvatarImage src={user.avatar} />
                 <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
               </Avatar>
               <div>

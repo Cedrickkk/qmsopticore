@@ -28,6 +28,7 @@ export function RecipientSearch({ onAddUser }: RecipientSearchProps) {
         id: user.id,
         name: user.name,
         email: user.email,
+        avatar: user.avatar ?? '',
         signatory: false,
       };
 

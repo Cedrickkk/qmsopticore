@@ -35,7 +35,7 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
 
         if ($request->user()->hasRole(RoleEnum::REGULAR_USER->value)) {
-            return redirect()->intended(route('documents', absolute: false));
+            return redirect()->intended(route('documents.index', absolute: false));
         }
 
         return redirect()->intended(route('dashboard', absolute: false));

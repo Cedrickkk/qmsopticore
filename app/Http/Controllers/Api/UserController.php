@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\FileService;
 use Illuminate\Http\Request;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
@@ -11,7 +12,8 @@ use Illuminate\Support\Facades\Auth;
 class UserController extends Controller
 {
     public function __construct(
-        private readonly UserService $service
+        private readonly UserService $service,
+        private readonly FileService $fileService,
     ) {}
 
     public function search(Request $request): JsonResponse
@@ -33,7 +35,12 @@ class UserController extends Controller
         }
 
         return response()->json([
-            'user' => $user
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'avatar' => $this->fileService->getUrlPath($user->avatar, 'avatars'),
+            ]
         ], 200);
     }
 }

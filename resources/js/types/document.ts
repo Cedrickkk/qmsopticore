@@ -38,6 +38,7 @@ export type DocumentType = {
 export type DocumentUser = {
   id: number;
   name: string;
+  avatar: string;
   email: string;
   signatory: boolean;
 };

@@ -30,12 +30,10 @@ class UserService
 
         $departmentId = $this->departmentRepository->findIdByName($data['department']);
 
-        $image = $this->fileService->upload($data['image'], 'avatars');
-
         return $this->userRepository->create([
             'name' => $data['name'],
             'email' => $data['email'],
-            'avatar' => $image,
+            'avatar' => $data['image']->getClientOriginalName(),
             'position' => $data['position'],
             'password' => Hash::make($request['password']),
             'department_id' => $departmentId,
