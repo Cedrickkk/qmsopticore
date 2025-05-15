@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/Cedrickkk/qmsopticore/compare/v1.1.0...v1.1.1) (2025-05-15)
+
+
+### Bug Fixes
+
+* resolve file uploads and user avatar handling ([5e2cc46](https://github.com/Cedrickkk/qmsopticore/commit/5e2cc466200f31d90a9183e4b549a4c88f20fbdf))
+
 # [1.1.0](https://github.com/Cedrickkk/qmsopticore/compare/v1.0.3...v1.1.0) (2025-05-15)
 
 
