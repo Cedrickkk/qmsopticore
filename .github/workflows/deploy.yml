@@ -62,14 +62,14 @@ jobs:
             fi
           fi
 
-          # Ensure APP_ENV is set to production
-          if [ -f ".env" ]; then
-            if grep -q "APP_ENV" .env; then
-              sed -i "s/APP_ENV=.*/APP_ENV=production/" .env
-            else
-              echo "APP_ENV=production" >> .env
-            fi
-          fi
+          # # Ensure APP_ENV is set to production
+          # if [ -f ".env" ]; then
+          #   if grep -q "APP_ENV" .env; then
+          #     sed -i "s/APP_ENV=.*/APP_ENV=production/" .env
+          #   else
+          #     echo "APP_ENV=production" >> .env
+          #   fi
+          # fi
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
