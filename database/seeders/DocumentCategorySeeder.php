@@ -33,7 +33,7 @@ class DocumentCategorySeeder extends Seeder
             $typeId = $documentTypes[$typeName];
 
             foreach ($categoryNames as $categoryName) {
-                DocumentCategory::factory()->create([
+                DocumentCategory::create([
                     'name' => $categoryName,
                     'type' => $typeId
                 ]);
