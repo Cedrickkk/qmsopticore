@@ -1,3 +1,10 @@
+## [1.1.6](https://github.com/Cedrickkk/qmsopticore/compare/v1.1.5...v1.1.6) (2025-05-16)
+
+
+### Bug Fixes
+
+* dynamic import on app.blade.php ([c655b35](https://github.com/Cedrickkk/qmsopticore/commit/c655b358668f70f64c9595cfadfe540b39c2b42f))
+
 ## [1.1.5](https://github.com/Cedrickkk/qmsopticore/compare/v1.1.4...v1.1.5) (2025-05-16)
 
 
