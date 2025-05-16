@@ -1,3 +1,10 @@
+## [1.1.5](https://github.com/Cedrickkk/qmsopticore/compare/v1.1.4...v1.1.5) (2025-05-16)
+
+
+### Bug Fixes
+
+* remove factory usage on DocumentCategorySeeder ([03cc6ce](https://github.com/Cedrickkk/qmsopticore/commit/03cc6cea96f442057978ae0db0e8eb087f1bf348))
+
 ## [1.1.4](https://github.com/Cedrickkk/qmsopticore/compare/v1.1.3...v1.1.4) (2025-05-16)
 
 
