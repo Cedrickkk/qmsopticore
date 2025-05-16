@@ -1,3 +1,10 @@
+## [1.1.3](https://github.com/Cedrickkk/qmsopticore/compare/v1.1.2...v1.1.3) (2025-05-16)
+
+
+### Bug Fixes
+
+* app_env to production ([1b7138b](https://github.com/Cedrickkk/qmsopticore/commit/1b7138bf9647793475b786294896c7b72f000ee3))
+
 ## [1.1.2](https://github.com/Cedrickkk/qmsopticore/compare/v1.1.1...v1.1.2) (2025-05-15)
 
 
