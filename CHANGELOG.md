@@ -1,3 +1,10 @@
+## [1.1.4](https://github.com/Cedrickkk/qmsopticore/compare/v1.1.3...v1.1.4) (2025-05-16)
+
+
+### Bug Fixes
+
+* create admin user without Faker dependency ([97ad91b](https://github.com/Cedrickkk/qmsopticore/commit/97ad91b2165562a0e3342dbd2edf86d4c8d933fd))
+
 ## [1.1.3](https://github.com/Cedrickkk/qmsopticore/compare/v1.1.2...v1.1.3) (2025-05-16)
 
 
