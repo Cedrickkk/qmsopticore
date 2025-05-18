@@ -13,7 +13,7 @@ export default function AuthSplitLayout({ children, title, description }: AuthLa
   return (
     <div className="relative grid h-dvh flex-col items-center justify-center px-8 sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0">
       <div className="bg-muted relative hidden h-full flex-col p-10 text-white lg:flex dark:border-r">
-        <div className="bg-primary/20 absolute inset-0 bg-[url('/images/home-img.jpg')] bg-cover bg-right bg-no-repeat" />\
+        <div className="bg-primary/20 absolute inset-0 bg-[url('images/home-img.jpg')] bg-cover bg-right bg-no-repeat" />\
         <div className="bg-primary/50 absolute inset-0" />
         <Link href={route('login')} className="relative z-20 flex items-center gap-5 text-lg font-medium drop-shadow-lg">
           <img src="/images/plp-1.png" alt="Pamantasan ng Lungsod ng Pasig Logo" className="size-9 scale-150" />
