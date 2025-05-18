@@ -2,6 +2,7 @@ import { DocumentCategoryField } from '@/components/document-category-field';
 import { Recipients } from '@/components/document-recipient';
 import { DocumentTypeField } from '@/components/document-type-field';
 import { DocumentUpload } from '@/components/document-upload';
+import InputError from '@/components/input-error';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -104,6 +105,7 @@ export default function Create() {
             <div className="space-y-2">
               <Label htmlFor="description">Description</Label>
               <Textarea id="description" className="rounded-sm" value={data.description} onChange={e => setData('description', e.target.value)} />
+              <InputError message={errors.description} />
             </div>
             <Recipients users={data.users} onChange={users => setData('users', users)} errors={errors} />
             <Button className="w-full" disabled={processing}>
