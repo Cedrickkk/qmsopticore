@@ -1,3 +1,10 @@
+## [1.1.9](https://github.com/Cedrickkk/qmsopticore/compare/v1.1.8...v1.1.9) (2025-05-18)
+
+
+### Bug Fixes
+
+* improve authentication flow and workflow service ([c023ffa](https://github.com/Cedrickkk/qmsopticore/commit/c023ffa64f5a2ab8295608680ac7e86ba2148b40))
+
 ## [1.1.8](https://github.com/Cedrickkk/qmsopticore/compare/v1.1.7...v1.1.8) (2025-05-18)
 
 
