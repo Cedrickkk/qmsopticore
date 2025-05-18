@@ -197,7 +197,7 @@ class WorkflowService implements WorkflowServiceInterface
             ->get();
 
         foreach ($pendingSignatories as $pendingSignatory) {
-            $pendingSignatory->update(['status' => 'canceled']);
+            $pendingSignatory->update(['status' => 'rejected']);
 
             $this->log(
                 $document,
