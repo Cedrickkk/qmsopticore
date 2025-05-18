@@ -1,3 +1,10 @@
+## [1.1.7](https://github.com/Cedrickkk/qmsopticore/compare/v1.1.6...v1.1.7) (2025-05-18)
+
+
+### Bug Fixes
+
+* revert image path on auth split layout ([7052070](https://github.com/Cedrickkk/qmsopticore/commit/7052070b25742da424c2a3d2001ef463a1a53573))
+
 ## [1.1.6](https://github.com/Cedrickkk/qmsopticore/compare/v1.1.5...v1.1.6) (2025-05-16)
 
 
