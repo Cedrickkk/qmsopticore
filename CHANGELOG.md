@@ -1,3 +1,10 @@
+## [1.1.8](https://github.com/Cedrickkk/qmsopticore/compare/v1.1.7...v1.1.8) (2025-05-18)
+
+
+### Bug Fixes
+
+* redirection route on RegisteredUserController ([9f2e372](https://github.com/Cedrickkk/qmsopticore/commit/9f2e3720225687152d4175b8ea2b9a0651643ee9))
+
 ## [1.1.7](https://github.com/Cedrickkk/qmsopticore/compare/v1.1.6...v1.1.7) (2025-05-18)
 
 
