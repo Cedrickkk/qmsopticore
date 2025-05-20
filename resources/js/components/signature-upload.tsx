@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { CreateAccountFormData } from '@/pages/accounts/create';
 import { FlaskServiceApi } from '@/services/flask';
-import { LoaderCircle, X } from 'lucide-react';
+import { LoaderCircle, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { SignatureValidationAlert } from './signature-validation-alert';
@@ -136,8 +136,8 @@ export function SignatureUpload({ signatures, onChange, errors, disabled, onVali
             <div className="flex h-10 w-full items-center justify-between rounded-md bg-gray-100 px-3 py-2 text-sm">
               <p>{file.name}</p>
               {!isValidated && (
-                <Button variant="ghost" size="icon" type="button" onClick={() => removeSignature(file.name)} className="cursor-pointer">
-                  <X className="text-red-500" />
+                <Button variant="ghost" size="sm" type="button" onClick={() => removeSignature(file.name)} className="cursor-pointer">
+                  <Trash2 className="text-destructive" />
                 </Button>
               )}
             </div>

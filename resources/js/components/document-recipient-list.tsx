@@ -2,7 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useInitials } from '@/hooks/use-initials';
-import { CircleMinus } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 
 interface User {
   id: number;
@@ -55,7 +55,7 @@ export function RecipientList({ users, onSignatoryChange, onRemoveUser }: Recipi
               </div>
 
               <Button type="button" variant="ghost" size="icon" onClick={() => onRemoveUser(user.id)}>
-                <CircleMinus className="text-destructive" />
+                <Trash2 className="text-destructive" />
               </Button>
             </div>
           </div>
