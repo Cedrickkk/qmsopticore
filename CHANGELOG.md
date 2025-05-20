@@ -1,3 +1,12 @@
+## [1.1.10](https://github.com/Cedrickkk/qmsopticore/compare/v1.1.9...v1.1.10) (2025-05-20)
+
+
+### Bug Fixes
+
+* improve document history navigation link styling ([abfd44d](https://github.com/Cedrickkk/qmsopticore/commit/abfd44dc94bfadd6e08eec368afc6bdc2ee2eda1))
+* improve recent documents display and status indicators ([7209bce](https://github.com/Cedrickkk/qmsopticore/commit/7209bcebe072edefac26d08ad8dcd583b7c31789))
+* update null handling for user avatar ([5cca680](https://github.com/Cedrickkk/qmsopticore/commit/5cca6804d7e44f782707231f76722922b4f5f18a))
+
 ## [1.1.9](https://github.com/Cedrickkk/qmsopticore/compare/v1.1.8...v1.1.9) (2025-05-18)
 
 
