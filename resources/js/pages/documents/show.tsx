@@ -13,8 +13,8 @@ import { useDownloadDocument } from '@/hooks/use-download-document';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { type Document } from '@/types/document';
-import { Head, usePage } from '@inertiajs/react';
-import { Download, Users } from 'lucide-react';
+import { Head, Link, usePage } from '@inertiajs/react';
+import { Download, History, Users } from 'lucide-react';
 import { useState } from 'react';
 import { File } from 'react-pdf/dist/esm/shared/types.js';
 
@@ -77,14 +77,23 @@ export default function Show() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="w-full lg:col-span-3">
           <Tabs defaultValue="document" className="w-full rounded-xs" onValueChange={setActiveTab}>
-            <TabsList className="mb-4 rounded-xs">
-              <TabsTrigger value="document" className="rounded-xs">
-                Document
-              </TabsTrigger>
-              <TabsTrigger value="info" className="rounded-xs">
-                Information
-              </TabsTrigger>
-            </TabsList>
+            <div className="flex items-center justify-between">
+              <TabsList className="mb-4 rounded-xs">
+                <TabsTrigger value="document" className="rounded-xs">
+                  Document
+                </TabsTrigger>
+                <TabsTrigger value="info" className="rounded-xs">
+                  Information
+                </TabsTrigger>
+              </TabsList>
+
+              <Link href={`/documents/${document.id}/history`}>
+                <Button variant="ghost" size="sm" className="flex items-center gap-1">
+                  <History />
+                  <span className="text-xs">History</span>
+                </Button>
+              </Link>
+            </div>
 
             <TabsContent value="document" className="mt-0" key={document.id} forceMount={true} hidden={'document' !== tab}>
               {canSign && (

@@ -4,10 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Separator } from '@/components/ui/separator';
 import { useInitials } from '@/hooks/use-initials';
 import { type Document } from '@/types/document';
-import { Link } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { CalendarDays, CheckCircle, Clock, FileText, History, Users, XCircle } from 'lucide-react';
-import { Button } from './ui/button';
+import { CalendarDays, CheckCircle, Clock, FileText, Users, XCircle } from 'lucide-react';
 
 const documentStatusConfig = {
   draft: { variant: 'outline', label: 'Draft' },
@@ -56,12 +54,6 @@ export function DocumentInfo({ document }: DocumentInfoProps) {
                 </CardDescription>
               </div>
               <div className="flex items-center gap-2">
-                <Link href={`/documents/${document.id}/history`}>
-                  <Button variant="outline" size="sm" className="flex items-center gap-1">
-                    <History className="h-3.5 w-3.5" />
-                    <span>History</span>
-                  </Button>
-                </Link>
                 <Badge
                   variant={documentStatusConfig[document.status as keyof typeof documentStatusConfig]?.variant || 'outline'}
                   className="rounded-sm px-2 py-1"
