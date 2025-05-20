@@ -1,3 +1,10 @@
+## [1.1.11](https://github.com/Cedrickkk/qmsopticore/compare/v1.1.10...v1.1.11) (2025-05-20)
+
+
+### Bug Fixes
+
+* update cache configuration to use file driver ([d3256eb](https://github.com/Cedrickkk/qmsopticore/commit/d3256eb6e1f85062fa81c4212ffaa943f0cd4a11))
+
 ## [1.1.10](https://github.com/Cedrickkk/qmsopticore/compare/v1.1.9...v1.1.10) (2025-05-20)
 
 
