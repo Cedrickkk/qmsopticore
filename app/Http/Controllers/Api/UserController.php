@@ -39,7 +39,7 @@ class UserController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
-                'avatar' => $this->fileService->getUrlPath($user->avatar, 'avatars'),
+                'avatar' => $this->fileService->getUrlPath($user->avatar ?? "", 'avatars'),
             ]
         ], 200);
     }
