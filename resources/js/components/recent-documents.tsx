@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { statusConfig } from '@/pages/documents';
 import { type Document } from '@/types/document';
 import { router } from '@inertiajs/react';
 import { FileStack } from 'lucide-react';
@@ -30,7 +31,7 @@ export default function RecentDocuments({ documents }: RecentDocumentsProps) {
           <TableHeader>
             <TableRow>
               <TableHead>From</TableHead>
-              <TableHead className="hidden text-right sm:table-cell">Type</TableHead>
+              <TableHead className="hidden sm:table-cell">Type</TableHead>
               <TableHead className="hidden text-right sm:table-cell">Status</TableHead>
             </TableRow>
           </TableHeader>
@@ -46,7 +47,9 @@ export default function RecentDocuments({ documents }: RecentDocumentsProps) {
                 </TableCell>
                 <TableCell className="text-right sm:table-cell">
                   <div className="flex items-center justify-end">
-                    <Badge className="text-xs">{document.status}</Badge>
+                    <Badge className="text-xs" variant={statusConfig[document.status as keyof typeof statusConfig].variant}>
+                      {document.status}
+                    </Badge>
                   </div>
                 </TableCell>
               </TableRow>

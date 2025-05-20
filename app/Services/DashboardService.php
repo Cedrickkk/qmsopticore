@@ -103,6 +103,7 @@ class DashboardService
                     $query->where('user_id', $userId);
                 });
             })
+            ->orWhere('created_by', $userId)
             ->with('createdBy:id,name,email')
             ->with('category:id,name')
             ->latest()
