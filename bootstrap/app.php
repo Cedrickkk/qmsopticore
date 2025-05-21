@@ -25,6 +25,11 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
+        $exceptions->renderable(function (\Exception $e) {
+            if ($e->getPrevious() instanceof \Illuminate\Session\TokenMismatchException) {
+                return redirect()->route('login');
+            };
+        });
         $exceptions->render(function (\Spatie\Permission\Exceptions\UnauthorizedException $e, $request) {
             if ($request->wantsJson()) {
                 return response()->json([
