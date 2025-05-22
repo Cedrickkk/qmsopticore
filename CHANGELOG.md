@@ -1,3 +1,10 @@
+## [1.1.12](https://github.com/Cedrickkk/qmsopticore/compare/v1.1.11...v1.1.12) (2025-05-22)
+
+
+### Bug Fixes
+
+* redirect users to login when page expires ([059e05a](https://github.com/Cedrickkk/qmsopticore/commit/059e05a61f22fd0acd23e45bb047c24f1a007bdd))
+
 ## [1.1.11](https://github.com/Cedrickkk/qmsopticore/compare/v1.1.10...v1.1.11) (2025-05-20)
 
 
