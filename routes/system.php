@@ -15,7 +15,7 @@ Route::middleware(['auth', 'role:super_admin'])->group(function () {
 
     Route::prefix('/backups')->name('backups.')->group(function () {
 
-      Route::get('/', [BackupController::class, 'index']);
+      Route::get('/', [BackupController::class, 'index'])->name('index');
     });
 
     Route::inertia('/contents', 'system-settings/contents');
