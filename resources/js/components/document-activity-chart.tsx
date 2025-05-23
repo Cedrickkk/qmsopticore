@@ -32,9 +32,7 @@ export default function DocumentActivityChart({ data }: DocumentActivityChartPro
   };
 
   const chartData = data.map(item => ({
-    month: `${item.week.slice(0, 3)}${
-      new Date(item.yearWeek).getFullYear() !== new Date().getFullYear() ? ' ' + new Date(item.yearWeek).getFullYear().toString().slice(2) : ''
-    }`,
+    month: item.week,
     documents: item.count,
   }));
 
@@ -53,9 +51,17 @@ export default function DocumentActivityChart({ data }: DocumentActivityChartPro
         <ChartContainer config={chartConfig}>
           <AreaChart accessibilityLayer data={chartData} margin={{ left: 12, right: 12 }}>
             <CartesianGrid vertical={false} />
-            <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={8} />
+            <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={8} interval="preserveStartEnd" />
             <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
-            <Area dataKey="documents" type="natural" fill="var(--color-desktop)" fillOpacity={0.4} stroke="var(--color-desktop)" stackId="a" />
+            <Area
+              dataKey="documents"
+              type="natural"
+              fill="var(--color-desktop)"
+              fillOpacity={0.4}
+              stroke="var(--color-desktop)"
+              stackId="a"
+              strokeWidth={2}
+            />
           </AreaChart>
         </ChartContainer>
       </CardContent>
