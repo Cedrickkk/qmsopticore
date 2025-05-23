@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/Cedrickkk/qmsopticore/compare/v1.2.0...v1.2.1) (2025-05-23)
+
+
+### Bug Fixes
+
+* **dashboard:** improve document activity chart readability ([7c337a1](https://github.com/Cedrickkk/qmsopticore/commit/7c337a1a165504aa4af622df3fd6a27673f48413))
+
 # [1.2.0](https://github.com/Cedrickkk/qmsopticore/compare/v1.1.12...v1.2.0) (2025-05-23)
 
 
