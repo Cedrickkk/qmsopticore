@@ -5,7 +5,8 @@ export default function AppLogo() {
         <img src="/images/plp-1.png" alt="Pamantasan ng Lungsod ng Pasig Logo" className="h-fit w-fit scale-125 rounded-full dark:bg-white" />
       </div>
       <div className="hidden flex-1 text-left text-sm sm:grid">
-        <span className="mb-0.5 truncate leading-none font-semibold">PLP - QMS</span>
+        <span className="truncate font-semibold">QMSOPTICORE</span>
+        <span className="text-muted-foreground truncate text-xs font-medium">Pamantasan ng Lungsod ng Pasig</span>
       </div>
     </div>
   );
