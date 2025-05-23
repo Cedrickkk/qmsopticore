@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/Cedrickkk/qmsopticore/compare/v1.1.12...v1.2.0) (2025-05-23)
+
+
+### Features
+
+* **admin:** implement system settings UI and database backups ([d69909e](https://github.com/Cedrickkk/qmsopticore/commit/d69909e60fc33431a55bff93a64a6b1bb4b7b5d8))
+
 ## [1.1.12](https://github.com/Cedrickkk/qmsopticore/compare/v1.1.11...v1.1.12) (2025-05-22)
 
 
