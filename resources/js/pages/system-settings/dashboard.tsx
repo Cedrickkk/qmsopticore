@@ -3,26 +3,10 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
 import SystemSettingsLayout from '@/layouts/system-settings/layout';
-import { Head, router } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { Database, File, Settings } from 'lucide-react';
-import { useState } from 'react';
 
 export default function Dashboard() {
-  const [isCreatingDbBackup, setIsCreatingDbBackup] = useState(false);
-
-  const handleCreateDatabaseBackup = () => {
-    setIsCreatingDbBackup(true);
-    router.post(
-      route('system-settings.backups.database.create'),
-      {},
-      {
-        onSuccess: () => setIsCreatingDbBackup(false),
-        onError: () => setIsCreatingDbBackup(false),
-        showProgress: false,
-      }
-    );
-  };
-
   return (
     <AppLayout>
       <Head title="System Settings" />
@@ -61,8 +45,8 @@ export default function Dashboard() {
               <h3>Database</h3>
             </div>
             <p className="text-muted-foreground mb-6 text-sm">Create a new backup of your database.</p>
-            <Button size="sm" className="rounded-xs" onClick={handleCreateDatabaseBackup} disabled={isCreatingDbBackup}>
-              {isCreatingDbBackup ? 'Creating Database Backup...' : 'Create Database Backup'}
+            <Button size="sm" className="rounded-xs">
+              Create Database Backup
             </Button>
           </div>
 
