@@ -26,10 +26,10 @@ export function DocumentTypeField({ value, onChange, types, errors }: DocumentTy
     <div className="space-y-2">
       <Label htmlFor="document-type">Document Type</Label>
       <Select value={value.name} onValueChange={handleTypeChange} name="document-type">
-        <SelectTrigger id="document-type" className="mt-1 w-full" aria-label="Select document type">
-          <SelectValue placeholder="Select a document type" />
+        <SelectTrigger id="document-type" className="mt-1 w-full rounded-xs" aria-label="Select document type">
+          <SelectValue placeholder="Select document type" />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="rounded-xs">
           <SelectGroup>
             {types.map(type => (
               <SelectItem key={type.id} value={type.name}>

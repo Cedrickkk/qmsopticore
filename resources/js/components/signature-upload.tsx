@@ -124,7 +124,7 @@ export function SignatureUpload({ signatures, onChange, errors, disabled, onVali
         type="file"
         name="signatures"
         accept="image/png, image/jpg, image/jpeg"
-        className="mt-1 block w-full"
+        className="mt-1 block w-full rounded-xs"
         disabled={disabled || isValidated}
         onChange={handleFileChange}
       />

@@ -65,7 +65,7 @@ export const PDFViewer = memo(function PDFViewerComponent({ file, showThumbnails
     <div>
       <div className="my-4 flex flex-col gap-4">
         <Document
-          className="bg-primary/10 border-primary relative flex h-fit justify-center rounded-sm border shadow-sm transition-colors"
+          className="bg-primary/10 border-primary relative flex h-fit justify-center rounded-xs border shadow-sm transition-colors"
           key={document.status}
           file={file}
           loading={
@@ -110,7 +110,7 @@ export const PDFViewer = memo(function PDFViewerComponent({ file, showThumbnails
             onPageChange={handlePageChange}
             onZoom={handleZoom}
           />
-          <Button variant="outline" className="flex items-center gap-2" onClick={handleDownloadClick}>
+          <Button variant="outline" className="flex items-center gap-2 rounded-xs" onClick={handleDownloadClick}>
             <Download className="h-4 w-4" />
             Download
           </Button>

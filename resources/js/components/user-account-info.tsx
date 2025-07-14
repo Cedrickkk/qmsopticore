@@ -22,7 +22,7 @@ export default function AccountInformation({ data, errors, setData, processing }
         <Input
           id="password"
           type="password"
-          className="mt-1"
+          className="mt-1 rounded-xs"
           autoComplete="new-password"
           value={data.password}
           onChange={e => setData('password', e.target.value)}
@@ -37,7 +37,7 @@ export default function AccountInformation({ data, errors, setData, processing }
         <Input
           id="password_confirmation"
           type="password"
-          className="mt-1"
+          className="mt-1 rounded-xs"
           autoComplete="new-password"
           value={data.password_confirmation}
           onChange={e => setData('password_confirmation', e.target.value)}
@@ -49,10 +49,10 @@ export default function AccountInformation({ data, errors, setData, processing }
       <div className="space-y-2">
         <Label htmlFor="password_confirmation">Role</Label>
         <Select value={data.role} onValueChange={value => setData('role', value)} disabled={processing}>
-          <SelectTrigger id="role" name="role" className="mt-1 w-full">
+          <SelectTrigger id="role" name="role" className="mt-1 w-full rounded-xs">
             <SelectValue placeholder="Select a role" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="rounded-xs">
             <SelectGroup>
               {roles &&
                 roles.map(role => (

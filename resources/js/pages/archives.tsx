@@ -119,7 +119,7 @@ export default function Archives() {
             />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="ml-auto rounded-sm">
+                <Button variant="outline" className="ml-auto rounded-xs">
                   <Settings2 /> Filter Columns
                 </Button>
               </DropdownMenuTrigger>

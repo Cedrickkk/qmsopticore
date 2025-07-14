@@ -14,13 +14,13 @@ interface PDFThumbnailsProps {
 
 export const PDFThumbnails = memo(function PDFThumbnailsViewer({ file, numPages, currentPage, onPageChange }: PDFThumbnailsProps) {
   return (
-    <div className="flex h-1/2 gap-2 overflow-y-auto rounded-sm border p-7">
+    <div className="flex h-1/2 gap-2 overflow-y-auto rounded-xs border p-7">
       {Array.from({ length: numPages }, (_, i) => i + 1).map(pageNum => (
         <button
           key={`thumb_${pageNum}`}
           onClick={() => onPageChange(pageNum)}
           className={cn(
-            'min-w-[200px] rounded-sm border p-1 transition-colors',
+            'min-w-[200px] rounded-xs border p-1 transition-colors',
             pageNum === currentPage ? 'border-primary bg-primary/10' : 'hover:border-primary/50'
           )}
         >

@@ -94,11 +94,11 @@ export function TableData<TData, TValue>({ columns, data }: DataTableProps<TData
           />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="ml-auto rounded-sm">
+              <Button variant="outline" className="ml-auto rounded-xs">
                 <Settings2 /> Filter Columns
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" className="rounded-xs">
               {table
                 .getAllColumns()
                 .filter(column => column.getCanHide())

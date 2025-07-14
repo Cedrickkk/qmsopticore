@@ -49,7 +49,7 @@ export function ProfileInformation({ data, setData, errors, processing, onSignat
           </Avatar>
           <div className="flex flex-col gap-2">
             <Input type="file" id="image" accept=".png, .jpeg, .jpg" className="hidden" onChange={handleImageChange} />
-            <Button className="w-fit cursor-pointer" variant="outline" asChild>
+            <Button className="w-fit cursor-pointer" variant="ghost" asChild size="sm">
               <Label htmlFor="image">{profileImageUrl ? 'Change image' : 'Upload image'}</Label>
             </Button>
             <p className="text-muted-foreground text-xs">.png, .jpeg, .jpg file up to 1mb. Recommended size is 150x150px</p>
@@ -64,7 +64,7 @@ export function ProfileInformation({ data, setData, errors, processing, onSignat
           id="fullname"
           type="text"
           name="fullname"
-          className="mt-1 block w-full"
+          className="mt-1 block w-full rounded-xs"
           value={data.name}
           disabled={processing}
           onChange={e => setData('name', e.target.value)}
@@ -78,7 +78,7 @@ export function ProfileInformation({ data, setData, errors, processing, onSignat
           id="email"
           type="email"
           name="email"
-          className="mt-1 block w-full"
+          className="mt-1 block w-full rounded-xs"
           value={data.email}
           disabled={processing}
           autoComplete="email"
@@ -97,7 +97,7 @@ export function ProfileInformation({ data, setData, errors, processing, onSignat
           id="position"
           type="text"
           name="position"
-          className="mt-1 block w-full"
+          className="mt-1 block w-full rounded-xs"
           value={data.position}
           disabled={processing}
           onChange={e => setData('position', e.target.value)}
@@ -108,10 +108,10 @@ export function ProfileInformation({ data, setData, errors, processing, onSignat
       <div className="space-y-2">
         <Label htmlFor="department">Department</Label>
         <Select value={data.department} onValueChange={value => setData('department', value)} disabled={processing}>
-          <SelectTrigger id="department" name="department" className="mt-1 w-full">
+          <SelectTrigger id="department" name="department" className="mt-1 w-full rounded-xs">
             <SelectValue placeholder="Select a department" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="rounded-xs">
             <SelectGroup>
               {departments &&
                 departments.map(item => (

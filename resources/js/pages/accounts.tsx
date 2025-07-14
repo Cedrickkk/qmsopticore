@@ -104,7 +104,7 @@ export default function Accounts() {
             />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="ml-auto rounded-sm">
+                <Button variant="outline" className="ml-auto rounded-xs">
                   <Settings2 /> Filter Columns
                 </Button>
               </DropdownMenuTrigger>
@@ -130,9 +130,9 @@ export default function Accounts() {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-          <Button asChild>
+          <Button asChild className="rounded-xs">
             <Link href="/accounts/create" prefetch>
-              <UserPlus /> Create new account
+              <UserPlus /> New Account
             </Link>
           </Button>
         </div>

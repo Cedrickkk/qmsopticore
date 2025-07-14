@@ -50,8 +50,15 @@ export function RecipientSearch({ onAddUser }: RecipientSearchProps) {
       <div className="space-y-2">
         <Label htmlFor="recipients">Search Recipients</Label>
         <div className="flex items-center gap-4">
-          <Input id="recipients" type="email" placeholder="Search email..." value={email} onChange={e => setEmail(e.target.value)} className="mt-1" />
-          <Button variant="secondary" onClick={handleSearchUser} disabled={!email || isLoading}>
+          <Input
+            id="recipients"
+            type="email"
+            placeholder="Search email..."
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            className="mt-1 rounded-xs"
+          />
+          <Button variant="secondary" onClick={handleSearchUser} disabled={!email || isLoading} className="rounded-xs">
             {isLoading ? <LoaderCircle className="animate-spin" /> : 'Add'}
           </Button>
         </div>
