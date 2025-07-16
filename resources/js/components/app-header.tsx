@@ -112,7 +112,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
             </Sheet>
           </div>
 
-          <Link href={userRoles.includes('super_admin') ? '/dashboard' : '/documents'} className="flex items-center space-x-2" prefetch>
+          <Link href={userRoles.includes('super_admin') ? '/dashboard' : '/documents'} className="flex items-center space-x-2">
             <AppLogo />
           </Link>
 

@@ -32,7 +32,7 @@ export default function RestoreDocumentActions({ row }: RestorDocumentActionsPro
         <DropdownMenuContent align="end" className="rounded-sm">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <DropdownMenuItem asChild>
-            <Link href={`/documents/${row.original.id}`} prefetch>
+            <Link href={`/documents/${row.original.id}`}>
               <Eye />
               <span>View Document</span>
             </Link>
