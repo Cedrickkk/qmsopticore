@@ -17,7 +17,7 @@ interface DocumentActivityChartProps {
 const chartConfig = {
   desktop: {
     label: 'Downloads',
-    color: 'oklch(43.2% 0.1526 259.33)',
+    color: 'var(--primary)',
   },
 } satisfies ChartConfig;
 

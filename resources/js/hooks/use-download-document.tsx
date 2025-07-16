@@ -1,7 +1,7 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { DocumentServiceApi } from '@/services/app';
 import { Document } from '@/types/document';
-import { AlertCircle, FileDown } from 'lucide-react';
+import { AlertCircle, CircleCheckBig } from 'lucide-react';
 import { useCallback } from 'react';
 import { toast } from 'sonner';
 
@@ -32,8 +32,8 @@ export function useDownloadDocument() {
 
       toast(
         <Alert className="border-none p-0 font-sans">
-          <FileDown className="h-4 w-4" color="green" />
-          <AlertTitle className="flex items-center gap-1.5 font-medium text-green-600">Download Complete</AlertTitle>
+          <CircleCheckBig color="green" />
+          <AlertTitle className="text-primary font-medium">Download Complete</AlertTitle>
           <AlertDescription>{documentData.title} has been downloaded.</AlertDescription>
         </Alert>
       );

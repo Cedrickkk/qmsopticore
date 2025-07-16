@@ -16,7 +16,7 @@ import AuthSimpleLayout from '@/layouts/auth/auth-simple-layout';
 import { Department } from '@/pages/accounts/create';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { DialogDescription } from '@radix-ui/react-dialog';
-import { LoaderCircle } from 'lucide-react';
+import { CircleCheckBig, LoaderCircle } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
 import { toast, Toaster } from 'sonner';
 
@@ -64,24 +64,8 @@ export default function Register() {
         reset();
         toast(
           <Alert className="border-none p-0 font-sans">
-            <AlertTitle className="flex items-center gap-1.5 font-medium text-green-600">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="lucide lucide-check-circle"
-              >
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-              </svg>
-              Account Created Successfully
-            </AlertTitle>
+            <CircleCheckBig color="green" />
+            <AlertTitle className="text-primary font-medium">Account Created Successfully</AlertTitle>
             <AlertDescription> The account was created successfully.</AlertDescription>
           </Alert>
         );
