@@ -1,10 +1,13 @@
+import AccountsTableActions from '@/components/accounts-table-actions';
 import { TableHeaderButton } from '@/components/table-header-button';
 import { TablePagination } from '@/components/table-pagination';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { getOnlineStatusBadge } from '@/lib/online-status';
 import { PaginatedData, User } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import {
@@ -24,11 +27,12 @@ type PageProps = {
   accounts: PaginatedData<User>;
 };
 
-type UserWithDepartment = User & {
+export type UserWithDepartment = User & {
   department: {
     id: number;
     name: string;
   };
+  online_status: string;
 };
 
 export const accountColumns: ColumnDef<UserWithDepartment>[] = [
@@ -51,6 +55,16 @@ export const accountColumns: ColumnDef<UserWithDepartment>[] = [
     accessorKey: 'department.name',
     header: ({ column }) => <TableHeaderButton column={column}>Department</TableHeaderButton>,
     cell: ({ row }) => <div>{row.original.department.name}</div>,
+  },
+  {
+    accessorKey: 'online_status',
+    header: ({ column }) => <TableHeaderButton column={column}>Status</TableHeaderButton>,
+    cell: ({ row }) => getOnlineStatusBadge(row.original.online_status),
+  },
+  {
+    id: 'actions',
+    enableHiding: false,
+    cell: ({ row }) => <AccountsTableActions row={row} />,
   },
 ];
 
@@ -94,44 +108,55 @@ export default function Accounts() {
       </div>
 
       <div className="flex h-full flex-1 flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Input
-              placeholder={'Search account...'}
-              value={globalFilter ?? ''}
-              onChange={event => setGlobalFilter(event.target.value)}
-              className="max-w-lg"
-            />
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="ml-auto rounded-xs">
-                  <Settings2 /> Filter Columns
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {table
-                  .getAllColumns()
-                  .filter(column => column.getCanHide())
-                  .map(column => {
-                    return (
-                      <DropdownMenuCheckboxItem
-                        key={column.id}
-                        className="capitalize"
-                        checked={column.getIsVisible()}
-                        onCheckedChange={value => column.toggleVisibility(!!value)}
-                      >
-                        {column.id
-                          .split('_')
-                          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                          .join(' ')}
-                      </DropdownMenuCheckboxItem>
-                    );
-                  })}
-              </DropdownMenuContent>
-            </DropdownMenu>
+        <div className="mb-4 flex items-end justify-between">
+          <div className="flex w-3/4 items-end gap-3">
+            <div className="flex w-full flex-col gap-3">
+              <Label htmlFor="search" className="px-1">
+                Search
+              </Label>
+              <Input
+                id="search"
+                placeholder={'Search accounts...'}
+                value={globalFilter ?? ''}
+                onChange={event => setGlobalFilter(event.target.value)}
+                className="w-full rounded-xs"
+              />
+            </div>
+            <div className="flex items-end gap-3">
+              <div className="flex flex-col gap-3">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="rounded-xs">
+                      <Settings2 />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="rounded-xs">
+                    {table
+                      .getAllColumns()
+                      .filter(column => column.getCanHide())
+                      .map(column => {
+                        return (
+                          <DropdownMenuCheckboxItem
+                            key={column.id}
+                            className="rounded-xs capitalize"
+                            checked={column.getIsVisible()}
+                            onCheckedChange={value => column.toggleVisibility(!!value)}
+                          >
+                            {column.id
+                              .split('_')
+                              .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                              .join(' ')}
+                          </DropdownMenuCheckboxItem>
+                        );
+                      })}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </div>
           </div>
-          <Button asChild className="rounded-xs">
-            <Link href="/accounts/create" prefetch>
+
+          <Button className="rounded-xs" asChild>
+            <Link href="/accounts/create">
               <UserPlus /> New Account
             </Link>
           </Button>
