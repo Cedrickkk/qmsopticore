@@ -5,8 +5,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CreateAccountFormData, Department } from '@/pages/accounts/create';
+import { SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SignatureUpload } from './signature-upload';
 
 /**
@@ -27,7 +28,36 @@ interface ProfileInformationProps {
 export function ProfileInformation({ data, setData, errors, processing, onSignaturesChanged, onSignaturesValidated }: ProfileInformationProps) {
   const [profileImageUrl, setProfileImageUrl] = useState<string>('');
 
+  const {
+    auth: { user },
+  } = usePage<
+    SharedData & {
+      auth: {
+        user: {
+          id: number;
+          name: string;
+          email: string;
+          roles?: string[];
+          department?: {
+            id: number;
+            name: string;
+          };
+        };
+      };
+    }
+  >().props;
+
   const { departments } = usePage<{ departments: Department[] }>().props;
+
+  const isSuperAdmin = user.roles?.includes('super_admin');
+
+  const isDepartmentAdmin = user.roles?.includes('department_admin') && !isSuperAdmin;
+
+  const availableDepartments = isSuperAdmin
+    ? departments
+    : isDepartmentAdmin
+      ? departments.filter(dept => dept.id === user.department?.id)
+      : departments;
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -37,6 +67,12 @@ export function ProfileInformation({ data, setData, errors, processing, onSignat
       setProfileImageUrl(imageUrl);
     }
   };
+
+  useEffect(() => {
+    if (isDepartmentAdmin && user.department && !data.department) {
+      setData('department', user.department.name);
+    }
+  }, [isDepartmentAdmin, user.department, data.department, setData]);
 
   return (
     <div className="space-y-6">
@@ -107,14 +143,14 @@ export function ProfileInformation({ data, setData, errors, processing, onSignat
 
       <div className="space-y-2">
         <Label htmlFor="department">Department</Label>
-        <Select value={data.department} onValueChange={value => setData('department', value)} disabled={processing}>
+        <Select value={data.department} onValueChange={value => setData('department', value)} disabled={processing || isDepartmentAdmin}>
           <SelectTrigger id="department" name="department" className="mt-1 w-full rounded-xs">
             <SelectValue placeholder="Select a department" />
           </SelectTrigger>
           <SelectContent className="rounded-xs">
             <SelectGroup>
-              {departments &&
-                departments.map(item => (
+              {availableDepartments &&
+                availableDepartments.map(item => (
                   <SelectItem key={item.id} value={item.name}>
                     {item.name}
                   </SelectItem>
@@ -122,6 +158,7 @@ export function ProfileInformation({ data, setData, errors, processing, onSignat
             </SelectGroup>
           </SelectContent>
         </Select>
+        {isDepartmentAdmin && <p className="text-muted-foreground text-xs">Department is automatically set based on your admin role.</p>}
         <InputError message={errors.department} />
       </div>
 
