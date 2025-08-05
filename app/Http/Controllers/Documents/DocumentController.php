@@ -2,30 +2,41 @@
 
 namespace App\Http\Controllers\Documents;
 
-use Inertia\Inertia;
-use App\Models\Document;
-use Illuminate\Http\Request;
-use App\Enums\PermissionEnum;
-use App\Services\DocumentService;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
-use App\Services\DocumentViewService;
 use App\Http\Requests\StoreDocumentRequest;
-use App\Services\DocumentPermissionService;
+use App\Models\Document;
+use App\Services\ActivityLogService;
+use App\Services\DocumentAccessPermissionService;
+use App\Services\DocumentService;
+use App\Services\DocumentViewService;
+use App\Services\FileService;
+use App\Services\PdfService;
+use App\Services\UserService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Inertia\Inertia;
 
 class DocumentController extends Controller
 {
     public function __construct(
-        private readonly DocumentService  $documentService,
-        private readonly DocumentPermissionService $permissionService,
-        private readonly DocumentViewService $documentViewService
+        private readonly DocumentService $documentService,
+        private readonly UserService $userService,
+        private readonly DocumentAccessPermissionService $documentAccessPermissionService,
+        private readonly DocumentViewService $documentViewService,
+        private readonly ActivityLogService $activityLogService,
+        private readonly PdfService $pdfService,
+        private readonly FileService $fileService,
     ) {}
 
     public function index(Request $request)
     {
         return Inertia::render('documents', [
-            'documents' => $this->documentService->getPaginatedDocuments($request->search),
+            'documents' => $this->documentService->getPaginatedDocuments(
+                $request->search,
+                $request->date_from,
+                $request->date_to
+            )
         ]);
     }
 
@@ -33,22 +44,23 @@ class DocumentController extends Controller
     {
         return Inertia::render('documents/create', [
             'options' => $this->documentService->getDocumentCreationOptions(),
-            'permission' => [
-                'canManageAccess' => Auth::user()->hasRole('super_admin') || Auth::user()->can(PermissionEnum::DOCUMENT_REVOKE_ACCESS->value)
-            ]
         ]);
     }
 
     public function show(Document $document)
     {
-        $viewData = $this->documentViewService->prepareDocumentForView($document, $this->documentService->getUser());
+        $this->activityLogService->logDocument('viewed', $document);
+
+        $viewData = $this->documentViewService->prepareDocumentForView($document, $this->userService->getUser());
 
         return Inertia::render('documents/show', [
             'document' => $viewData['document'],
             'file' => $viewData['file'],
             'canSign' => $viewData['canSign'],
             'signatures' => $viewData['signatures'],
-            'isNextSignatory' => $viewData['isNextSignatory']
+            'nextSignatory' => $viewData['nextSignatory'],
+            'accessPermissions' => $this->documentAccessPermissionService->getUserPermissionsSummary($document, Auth::user()),
+            'workflowLogs' => $this->documentService->getDocumentHistoryLogs($document),
         ]);
     }
 
@@ -57,29 +69,34 @@ class DocumentController extends Controller
         $this->documentService->store($request);
     }
 
-
     public function history(Document $document)
     {
         Gate::authorize('view', $document);
 
         return Inertia::render('documents/history', [
             'document' => $document,
-            'workflowLogs' => $this->documentService->getDocumentHistoryLogs($document)
+            'workflowLogs' => $this->documentService->getDocumentHistoryLogs($document),
         ]);
     }
 
     public function archive(Document $document)
     {
         $this->documentService->archive($document);
+
+        $this->activityLogService->logDocument('archived', $document);
     }
 
-    public function approve(Document $document, Request $request,)
+    public function approve(Document $document, Request $request)
     {
-        $this->documentService->approve($document,  $request->comment);
+        $this->documentService->approve($document, $request->comment);
+
+        $this->activityLogService->logDocument('approved', $document);
     }
 
     public function reject(Document $document, Request $request)
     {
         $this->documentService->reject($document, 'Test reason', $request->comment);
+
+        $this->activityLogService->logDocument('rejected', $document);
     }
 }

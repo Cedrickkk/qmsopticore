@@ -3,19 +3,18 @@
 namespace App\Services;
 
 use App\Contracts\Repositories\DocumentRepositoryInterface;
-use App\Contracts\Repositories\WorkflowServiceInterface;
 use App\Enums\DepartmentEnum;
-use App\Models\User;
-use App\Models\Document;
-use App\Models\DocumentType;
-use App\Models\DocumentRecipient;
 use App\Enums\DocumentStatusEnum;
+use App\Http\Requests\StoreDocumentRequest;
+use App\Http\Requests\UpdateDocumentAccessRequest;
+use App\Models\Document;
+use App\Models\DocumentRecipient;
+use App\Models\DocumentType;
+use App\Models\User;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Requests\StoreDocumentRequest;
-use Illuminate\Pagination\LengthAwarePaginator;
-use App\Http\Requests\UpdateDocumentAccessRequest;
+use Illuminate\Support\Facades\Log;
 
 class DocumentService
 {
@@ -23,11 +22,11 @@ class DocumentService
      * Create a new class instance.
      */
     public function __construct(
-        private readonly DocumentRepositoryInterface $documentRepository,
-        private readonly WorkflowServiceInterface $workflowService,
-        private readonly FileService $fileService,
         private readonly PdfService $pdfService,
-        private readonly DocumentPermissionService $permissionService
+        private readonly FileService $fileService,
+        private readonly WorkflowService $workflowService,
+        private readonly DocumentRepositoryInterface $documentRepository,
+        private readonly UserService $userService,
     ) {}
 
     public function store(StoreDocumentRequest $request): Document
@@ -36,7 +35,7 @@ class DocumentService
 
         $data = $request->validated();
 
-        $user = $this->getUser();
+        $user = $this->userService->getUser();
 
         $file = $data['file'];
 
@@ -64,7 +63,7 @@ class DocumentService
             'Document created'
         );
 
-        if (!empty($data['users'])) {
+        if (! empty($data['users'])) {
             $users = collect($data['users']);
 
             $this->handleSignatories($document, collect($data['users']), $user);
@@ -77,28 +76,12 @@ class DocumentService
 
     public function approve(Document $document, ?string $comment = null)
     {
-        $this->workflowService->approve($document, $this->getUser(), $comment);
+        $this->workflowService->approve($document, $this->userService->getUser(), $comment);
     }
 
     public function reject(Document $document, string $reason, ?string $comment = null)
     {
-        $this->workflowService->reject($document, $this->getUser(), $reason, $comment);
-    }
-
-    // TODO: Extract this into DocumentPermission class
-    public function updateAccess(UpdateDocumentAccessRequest $request, Document $document)
-    {
-        Gate::authorize('managePermissions', $document);
-
-        $data = $request->validated();
-
-        $userPermissions = [];
-
-        foreach ($data['users'] as $userData) {
-            $userPermissions[$userData['id']] = $userData['permissions'];
-        }
-
-        return $this->permissionService->updatePermissions($document, $userPermissions);
+        $this->workflowService->reject($document, $this->userService->getUser(), $reason, $comment);
     }
 
     public function download(string $filename)
@@ -126,9 +109,9 @@ class DocumentService
         $this->documentRepository->unarchive($document);
     }
 
-    public function getPaginatedDocuments(?string $search = null): LengthAwarePaginator
+    public function getPaginatedDocuments(?string $search = null, ?string $dateFrom = null, ?string $dateTo = null): LengthAwarePaginator
     {
-        return $this->documentRepository->paginate($search);
+        return $this->documentRepository->paginate($search, $dateFrom, $dateTo);
     }
 
     public function getPaginatedArchivedDocuments(?string $search = null)
@@ -151,6 +134,7 @@ class DocumentService
     {
         $signatories = $users->filter(fn($user) => $user['signatory'] === '1')->values()->map(function ($user, $index) {
             $user['signatory_order'] = $index + 1;
+
             return $user;
         });
 
@@ -162,7 +146,7 @@ class DocumentService
             $this->documentRepository->addSignatory($document, [
                 'user_id' => $signatory['id'],
                 'signatory_order' => $signatory['signatory_order'],
-                'status' => 'pending'
+                'status' => 'pending',
             ]);
 
             $this->workflowService->log(
@@ -187,7 +171,7 @@ class DocumentService
         });
     }
 
-    public function isSignatory(Document $document, $userId): bool
+    public function isSignatory(Document $document, string $userId): bool
     {
         return $document->signatories()->where('user_id', $userId)->exists();
     }
@@ -206,7 +190,7 @@ class DocumentService
 
             $this->workflowService->log(
                 $document,
-                $this->getUser(),
+                $this->userService->getUser(),
                 'recipient_added',
                 $document->status,
                 $document->status,
@@ -215,14 +199,80 @@ class DocumentService
         });
     }
 
-    public function getUser()
+    public function getPaginatedAuthorizedDocuments(
+        User $user,
+        ?string $search = null,
+        ?string $dateFrom = null,
+        ?string $dateTo = null,
+        int $perPage = 10
+    ): LengthAwarePaginator {
+        $paginatedDocuments = $this->documentRepository->paginateAuthorizedDocuments(
+            $user,
+            $search,
+            $dateFrom,
+            $dateTo,
+            $perPage
+        );
+
+        $paginatedDocuments->getCollection()->transform(function ($document) use ($user) {
+            $association = $this->determineUserAssociation($document, $user);
+            $document->user_association = $association;
+            return $document;
+        });
+
+        return $paginatedDocuments;
+    }
+
+
+    public function getAuthorizedDocuments(User $user): Collection
     {
-        return User::where('id', Auth::user()->id)->first();
+        return Document::where(function ($query) use ($user) {
+            $query->where('created_by', $user->id)
+                ->orWhereHas('recipients', function ($subQuery) use ($user) {
+                    $subQuery->where('user_id', $user->id);
+                })
+                ->orWhereHas('signatories', function ($subQuery) use ($user) {
+                    $subQuery->where('user_id', $user->id);
+                });
+        })
+            ->with([
+                'createdBy:id,name,email,avatar',
+                'category:id,name',
+                'recipients.user:id,name,email,avatar',
+                'signatories.user:id,name,email,avatar,position'
+            ])
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($document) use ($user) {
+                $association = $this->determineUserAssociation($document, $user);
+                $document->user_association = $association;
+                return $document;
+            });;
+    }
+
+
+    private function determineUserAssociation(Document $document, User $user): string
+    {
+        if ($document->created_by === $user->id) {
+            return 'Creator';
+        }
+
+        $signatory = $document->signatories->where('user_id', $user->id)->first();
+        if ($signatory) {
+            return "Signatory";
+        }
+
+        $recipient = $document->recipients->where('user_id', $user->id)->first();
+        if ($recipient) {
+            return 'Recipient';
+        }
+
+        return 'Unknown';
     }
 
     private function generateDocumentCode($documentTypeId = null): string
     {
-        $user = $this->getUser();
+        $user = $this->userService->getUser();
 
         $department = $user->department;
 
@@ -258,7 +308,7 @@ class DocumentService
             ->orderByRaw('CAST(SUBSTRING_INDEX(code, "-", -1) AS UNSIGNED) DESC')
             ->first();
 
-        if (!$lastDocument) {
+        if (! $lastDocument) {
             return 1;
         }
 

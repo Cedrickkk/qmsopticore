@@ -2,15 +2,16 @@
 
 namespace App\Models;
 
-use App\Enums\PermissionEnum;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Casts\ReadableDate;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Document extends Model
 {
     use HasFactory;
+
     protected $fillable = [
         'code',
         'title',
@@ -19,9 +20,13 @@ class Document extends Model
         'status',
         'category',
         'version',
-        'description'
+        'description',
     ];
 
+    protected $casts = [
+        'created_at' => ReadableDate::class,
+        'updated_at' => ReadableDate::class,
+    ];
 
     /**
      * Get the category of the document.
@@ -38,6 +43,10 @@ class Document extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    /**
+     * Get the creator of the document.
+     */
 
     public function recipients(): HasMany
     {
@@ -65,49 +74,49 @@ class Document extends Model
         return $this->hasOne(ArchivedDocument::class);
     }
 
-    public function permissions()
+    public function scopeByTile($query, string $title)
     {
-        return $this->hasMany(DocumentPermission::class);
+        return $query->where('description', 'like', "%{$title}%");
     }
 
-    public function hasUserPermission(User $user, string $permission)
+    public function scopeDateRange($query, $from = null, $to = null)
     {
-        $permissionMap = [
-            'view' => 'can_view',
-            'edit' => 'can_edit',
-            'download' => 'can_downlaod',
-            'share' => 'can_share',
-        ];
-
-        $permissionField = $permissionMap[$permission] ?? null;
-
-        if (!$permissionField) {
-            return false;
+        if ($from) {
+            $query->whereDate('created_at', '>=', $from);
         }
 
-        if ($this->createdBy->id === $user->id) {
-            return true;
+        if ($to) {
+            $query->whereDate('created_at', '<=', $to);
         }
 
-        $userPermission = $this->permissions()->where('user_id', $user->id)->first();
+        return $query;
+    }
 
-        if ($userPermission && $userPermission->{$permissionField}) {
-            return true;
-        }
+    public function scopeForUser($query, int $userId)
+    {
+        return $query->where(function ($q) use ($userId) {
+            $q->where('created_by', $userId)
+                ->orWhereHas('signatories', function ($sq) use ($userId) {
+                    $sq->where('user_id', $userId);
+                })
+                ->orWhereHas('recipients', function ($rq) use ($userId) {
+                    $rq->where('user_id', $userId);
+                });
+        });
+    }
 
-        $permissionEnumMap = [
-            'view' => PermissionEnum::DOCUMENT_VIEW->value,
-            'edit' => PermissionEnum::DOCUMENT_EDIT->value,
-            'download' => PermissionEnum::DOCUMENT_DOWNLOAD->value,
-            'sign' => PermissionEnum::DOCUMENT_SIGN->value,
-            'reject' => PermissionEnum::DOCUMENT_REJECT->value,
-            'archive' => PermissionEnum::DOCUMENT_ARCHIVE->value,
-            'revoke_access' => PermissionEnum::DOCUMENT_REVOKE_ACCESS->value,
-            'share' => PermissionEnum::DOCUMENT_REVOKE_ACCESS->value, // Using revoke_access as a proxy for share
-        ];
+    public function scopeByCreator($query, int $userId)
+    {
+        return $query->where('created_by', $userId);
+    }
 
-        $enumPermission = $permissionEnumMap[$permission] ?? null;
+    public function scopeByStatus($query, string $status)
+    {
+        return $query->where('status', $status);
+    }
 
-        return $enumPermission && $user->hasPermissionTo($enumPermission);
+    public function scopeByCategory($query, int $categoryId)
+    {
+        return $query->where('category_id', $categoryId);
     }
 }
