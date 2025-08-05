@@ -1,17 +1,24 @@
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { router } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 import { useState } from 'react';
 
 interface RejectDocumentModalProps {
-  isOpen: boolean;
-  onClose: () => void;
   documentId: number;
 }
 
-export function RejectDocumentDialog({ isOpen, onClose, documentId }: RejectDocumentModalProps) {
+export function RejectDocumentDialog({ documentId }: RejectDocumentModalProps) {
   const [reason, setReason] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -25,14 +32,16 @@ export function RejectDocumentDialog({ isOpen, onClose, documentId }: RejectDocu
       {
         onFinish: () => {
           setIsSubmitting(false);
-          onClose();
         },
       }
     );
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="destructive">Reject Document</Button>
+      </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Reject Document</DialogTitle>
@@ -48,10 +57,10 @@ export function RejectDocumentDialog({ isOpen, onClose, documentId }: RejectDocu
           />
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
-            Cancel
-          </Button>
-          <Button variant="destructive" onClick={handleReject} disabled={isSubmitting || !reason.trim()}>
+          <DialogClose asChild>
+            <Button variant="outline">Cancel</Button>
+          </DialogClose>
+          <Button type="submit" variant="destructive" onClick={handleReject} disabled={isSubmitting || !reason.trim()}>
             {isSubmitting && <LoaderCircle h-4 w-4 animate-spin />} Reject
           </Button>
         </DialogFooter>

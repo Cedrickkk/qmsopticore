@@ -1,14 +1,12 @@
 import { PDFControls } from '@/components/document-viewer-controls';
 import { PDFThumbnails } from '@/components/document-viewer-thumbnails';
-import { useDownloadDocument } from '@/hooks/use-download-document';
 import '@/lib/pdfjs';
 import { type Document as TDocument } from '@/types/document';
 import { usePage } from '@inertiajs/react';
-import { Download, LoaderCircle } from 'lucide-react';
+import { LoaderCircle } from 'lucide-react';
 import { memo, useCallback, useState } from 'react';
 import { Document, Page } from 'react-pdf';
 import { File } from 'react-pdf/dist/esm/shared/types.js';
-import { Button } from './ui/button';
 
 interface PDFPageState {
   numPages: number;
@@ -26,7 +24,6 @@ type PageProps = {
   document: TDocument;
 };
 export const PDFViewer = memo(function PDFViewerComponent({ file, showThumbnails = false }: PDFViewerProps) {
-  const { handleDownload } = useDownloadDocument();
   const { document } = usePage<PageProps>().props;
   const [pdfState, setPdfState] = useState<PDFPageState>({
     numPages: 0,
@@ -56,10 +53,6 @@ export const PDFViewer = memo(function PDFViewerComponent({ file, showThumbnails
       scale: Math.max(0.5, Math.min(2, prev.scale + delta)),
     }));
   }, []);
-
-  const handleDownloadClick = useCallback(() => {
-    handleDownload(document);
-  }, [document, handleDownload]);
 
   return (
     <div>
@@ -110,10 +103,6 @@ export const PDFViewer = memo(function PDFViewerComponent({ file, showThumbnails
             onPageChange={handlePageChange}
             onZoom={handleZoom}
           />
-          <Button variant="outline" className="flex items-center gap-2 rounded-xs" onClick={handleDownloadClick}>
-            <Download className="h-4 w-4" />
-            Download
-          </Button>
         </div>
       </div>
     </div>
