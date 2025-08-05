@@ -3,6 +3,7 @@ import { TablePagination } from '@/components/table-pagination';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { PaginatedData } from '@/types';
@@ -104,20 +105,23 @@ export default function Departments() {
 
       <div className="flex h-full flex-1 flex-col gap-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Input
-              placeholder={'Search department...'}
-              value={globalFilter ?? ''}
-              onChange={event => setGlobalFilter(event.target.value)}
-              className="max-w-lg"
-            />
+          <div className="flex w-full items-end justify-between gap-3">
+            <div className="flex w-1/2 flex-col gap-3">
+              <Label>Search</Label>
+              <Input
+                placeholder={'Search department...'}
+                value={globalFilter ?? ''}
+                onChange={event => setGlobalFilter(event.target.value)}
+                className="w-full rounded-xs"
+              />
+            </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="ml-auto rounded-sm">
-                  <Settings2 /> Filter Columns
+                <Button variant="ghost" className="ml-auto rounded-xs">
+                  <Settings2 />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="end" className="rounded-xs">
                 {table
                   .getAllColumns()
                   .filter(column => column.getCanHide())
@@ -125,7 +129,7 @@ export default function Departments() {
                     return (
                       <DropdownMenuCheckboxItem
                         key={column.id}
-                        className="capitalize"
+                        className="rounded-xs capitalize"
                         checked={column.getIsVisible()}
                         onCheckedChange={value => column.toggleVisibility(!!value)}
                       >
