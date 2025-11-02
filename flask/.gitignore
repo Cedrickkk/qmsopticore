@@ -168,6 +168,8 @@ cython_debug/
 # Machine Learning Model
 model.keras
 
+models/
+
 # Signatures training files
 sign_data/
 .flaskenv
