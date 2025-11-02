@@ -13,6 +13,7 @@ import { Document } from '@/types/document';
 import { useForm } from '@inertiajs/react';
 import { FileDown, LoaderCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { Textarea } from './ui/textarea';
 
 interface DocumentArchiveFormProps {
   open: boolean;
@@ -21,19 +22,21 @@ interface DocumentArchiveFormProps {
 }
 
 export default function DocumentArchiveForm({ open, onOpenChange, document }: DocumentArchiveFormProps) {
-  const { patch, processing } = useForm();
+  const { data, setData, patch, processing } = useForm({
+    reason: '',
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     patch(`/documents/${document.id}/archive`, {
       preserveState: true,
       showProgress: false,
-      onFinish: () => {
+      onSuccess: () => {
         onOpenChange(!open);
         toast(
           <Alert className="border-none p-0 font-sans">
-            <FileDown className="h-4 w-4" />
-            <AlertTitle>Document Archived</AlertTitle>
+            <FileDown className="h-4 w-4" color="green" />
+            <AlertTitle className="text-primary font-medium">Document Archived</AlertTitle>
             <AlertDescription>{document.title} has been archived.</AlertDescription>
           </Alert>
         );
@@ -48,6 +51,12 @@ export default function DocumentArchiveForm({ open, onOpenChange, document }: Do
           <AlertDialogTitle>Are you sure you want to archive this document?</AlertDialogTitle>
           <AlertDialogDescription>This action will move the document to the archive. You can restore it later if needed.</AlertDialogDescription>
         </AlertDialogHeader>
+        <Textarea
+          value={data.reason}
+          onChange={e => setData('reason', e.target.value)}
+          placeholder="Add an optional comment with your approval"
+          className="min-h-[100px]"
+        />
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <Button disabled={processing} variant="destructive" onClick={handleSubmit}>

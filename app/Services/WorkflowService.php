@@ -2,16 +2,16 @@
 
 namespace App\Services;
 
-use App\Models\User;
+use App\Contracts\Repositories\WorkflowRepositoryInterface;
 use App\Models\Document;
 use App\Models\DocumentWorkflowLog;
-use App\Contracts\Repositories\WorkflowServiceInterface;
-use App\Contracts\Repositories\DocumentRepositoryInterface;
+use App\Models\User;
 
-class WorkflowService implements WorkflowServiceInterface
+class WorkflowService
 {
-
-    public function __construct(private readonly DocumentRepositoryInterface $repository) {}
+    public function __construct(
+        private readonly WorkflowRepositoryInterface $workflowRepository,
+    ) {}
 
     public function log(
         Document $document,
@@ -21,20 +21,18 @@ class WorkflowService implements WorkflowServiceInterface
         ?string $toStatus = 'draft',
         ?string $notes = null
     ): DocumentWorkflowLog {
-        return DocumentWorkflowLog::create([
-            'document_id' => $document->id,
-            'user_id' => $user->id,
-            'action' => $action,
-            'from_status' => $fromStatus,
-            'to_status' => $toStatus,
-            'notes' => $notes ?? $this->getDefaultNotes($action),
-            'created_at' => now(),
-        ]);
+        return $this->workflowRepository->log($document, $user, $action, $fromStatus, $toStatus, $notes);
     }
 
-    public function approve(Document $document, User $user, ?string $comment = null)
+    public function approve(Document $document, User $user, ?string $comment = null): bool
     {
-        $signatory = $this->getDocumentSignatory($document, $user);
+        // Try to get signatory record for the user
+        $signatory = $this->workflowRepository->getDocumentSignatory($document, $user);
+
+        // If not found, check if user is a representative
+        if (!$signatory) {
+            $signatory = $this->workflowRepository->getSignatoryByRepresentative($document, $user);
+        }
 
         if (!$this->canApprove($signatory, $document)) {
             return false;
@@ -42,7 +40,14 @@ class WorkflowService implements WorkflowServiceInterface
 
         $currentStatus = $document->status;
 
-        $this->updateSignatoryStatus($signatory, 'approved', $comment);
+        // Check if signing as representative
+        $isRepresentative = $signatory->user_id !== $user->id;
+
+        $this->workflowRepository->approve($document, $user, $comment, $isRepresentative);
+
+        $signerName = $isRepresentative
+            ? "{$user->name} (on behalf of {$signatory->user->name})"
+            : $user->name;
 
         $this->log(
             $document,
@@ -50,23 +55,29 @@ class WorkflowService implements WorkflowServiceInterface
             'approved',
             $currentStatus,
             $currentStatus,
-            $comment ?? 'Document approved'
+            $comment ?? "Document approved by {$signerName}"
         );
 
-        if ($this->allSignatoriesApproved($document)) {
+        if ($this->workflowRepository->allSignatoriesApproved($document)) {
             $this->handleFullApproval($document, $user, $currentStatus);
         } else {
             $this->handlePartialApproval($document, $user, $currentStatus);
         }
+
+        return true;
     }
 
-    public function reject(Document $document, User $user, string $reason, ?string $comment = null)
+    public function reject(Document $document, User $user, string $reason, ?string $comment = null): bool
     {
-        $signatory = $this->getDocumentSignatory($document, $user);
+        $signatory = $this->workflowRepository->getDocumentSignatory($document, $user);
+
+        // Check if user is a representative
+        if (!$signatory) {
+            $signatory = $this->workflowRepository->getSignatoryByRepresentative($document, $user);
+        }
 
         $isSuperAdmin = $user->hasRole('super_admin');
-
-        $nextSignatory = $this->getNextSignatory($document);
+        $nextSignatory = $this->workflowRepository->getNextSignatory($document);
 
         if (!$this->canReject($signatory, $nextSignatory, $isSuperAdmin)) {
             return false;
@@ -74,13 +85,22 @@ class WorkflowService implements WorkflowServiceInterface
 
         $currentStatus = $document->status;
 
-        $document->update(['status' => 'rejected']);
+        $isRepresentative = $signatory && $signatory->user_id !== $user->id;
 
-        if ($signatory && $signatory->status === 'pending') {
-            $this->updateSignatoryStatus($signatory, 'rejected', $comment);
-        }
+        $this->workflowRepository->reject($document, $user, $reason, $comment, $isRepresentative);
 
-        $this->log($document, $user, 'rejected', $currentStatus, 'rejected', $reason);
+        $signerName = $isRepresentative
+            ? "{$user->name} (on behalf of {$signatory->user->name})"
+            : $user->name;
+
+        $this->log(
+            $document,
+            $user,
+            'rejected',
+            $currentStatus,
+            'rejected',
+            "Rejected by {$signerName}: {$reason}"
+        );
 
         $this->cancelPendingSignatories($document, $user, $signatory);
 
@@ -92,6 +112,26 @@ class WorkflowService implements WorkflowServiceInterface
             'rejected',
             "Document workflow terminated due to rejection: {$reason}"
         );
+
+        return true;
+    }
+
+    public function publish(Document $document, User $user): bool
+    {
+        $success = $this->workflowRepository->publish($document, $user);
+
+        if ($success) {
+            $this->log(
+                $document,
+                $user,
+                'published',
+                'approved',
+                'published',
+                'Document published after all approvals received.'
+            );
+        }
+
+        return $success;
     }
 
     private function canApprove($signatory, Document $document): bool
@@ -100,50 +140,19 @@ class WorkflowService implements WorkflowServiceInterface
             return false;
         }
 
-        $nextSignatory = $this->getNextSignatory($document);
+        $nextSignatory = $this->workflowRepository->getNextSignatory($document);
+
         return $nextSignatory && $nextSignatory->id === $signatory->id;
     }
 
-    // TODO: Refactor this into document permission
     private function canReject($signatory, $nextSignatory, bool $isAdmin): bool
     {
         return $isAdmin || ($signatory && $signatory->status === 'pending' && $signatory->id === $nextSignatory?->id);
     }
 
-    public function getNextSignatory(Document $document)
-    {
-        return $document->signatories()
-            ->where('status', 'pending')
-            ->orderBy('signatory_order')
-            ->first();
-    }
-
-    private function getDocumentSignatory(Document $document, User $user)
-    {
-        return $document->signatories()
-            ->where('user_id', $user->id)
-            ->first();
-    }
-
-    private function updateSignatoryStatus($signatory, string $status, ?string $comment = null): void
-    {
-        $signatory->update([
-            'status' => $status,
-            'signed_at' => now(),
-            'comment' => $comment
-        ]);
-    }
-
-    private function allSignatoriesApproved(Document $document): bool
-    {
-        return $document->signatories()
-            ->where('status', 'pending')
-            ->count() === 0;
-    }
-
     private function handleFullApproval(Document $document, User $user, string $currentStatus): void
     {
-        $document->update(['status' => 'approved']);
+        $this->workflowRepository->updateDocumentStatus($document, 'approved');
 
         $this->log(
             $document,
@@ -159,7 +168,7 @@ class WorkflowService implements WorkflowServiceInterface
 
     private function handlePartialApproval(Document $document, User $user, string $currentStatus): void
     {
-        $nextSignatory = $this->getNextSignatory($document);
+        $nextSignatory = $this->workflowRepository->getNextSignatory($document);
 
         if ($nextSignatory) {
             $this->log(
@@ -170,35 +179,19 @@ class WorkflowService implements WorkflowServiceInterface
                 $currentStatus,
                 "Document ready for next signatory (#{$nextSignatory->signatory_order})"
             );
-            // TODO: Feature - notification
-            // $this->notifyNextSignatory($nextSignatory);
         }
-    }
-
-    public function publish(Document $document, User $user): void
-    {
-        $document->update(['status' => 'published']);
-
-        $this->log(
-            $document,
-            $user,
-            'published',
-            'approved',
-            'published',
-            'Document published after all approvals received.'
-        );
     }
 
     private function cancelPendingSignatories(Document $document, User $user, $currentSignatory): void
     {
-        $pendingSignatories = $document->signatories()
-            ->where('status', 'pending')
-            ->where('id', '!=', $currentSignatory->id ?? 0)
-            ->get();
+        $pendingSignatories = $this->workflowRepository->getPendingSignatories(
+            $document,
+            $currentSignatory->id ?? 0
+        );
+
+        $this->workflowRepository->cancelPendingSignatories($document, $currentSignatory->id ?? 0);
 
         foreach ($pendingSignatories as $pendingSignatory) {
-            $pendingSignatory->update(['status' => 'rejected']);
-
             $this->log(
                 $document,
                 $user,
@@ -210,15 +203,23 @@ class WorkflowService implements WorkflowServiceInterface
         }
     }
 
-    private function getDefaultNotes(string $action): ?string
+    public function getPreviousStatusBeforeArchive($documentId): string
     {
-        return match ($action) {
-            'created' => 'Document created',
-            'signatories_assigned' => 'Signatories assigned to document',
-            'approved' => 'Document approved',
-            'rejected' => 'Document rejected',
-            'published' => 'Document published',
-            default => null
-        };
+        $archiveLog = DocumentWorkflowLog::where('document_id', $documentId)
+            ->where('action', 'archived')
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        if ($archiveLog && $archiveLog->from_status) {
+            return $archiveLog->from_status;
+        }
+
+        $previousLog = DocumentWorkflowLog::where('document_id', $documentId)
+            ->where('action', '!=', 'archived')
+            ->whereNotNull('to_status')
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        return $previousLog ? $previousLog->to_status : 'draft';
     }
 }

@@ -47,6 +47,11 @@ export interface User {
   defaultPermissions: UserPermissions;
   created_at: string;
   updated_at: string;
+  department: {
+    id: number;
+    name: string;
+  };
+  position: string;
   [key: string]: unknown;
 }
 

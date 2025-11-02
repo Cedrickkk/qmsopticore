@@ -8,28 +8,19 @@ use Illuminate\Support\Facades\Storage;
 
 class PdfService
 {
-    public function download(Document $document)
-    {
-        return Storage::download("documents/{$document->title}");
-    }
-
-    public function exists(Document $document)
-    {
-        return Storage::exists("documents/{$document->title}");
-    }
-
     public function updateVersion(Document $document, string $version)
     {
-        $existingPdfPath = Storage::path("documents/{$document->title}");
+        $path = Storage::path("documents/{$document->filename}");
+
         $pdf = new Fpdi();
 
-        $pageCount = $pdf->setSourceFile($existingPdfPath);
+        $pageCount = $pdf->setSourceFile($path);
 
         for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
             $this->addVersionToPage($pdf, $pageNo, $version);
         }
 
-        $pdf->Output($existingPdfPath, 'F');
+        $pdf->Output($path, 'F');
     }
 
     private function addVersionToPage(Fpdi $pdf, int $pageNo, string $version): void
@@ -38,15 +29,21 @@ class PdfService
         $templateId = $pdf->importPage($pageNo);
         $pdf->useImportedPage($templateId);
 
-        $footerX = 23;
-        $footerY = 275;
-
-        $pdf->SetFillColor(255, 255, 255);
-        $pdf->Rect($footerX, $footerY - 5, 100, 50, 'F');
+        $pageHeight = $pdf->GetPageHeight();
+        $pageWidth = $pdf->GetPageWidth();
 
         $pdf->SetFont('Helvetica', '', 6);
         $pdf->SetTextColor(128, 128, 128);
-        $pdf->SetXY($footerX, $footerY);
-        $pdf->Write(0, "VERSION: $version");
+
+        $text = "VERSION: $version";
+        $textWidth = $pdf->GetStringWidth($text);
+
+        $footerX = $pageWidth - $textWidth - 5;
+        $footerY = $pageHeight - 5;
+
+        $pdf->SetAutoPageBreak(false);
+        $pdf->Text($footerX, $footerY, $text);
+
+        $pdf->SetAutoPageBreak(true, 10);
     }
 }

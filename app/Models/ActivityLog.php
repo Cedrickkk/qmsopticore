@@ -3,10 +3,18 @@
 namespace App\Models;
 
 use App\Casts\HumanReadableTime;
+use App\Casts\ReadableDate;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+
+/**
+ * ! Prefer to use `laravel-activitylog` package than creating new activity_log table
+ * 
+ * TODO: Change the old and new values column in the database
+ *  
+ */
 class ActivityLog extends Model
 {
     use HasFactory;
@@ -26,8 +34,8 @@ class ActivityLog extends Model
     protected $casts = [
         'old_values' => 'array',
         'new_values' => 'array',
-        'created_at' => HumanReadableTime::class,
-        'updated_at' => HumanReadableTime::class,
+        'created_at' => ReadableDate::class,
+        'updated_at' => ReadableDate::class,
     ];
 
     public function user(): BelongsTo

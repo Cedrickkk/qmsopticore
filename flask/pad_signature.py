@@ -26,46 +26,15 @@ def remove_signature_background(image_array):
 
     return result_rgba
 
-# def add_signature_above_name(pdf_path, signature_image_path, name):
-#     signature_with_transparent_bg = remove_signature_background(signature_image_path)
-
-#     sharpened_signature = unsharpen_mask(signature_with_transparent_bg)
-
-#     _, img_buffer = cv2.imencode('.png', sharpened_signature) 
-    
-#     img_bytes = img_buffer.tobytes() 
-
-#     pdf_document = fitz.open(pdf_path)
-
-#     for page_number in range(len(pdf_document)):
-#         page = pdf_document[page_number]
-
-#         text_instances = page.search_for(name)
-#         if not text_instances:
-#             continue  
-
-#         for rect in text_instances:
-#             x1, y1, x2, y2 = rect  
-#             x = x1  
-#             y = y1 - 50 - (-10)
-
-#             signature_rect = fitz.Rect(x, y, x + 100, y + 50)
-
-#             page.insert_image(signature_rect, stream=img_bytes)
-
-#     pdf_document.save(pdf_path, incremental=True, encryption=0)
-#     pdf_document.close()
-
-
-def add_signature_above_name(pdf_path, signature_image_path, name):
+def add_signature_above_name(pdf_path, signature_image_path, name, representative_name=None):
     signature_with_transparent_bg = remove_signature_background(signature_image_path)
     sharpened_signature = unsharpen_mask(signature_with_transparent_bg)
+
     _, img_buffer = cv2.imencode('.png', sharpened_signature) 
     img_bytes = img_buffer.tobytes() 
-    
+
     pdf_document = fitz.open(pdf_path)
     
-    # Find all occurrences of the name across all pages
     occurrences = []
     for page_number in range(len(pdf_document)):
         page = pdf_document[page_number]
@@ -79,24 +48,44 @@ def add_signature_above_name(pdf_path, signature_image_path, name):
         pdf_document.close()
         return False
     
-    # Get the last occurrence
     last_page_number, last_rect = occurrences[-1]
     
-    # Add signature only on the last occurrence
     page = pdf_document[last_page_number]
     x1, y1, x2, y2 = last_rect
     x = x1
-    y = y1 - 50 - (-10)  # 50 pixels above the name, with adjustment
+    y = y1 - 50 - (-10)
     
     signature_rect = fitz.Rect(x, y, x + 100, y + 50)
     page.insert_image(signature_rect, stream=img_bytes)
     
-    # Print information about where the signature was placed
+    if representative_name:
+        rep_y = y2 + 2
+        
+        page.insert_text(
+            (x1, rep_y + 10),  
+            representative_name,
+            fontsize=9,
+            fontname="helv",  
+            color=(0, 0, 0) 
+        )
+        
+        page.insert_text(
+            (x1, rep_y + 22),  
+            "Representative",
+            fontsize=8,
+            fontname="hebo",
+            color=(0.3, 0.3, 0.3)
+        )
+    
     if len(pdf_document) == 1:
         print(f"Signature for '{name}' placed on the only page of the document.")
     else:
         print(f"Signature for '{name}' placed on page {last_page_number + 1} of {len(pdf_document)}.")
     
-    pdf_document.save(pdf_path, incremental=True, encryption=0)
+    if representative_name:
+        print(f"Representative '{representative_name}' added below '{name}'.")
+    
+    pdf_document.save(pdf_path, incremental=True, encryption=fitz.PDF_ENCRYPT_KEEP)
     pdf_document.close()
+    
     return True

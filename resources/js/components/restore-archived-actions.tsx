@@ -7,10 +7,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useDownloadDocument } from '@/hooks/use-download-document';
 import { ArchivedDocument } from '@/pages/archives';
 import { Link } from '@inertiajs/react';
 import { Row } from '@tanstack/react-table';
-import { Download, Eye, History, MoreHorizontal, RotateCcw } from 'lucide-react';
+import { Download, Eye, MoreHorizontal, RotateCcw } from 'lucide-react';
 import { useState } from 'react';
 import RestoreArchivedDocumentForm from './document-restore-form';
 
@@ -20,6 +21,7 @@ interface RestorDocumentActionsProps {
 
 export default function RestoreDocumentActions({ row }: RestorDocumentActionsProps) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const { handleDownload } = useDownloadDocument();
   return (
     <>
       <DropdownMenu>
@@ -32,22 +34,17 @@ export default function RestoreDocumentActions({ row }: RestorDocumentActionsPro
         <DropdownMenuContent align="end" className="rounded-sm">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <DropdownMenuItem asChild>
-            <Link href={`/documents/${row.original.id}`}>
+            <Link href={`/archives/${row.original.id}`}>
               <Eye />
               <span>View Document</span>
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href={`/documents/${row.original.id}/history`} prefetch>
-              <History /> <span>View History</span>
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={() => handleDownload(row.original.document)}>
             <Download /> <span>Download PDF </span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => setIsOpen(open => !open)}>
-            <RotateCcw /> <span>Restore </span>
+          <DropdownMenuItem onClick={() => setIsOpen(open => !open)} className="text-primary">
+            <RotateCcw className="text-primary" /> <span>Restore Document</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

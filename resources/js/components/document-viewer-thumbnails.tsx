@@ -2,36 +2,27 @@ import '@/lib/pdfjs';
 import { cn } from '@/lib/utils';
 import { LoaderCircle } from 'lucide-react';
 import { memo } from 'react';
-import { Document, Page } from 'react-pdf';
-import { File } from 'react-pdf/dist/esm/shared/types.js';
+import { Page } from 'react-pdf';
+import { ScrollArea, ScrollBar } from './ui/scroll-area';
 
 interface PDFThumbnailsProps {
-  file: File;
   numPages: number;
   currentPage: number;
   onPageChange: (page: number) => void;
 }
 
-export const PDFThumbnails = memo(function PDFThumbnailsViewer({ file, numPages, currentPage, onPageChange }: PDFThumbnailsProps) {
+export const PDFThumbnails = memo(function PDFThumbnailsViewer({ numPages, currentPage, onPageChange }: PDFThumbnailsProps) {
   return (
-    <div className="flex h-1/2 gap-2 overflow-y-auto rounded-xs border p-7">
-      {Array.from({ length: numPages }, (_, i) => i + 1).map(pageNum => (
-        <button
-          key={`thumb_${pageNum}`}
-          onClick={() => onPageChange(pageNum)}
-          className={cn(
-            'min-w-[200px] rounded-xs border p-1 transition-colors',
-            pageNum === currentPage ? 'border-primary bg-primary/10' : 'hover:border-primary/50'
-          )}
-        >
-          <Document
-            file={file}
-            className="flex justify-center"
-            loading={
-              <div className="items-center justify-center">
-                <LoaderCircle className="text-muted-foreground animate-spin">Loading PDF...</LoaderCircle>
-              </div>
-            }
+    <ScrollArea className="w-full rounded-xs border">
+      <div className="flex gap-2 p-4">
+        {Array.from({ length: numPages }, (_, i) => i + 1).map(pageNum => (
+          <button
+            key={`thumb_${pageNum}`}
+            onClick={() => onPageChange(pageNum)}
+            className={cn(
+              'flex-shrink-0 rounded-xs border p-1 transition-colors',
+              pageNum === currentPage ? 'border-primary bg-primary/10' : 'hover:border-primary/50'
+            )}
           >
             <Page
               pageNumber={pageNum}
@@ -39,14 +30,15 @@ export const PDFThumbnails = memo(function PDFThumbnailsViewer({ file, numPages,
               renderTextLayer={false}
               renderAnnotationLayer={false}
               loading={
-                <div className="items-center justify-center">
-                  <LoaderCircle className="text-muted-foreground animate-spin">Loading PDF...</LoaderCircle>
+                <div className="flex h-[100px] w-[150px] items-center justify-center">
+                  <LoaderCircle className="text-muted-foreground h-4 w-4 animate-spin" />
                 </div>
               }
             />
-          </Document>
-        </button>
-      ))}
-    </div>
+          </button>
+        ))}
+      </div>
+      <ScrollBar orientation="horizontal" />
+    </ScrollArea>
   );
 });

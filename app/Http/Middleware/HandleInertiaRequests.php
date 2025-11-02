@@ -39,7 +39,6 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
-
         $user = $request->user();
 
         return [
@@ -52,8 +51,10 @@ class HandleInertiaRequests extends Middleware
                     'id' => $user->id,
                     'name' => $user->name,
                     'email' => $user->email,
+                    'position' => $user->position,
                     'avatar' => $this->fileService->getUrlPath($user->avatar ?? "", 'avatars') ?? null,
                     'roles' => $user->getRoleNames()->toArray(),
+                    'department' => $user->department->only(['id', 'name']) ?? null,
                 ] : null,
             ],
         ];

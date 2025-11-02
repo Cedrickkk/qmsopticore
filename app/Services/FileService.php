@@ -45,6 +45,11 @@ class FileService
         return Storage::url("$directory/$filename");
     }
 
+    public function getPath(string $filename, string $directory = 'documents'): string
+    {
+        return Storage::path("$directory/$filename");
+    }
+
     public function generateUniqueFilename($file): string
     {
         $extension = $file->getClientOriginalExtension();

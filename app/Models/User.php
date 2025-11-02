@@ -2,18 +2,17 @@
 
 namespace App\Models;
 
-use Spatie\Permission\Traits\HasRoles;
-use Illuminate\Notifications\Notifiable;
+use App\Casts\ReadableDate;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, HasRoles, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -47,41 +46,17 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'email_verified_at' => 'datetime',
+            'created_at' => ReadableDate::class,
+            'updated_at' => ReadableDate::class,
         ];
     }
 
-    public function documentPermissions(): HasMany
-    {
-        return $this->hasMany(DocumentPermission::class);
-    }
-
-    public function authorizedDocuments()
-    {
-        return Document::whereHas('permission', function ($query) {
-            $query->where('user_id', $this->id)
-                ->where('can_view', true);
-        })->orWhere('created_by', $this->id);
-    }
 
     public function signatures()
     {
         return $this->hasMany(Signature::class);
-    }
-
-    // TODO: This shouldnt b here, make this into user repository or user service class
-    public function getSignatures(): array
-    {
-        $signatureFilePaths = [];
-
-        $signatures = $this->signatures()->get(['file_name']);
-
-        foreach ($signatures as $signature) {
-            $signatureFilePaths[] = Storage::url("signatures/{$signature->file_name}");
-        }
-
-        return $signatureFilePaths;
     }
 
     public function department()
@@ -91,6 +66,11 @@ class User extends Authenticatable
 
     public function documents()
     {
-        return $this->hasMany(Document::class);
+        return $this->hasMany(Document::class, 'created_by');
+    }
+
+    public function activityLogs()
+    {
+        return $this->hasMany(ActivityLog::class);
     }
 }

@@ -4,13 +4,9 @@ namespace App\Enums;
 
 enum PermissionEnum: string
 {
-
 /**
-     * 
      * Document Permissions
-     * 
      */
-
     case DOCUMENT_CREATE = 'document:create';
     case DOCUMENT_VIEW = 'document:view';
     case DOCUMENT_EDIT = 'document:edit';
@@ -20,24 +16,20 @@ enum PermissionEnum: string
     case DOCUMENT_REJECT = 'document:reject';
     case DOCUMENT_ARCHIVE = 'document:archive';
     case DOCUMENT_REVOKE_ACCESS = 'document:revoke_access';
+    case DOCUMENT_MANAGE_ACCESS = 'document:manage_access';
 
 /**
-     * 
      * User Permissions
-     * 
      */
-
     case USER_CREATE = 'user:create';
     case USER_VIEW = 'user:view';
     case USER_EDIT = 'user:edit';
     case USER_DELETE = 'user:delete';
+    case USER_MANAGE_PERMISSIONS = 'user:manage_permissions';
 
 /**
-     * 
      * Department Permissions
-     * 
      */
-
     case DEPARTMENT_CREATE = 'department:create';
     case DEPARTMENT_VIEW = 'department:view';
     case DEPARTMENT_EDIT = 'department:edit';

@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 import { Link } from '@inertiajs/react';
-import { ComponentProps } from 'react';
+import { ComponentProps, ReactNode } from 'react';
 
 type PaginationLinkProps = Omit<ComponentProps<typeof Link>, 'href'> & {
   link: {
@@ -8,14 +8,13 @@ type PaginationLinkProps = Omit<ComponentProps<typeof Link>, 'href'> & {
     label: string;
     active: boolean;
   };
+  children?: ReactNode;
 };
 
-export default function PaginationLink({ link, className = '', ...props }: PaginationLinkProps) {
+export default function PaginationLink({ link, className = '', children, ...props }: PaginationLinkProps) {
   return (
     <Link
       href={link.url}
-      dangerouslySetInnerHTML={{ __html: link.label }}
-      prefetch
       preserveState
       preserveScroll
       className={cn(
@@ -25,6 +24,8 @@ export default function PaginationLink({ link, className = '', ...props }: Pagin
         className
       )}
       {...props}
-    />
+    >
+      {children || <span dangerouslySetInnerHTML={{ __html: link.label }} />}
+    </Link>
   );
 }

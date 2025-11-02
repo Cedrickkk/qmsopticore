@@ -1,4 +1,6 @@
 import { DocumentCategoryField } from '@/components/document-category-field';
+import { DocumentConfidentialityField } from '@/components/document-confidentiality-field';
+import { DocumentPriorityField } from '@/components/document-priority-field';
 import { Recipients } from '@/components/document-recipient';
 import { DocumentTypeField } from '@/components/document-type-field';
 import { DocumentUpload } from '@/components/document-upload';
@@ -47,6 +49,8 @@ export default function Create() {
     description: '',
     users: [],
     permissions: [],
+    confidentiality_level: 'internal',
+    priority: 'normal',
   });
 
   const selectedTypeCategories = options.types.find(type => type.name === data.type.name)?.categories || [];
@@ -90,6 +94,11 @@ export default function Create() {
               <Textarea id="description" className="rounded-xs" value={data.description} onChange={e => setData('description', e.target.value)} />
               <InputError message={errors.description} />
             </div>
+
+            <DocumentConfidentialityField level={data.confidentiality_level} onLevelChange={level => setData('confidentiality_level', level)} />
+
+            <DocumentPriorityField priority={data.priority} onPriorityChange={priority => setData('priority', priority)} />
+
             <Recipients users={data.users} onChange={users => setData('users', users)} errors={errors} />
             <Button className="w-full rounded-xs" disabled={processing}>
               {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}

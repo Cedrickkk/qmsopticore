@@ -40,11 +40,12 @@ def sign():
     pdf_file = os.path.join(LARAVEL_STORAGE_DIR, data['pdf'].replace('/storage', '').lstrip('/'))
 
     signatory = data['signatory'] 
+    representative_name = data.get('representative_name')
 
     signature_paths = data['signatures']
     
     signature_full_paths = [
-    os.path.join(LARAVEL_STORAGE_DIR, sig_path.replace('/storage', '').lstrip('/'))
+        os.path.join(LARAVEL_STORAGE_DIR, sig_path.replace('/storage', '').lstrip('/'))
         for sig_path in signature_paths
     ]
 
@@ -53,14 +54,14 @@ def sign():
 
     try:
         augmented_signature = create_augmented_signature(signature_full_paths)
-        # TODO: Handle when name is not on the document
-        add_signature_above_name(pdf_file, augmented_signature, signatory)
+
+        add_signature_above_name(pdf_file, augmented_signature, signatory, representative_name)
 
         return jsonify({"message": "Signature added successfully!"}), 200
 
     except Exception as e:
         print(f"Error adding signature: {e}")
-        return jsonify({"error": f"Failed to add signature: {str(e)}"}), 500
+        return jsonify({"error": f"Failed to add signature: {str(e)}"}), 200
 
 
 @app.route('/api/validate-signatures', methods=['POST'])

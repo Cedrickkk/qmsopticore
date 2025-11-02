@@ -2,20 +2,17 @@
 
 namespace App\Policies;
 
-use App\Models\User;
+use App\Enums\PermissionEnum;
 use App\Enums\RoleEnum;
 use App\Models\Document;
-use App\Enums\PermissionEnum;
-use App\Services\DocumentPermissionService;
-use App\Services\DocumentService;
+use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class DocumentPolicy
 {
     use HandlesAuthorization;
 
-
-    public function __construct(private readonly DocumentPermissionService $permissionService) {}
+    public function __construct() {}
 
     /**
      * Determine whether the user can view any documents.
@@ -51,6 +48,16 @@ class DocumentPolicy
             return true;
         }
 
+        // Users can view documents they are representatives for
+        if ($document->signatories()->where('representative_user_id', $user->id)->exists()) {
+            return true;
+        }
+
+        // Users can view documents they are recipients for
+        if ($document->recipients()->where('user_id', $user->id)->exists()) {
+            return true;
+        }
+
         return false;
     }
 
@@ -61,7 +68,7 @@ class DocumentPolicy
     {
         return $user->hasAnyRole([
             RoleEnum::SUPER_ADMIN->value,
-            RoleEnum::DEPARTMENT_ADMIN->value
+            RoleEnum::DEPARTMENT_ADMIN->value,
         ]) || $user->hasPermissionTo(PermissionEnum::DOCUMENT_CREATE->value);
     }
 
@@ -76,7 +83,7 @@ class DocumentPolicy
         }
 
         return $document->created_by === $user->id &&
-            !in_array($document->status, ['approved', 'published', 'archived']);
+            ! in_array($document->status, ['approved', 'published', 'archived']);
     }
 
     /**
@@ -102,7 +109,13 @@ class DocumentPolicy
             ->orderBy('signatory_order')
             ->first();
 
-        return $nextSignatory && $nextSignatory->user_id === $user->id;
+        if (!$nextSignatory) {
+            return false;
+        }
+
+        // Check if user is the signatory OR the representative
+        return $nextSignatory->user_id === $user->id ||
+            $nextSignatory->representative_user_id === $user->id;
     }
 
     /**
@@ -110,7 +123,6 @@ class DocumentPolicy
      */
     public function reject(User $user, Document $document): bool
     {
-        // Same rules as approve
         return $this->approve($user, $document);
     }
 
@@ -119,7 +131,7 @@ class DocumentPolicy
      */
     public function archive(User $user, Document $document): bool
     {
-        if (!in_array($document->status, ['approved', 'published'])) {
+        if (! in_array($document->status, ['approved', 'published'])) {
             return false;
         }
 
@@ -141,19 +153,6 @@ class DocumentPolicy
     public function forceDelete(User $user, Document $document): bool
     {
         return $user->hasRole(RoleEnum::SUPER_ADMIN->value);
-    }
-
-    public function download(User $user, Document $document): bool
-    {
-        return $this->permissionService->canUserAccess($document, $user, 'download');
-    }
-
-    /**
-     * Determine if the user can share the document.
-     */
-    public function share(User $user, Document $document): bool
-    {
-        return $this->permissionService->canUserAccess($document, $user, 'share');
     }
 
     /**

@@ -18,9 +18,13 @@ class Document extends Model
         'filename',
         'created_by',
         'status',
+        'priority',
         'category',
         'version',
         'description',
+        'confidentiality_level',
+        'require_reauth_on_view',
+        'auto_blur_after_seconds',
     ];
 
     protected $casts = [
@@ -118,5 +122,35 @@ class Document extends Model
     public function scopeByCategory($query, int $categoryId)
     {
         return $query->where('category_id', $categoryId);
+    }
+
+    public function  isConfidential()
+    {
+        return in_array($this->confidentiality_level, ['confidential', 'highly_confidential']);
+    }
+
+    public function isHighlyConfidential(): bool
+    {
+        return $this->confidentiality_level === 'highly_confidential';
+    }
+
+
+    public function requiresReauth(): bool
+    {
+        return $this->require_reauth_on_view || $this->isConfidential();
+    }
+
+    public function getAutoBlurSeconds(): int
+    {
+        if ($this->auto_blur_after_seconds != null) {
+            return $this->auto_blur_after_seconds;
+        }
+
+        return match ($this->confidentiality_level) {
+            'highly_confidential' => 30,
+            'confidential' => 60,
+            'internal' => 120,
+            default => 0,
+        };
     }
 }

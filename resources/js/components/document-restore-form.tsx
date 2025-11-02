@@ -9,14 +9,14 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import { type Document } from '@/types/document';
+import { ArchivedDocument } from '@/pages/archives';
 import { useForm } from '@inertiajs/react';
 import { FileDown, LoaderCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface RestoreArchivedDocumentFormProps {
   open: boolean;
-  document: Document;
+  document: ArchivedDocument;
   onOpenChange: (state: boolean) => void;
 }
 
@@ -25,16 +25,16 @@ export default function RestoreArchivedDocumentForm({ document, open, onOpenChan
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    patch(`/documents/${document.id}/unarchive`, {
+    patch(`/archives/${document.id}/unarchive`, {
       preserveState: true,
       showProgress: false,
-      onFinish: () => {
+      onSuccess: () => {
         onOpenChange(!open);
         toast(
           <Alert className="border-none p-0 font-sans">
-            <FileDown className="h-4 w-4" />
-            <AlertTitle>Document Restored</AlertTitle>
-            <AlertDescription>{document.title} has been restored.</AlertDescription>
+            <FileDown className="h-4 w-4" color="green" />
+            <AlertTitle className="text-primary font-medium">Document Restored</AlertTitle>
+            <AlertDescription>{document.document.title} has been restored.</AlertDescription>
           </Alert>
         );
       },

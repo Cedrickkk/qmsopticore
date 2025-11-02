@@ -16,41 +16,96 @@ class DashboardService
         //
     }
 
-    public function getDashboardStats()
+    public function getDashboardStats($departmentId = null)
     {
         return [
-            'totalDocuments' => Document::count(),
-            'totalUsers' => User::count(),
-            'documentsGrowth' => $this->getDocumentGrowthPercentage(),
-            'usersGrowth' => $this->getUserGrowthPercentage(),
-            'documentActivity' => $this->getWeeklyDocumentActivity()
+            'totalDocuments' => $this->getTotalDocuments($departmentId),
+            'totalUsers' => $this->getTotalUsers($departmentId),
+            'documentsGrowth' => $this->getDocumentGrowthPercentage($departmentId),
+            'usersGrowth' => $this->getUserGrowthPercentage($departmentId),
+            'documentActivity' => $this->getWeeklyDocumentActivity($departmentId)
         ];
     }
 
-    public function getDocumentGrowthPercentage(): float|int
+    public function getTotalDocuments($departmentId = null): int
     {
-        return $this->calculateGrowthPercentage('Document');
+        $query = Document::query();
+
+        if ($departmentId) {
+            $query->where(function ($q) use ($departmentId) {
+                $q->whereHas('createdBy', function ($userQuery) use ($departmentId) {
+                    $userQuery->where('department_id', $departmentId);
+                })
+                    ->orWhereHas('recipients', function ($recipientQuery) use ($departmentId) {
+                        $recipientQuery->whereHas('user', function ($userQuery) use ($departmentId) {
+                            $userQuery->where('department_id', $departmentId);
+                        });
+                    })
+                    ->orWhereHas('signatories', function ($signatoryQuery) use ($departmentId) {
+                        $signatoryQuery->whereHas('user', function ($userQuery) use ($departmentId) {
+                            $userQuery->where('department_id', $departmentId);
+                        });
+                    });
+            });
+        }
+
+        return $query->count();
     }
 
-    public function getUserGrowthPercentage(): float|int
+    private function getTotalUsers($departmentId = null): int
     {
-        return $this->calculateGrowthPercentage('User');
+        $query = User::query();
+
+        if ($departmentId) {
+            $query->where('department_id', $departmentId);
+        }
+
+        return $query->count();
     }
 
-    public function getWeeklyDocumentActivity()
+    public function getDocumentGrowthPercentage($departmentId = null): float|int
+    {
+        return $this->calculateGrowthPercentage('Document', $departmentId);
+    }
+
+    public function getUserGrowthPercentage($departmentId = null): float|int
+    {
+        return $this->calculateGrowthPercentage('User', $departmentId);
+    }
+
+    public function getWeeklyDocumentActivity($departmentId = null)
     {
         $endDate = now();
         $startDate = now()->subWeeks(4);
 
-        return Document::selectRaw('
+        $query = Document::selectRaw('
         COUNT(*) as count,
         YEARWEEK(created_at, 1) as yearWeek,
         CONCAT("Week ", WEEK(created_at, 1) - WEEK(DATE_SUB(created_at, INTERVAL DAYOFMONTH(created_at)-1 DAY), 1) + 1, 
                " (", DATE_FORMAT(created_at, "%b %d"), " - ", 
                DATE_FORMAT(DATE_ADD(created_at, INTERVAL 6 - WEEKDAY(created_at) DAY), "%b %d"), ")") as weekLabel')
             ->where('created_at', '>=', $startDate)
-            ->where('created_at', '<=', $endDate)
-            ->groupBy('yearWeek', 'weekLabel')
+            ->where('created_at', '<=', $endDate);
+
+        if ($departmentId) {
+            $query->where(function ($q) use ($departmentId) {
+                $q->whereHas('createdBy', function ($userQuery) use ($departmentId) {
+                    $userQuery->where('department_id', $departmentId);
+                })
+                    ->orWhereHas('recipients', function ($recipientQuery) use ($departmentId) {
+                        $recipientQuery->whereHas('user', function ($userQuery) use ($departmentId) {
+                            $userQuery->where('department_id', $departmentId);
+                        });
+                    })
+                    ->orWhereHas('signatories', function ($signatoryQuery) use ($departmentId) {
+                        $signatoryQuery->whereHas('user', function ($userQuery) use ($departmentId) {
+                            $userQuery->where('department_id', $departmentId);
+                        });
+                    });
+            });
+        }
+
+        return $query->groupBy('yearWeek', 'weekLabel')
             ->orderBy('yearWeek')
             ->get()
             ->map(function ($item) {
@@ -62,15 +117,15 @@ class DashboardService
             });
     }
 
-    public function getMonthlyDocumentActivity()
+    public function getMonthlyDocumentActivity($departmentId = null)
     {
         $currentMonth = now();
         $lastMonth = now()->subMonth();
 
-        return Document::selectRaw('
-            COUNT(*) as count,
-            DATE_FORMAT(created_at, "%Y-%m") as yearMonth,
-            DATE_FORMAT(created_at, "%M") as month')
+        $query = Document::selectRaw('
+        COUNT(*) as count,
+        DATE_FORMAT(created_at, "%Y-%m") as yearMonth,
+        DATE_FORMAT(created_at, "%M") as month')
             ->where(function ($query) use ($currentMonth, $lastMonth) {
                 $query->whereBetween('created_at', [
                     $lastMonth->startOfMonth(),
@@ -80,8 +135,27 @@ class DashboardService
                         $currentMonth->startOfMonth(),
                         $currentMonth->endOfMonth()
                     ]);
-            })
-            ->groupBy('yearMonth', 'month')
+            });
+
+        if ($departmentId) {
+            $query->where(function ($q) use ($departmentId) {
+                $q->whereHas('createdBy', function ($userQuery) use ($departmentId) {
+                    $userQuery->where('department_id', $departmentId);
+                })
+                    ->orWhereHas('recipients', function ($recipientQuery) use ($departmentId) {
+                        $recipientQuery->whereHas('user', function ($userQuery) use ($departmentId) {
+                            $userQuery->where('department_id', $departmentId);
+                        });
+                    })
+                    ->orWhereHas('signatories', function ($signatoryQuery) use ($departmentId) {
+                        $signatoryQuery->whereHas('user', function ($userQuery) use ($departmentId) {
+                            $userQuery->where('department_id', $departmentId);
+                        });
+                    });
+            });
+        }
+
+        return $query->groupBy('yearMonth', 'month')
             ->orderBy('yearMonth')
             ->get()
             ->map(function ($item) {
@@ -93,9 +167,9 @@ class DashboardService
             });
     }
 
-    public function getUserRecentDocuments(string $userId): Collection
+    public function getUserRecentDocuments(string $userId, $departmentId = null): Collection
     {
-        return Document::query()
+        $query = Document::query()
             ->where(function ($query) use ($userId) {
                 $query->whereHas('recipients', function ($query) use ($userId) {
                     $query->where('user_id', $userId);
@@ -103,33 +177,75 @@ class DashboardService
                     $query->where('user_id', $userId);
                 });
             })
-            ->orWhere('created_by', $userId)
-            ->with('createdBy:id,name,email')
+            ->orWhere('created_by', $userId);
+
+        if ($departmentId) {
+            $query->where(function ($q) use ($departmentId) {
+                $q->whereHas('createdBy', function ($userQuery) use ($departmentId) {
+                    $userQuery->where('department_id', $departmentId);
+                })
+                    ->orWhereHas('recipients', function ($recipientQuery) use ($departmentId) {
+                        $recipientQuery->whereHas('user', function ($userQuery) use ($departmentId) {
+                            $userQuery->where('department_id', $departmentId);
+                        });
+                    })
+                    ->orWhereHas('signatories', function ($signatoryQuery) use ($departmentId) {
+                        $signatoryQuery->whereHas('user', function ($userQuery) use ($departmentId) {
+                            $userQuery->where('department_id', $departmentId);
+                        });
+                    });
+            });
+        }
+
+        return $query->with('createdBy:id,name,email')
             ->with('category:id,name')
+            ->orderBy('created_at', 'desc')
             ->latest()
             ->take(10)
             ->get();
     }
 
-    private function calculateGrowthPercentage(string $model): float|int
+    public function calculateGrowthPercentage(string $model, $departmentId = null): float|int
     {
         $currentMonth = now();
         $lastMonth = now()->subMonth();
 
         $modelClass = "App\\Models\\{$model}";
+        $query = $modelClass::query();
 
-        $currentMonthCount = $modelClass::whereMonth('created_at', $currentMonth->month)
+        if ($departmentId) {
+            if ($model === 'User') {
+                $query->where('department_id', $departmentId);
+            } elseif ($model === 'Document') {
+                $query->where(function ($q) use ($departmentId) {
+                    $q->whereHas('createdBy', function ($userQuery) use ($departmentId) {
+                        $userQuery->where('department_id', $departmentId);
+                    })
+                        ->orWhereHas('recipients', function ($recipientQuery) use ($departmentId) {
+                            $recipientQuery->whereHas('user', function ($userQuery) use ($departmentId) {
+                                $userQuery->where('department_id', $departmentId);
+                            });
+                        })
+                        ->orWhereHas('signatories', function ($signatoryQuery) use ($departmentId) {
+                            $signatoryQuery->whereHas('user', function ($userQuery) use ($departmentId) {
+                                $userQuery->where('department_id', $departmentId);
+                            });
+                        });
+                });
+            }
+        }
+
+        $currentMonthCount = (clone $query)->whereMonth('created_at', $currentMonth->month)
             ->whereYear('created_at', $currentMonth->year)
             ->count();
 
-        $lastMonthCount = $modelClass::whereMonth('created_at', $lastMonth->month)
+        $lastMonthCount = (clone $query)->whereMonth('created_at', $lastMonth->month)
             ->whereYear('created_at', $lastMonth->year)
             ->count();
 
         if ($lastMonthCount === 0) {
             return $currentMonthCount > 0 ? 100 : 0;
         }
-
         return round((($currentMonthCount - $lastMonthCount) / $lastMonthCount) * 100, 1);
     }
 }

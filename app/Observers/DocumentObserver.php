@@ -3,17 +3,21 @@
 namespace App\Observers;
 
 use App\Models\Document;
-use Illuminate\Http\Exceptions\HttpResponseException;
-use Illuminate\Support\Facades\Storage;
+use App\Services\ActivityLogService;
 
 class DocumentObserver
 {
+    public function __construct(private readonly ActivityLogService $activityLogService) {}
+
     /**
      * Handle the Document "created" event.
      */
     public function created(Document $document): void
     {
-        //
+        $this->activityLogService->logDocument(
+            action: 'created',
+            document: $document,
+        );
     }
 
     /**
@@ -21,7 +25,18 @@ class DocumentObserver
      */
     public function updated(Document $document): void
     {
-        //
+        $significantFields = ['title', 'status', 'description', 'category'];
+
+        $changes = $document->getChanges();
+
+        if (array_intersect_key($changes, array_flip($significantFields))) {
+            $this->activityLogService->logDocument(
+                action: 'updated',
+                document: $document,
+                oldValues: array_intersect_key($document->getOriginal(), array_flip($significantFields)),
+                newValues: array_intersect_key($changes, array_flip($significantFields)),
+            );
+        }
     }
 
     /**
@@ -29,7 +44,10 @@ class DocumentObserver
      */
     public function deleted(Document $document): void
     {
-        //
+        $this->activityLogService->logDocument(
+            action: 'deleted',
+            document: $document,
+        );
     }
 
     /**

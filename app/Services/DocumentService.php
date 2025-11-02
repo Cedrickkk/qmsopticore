@@ -7,9 +7,11 @@ use App\Enums\DepartmentEnum;
 use App\Enums\DocumentStatusEnum;
 use App\Http\Requests\StoreDocumentRequest;
 use App\Http\Requests\UpdateDocumentAccessRequest;
+use App\Models\ArchivedDocument;
 use App\Models\Document;
 use App\Models\DocumentRecipient;
 use App\Models\DocumentType;
+use App\Models\DocumentWorkflowLog;
 use App\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -41,6 +43,17 @@ class DocumentService
 
         $filename = $this->fileService->generateUniqueFilename($file);
 
+        $confidentialityLevel = $data['confidentiality_level'] ?? 'internal';
+
+        $autoBlurSeconds = match ($confidentialityLevel) {
+            'highly_confidential' => 30,
+            'confidential' => 60,
+            'internal' => 120,
+            default => null,
+        };
+
+        $requireReauth = in_array($confidentialityLevel, ['confidential', 'highly_confidential']);
+
         $document = $this->documentRepository->create([
             'code' => $this->generateDocumentCode($data['type']['id']),
             'title' => $file->getClientOriginalName(),
@@ -49,7 +62,11 @@ class DocumentService
             'created_by' => $user->id,
             'status' => DocumentStatusEnum::DRAFT->value,
             'category' => $data['category']['id'],
+            'priority' => $data['priority'],
             'version' => '1.0.0',
+            'confidentiality_level' => $confidentialityLevel,
+            'require_reauth_on_view' => $requireReauth,
+            'auto_blur_after_seconds' => $autoBlurSeconds,
         ]);
 
         $this->fileService->upload($file, 'documents', $filename);
@@ -70,6 +87,8 @@ class DocumentService
 
             $this->handleRecipients($users, $document);
         }
+
+        $this->pdfService->updateVersion($document, $document->version);
 
         return $document;
     }
@@ -99,14 +118,25 @@ class DocumentService
         $this->pdfService->updateVersion($document, $version);
     }
 
-    public function archive(Document $document)
+    public function archive(Document $document, int $archivedBy, string $reason = 'Manual archive')
     {
-        $this->documentRepository->archive($document);
+        $previousStatus = $document->status;
+
+        $this->documentRepository->archive($document, $archivedBy, $reason);
+
+        $this->workflowService->log(
+            $document,
+            $this->userService->getUser(),
+            'archived',
+            $previousStatus,
+            'archived',
+            $reason
+        );
     }
 
-    public function unarchive(Document $document)
+    public function unarchive(ArchivedDocument $document, int $unarchivedBy)
     {
-        $this->documentRepository->unarchive($document);
+        $this->documentRepository->unarchive($document, $unarchivedBy);
     }
 
     public function getPaginatedDocuments(?string $search = null, ?string $dateFrom = null, ?string $dateTo = null): LengthAwarePaginator
@@ -114,9 +144,9 @@ class DocumentService
         return $this->documentRepository->paginate($search, $dateFrom, $dateTo);
     }
 
-    public function getPaginatedArchivedDocuments(?string $search = null)
+    public function getPaginatedArchivedDocuments(?string $search = null, ?string $dateFrom = null, ?string $dateTo = null)
     {
-        return $this->documentRepository->paginateArchived($search);
+        return $this->documentRepository->paginateArchived($search, $dateFrom, $dateTo);
     }
 
     public function getDocumentCreationOptions(): array
@@ -316,5 +346,14 @@ class DocumentService
         $lastSequence = (int) end($parts);
 
         return $lastSequence + 1;
+    }
+
+
+    public function isRepresentative(Document $document, int $userId): bool
+    {
+        return $document->signatories()
+            ->where('representative_user_id', $userId)
+            ->where('status', 'pending')
+            ->exists();
     }
 }

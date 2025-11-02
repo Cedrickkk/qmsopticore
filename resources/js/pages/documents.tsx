@@ -1,14 +1,19 @@
 import DocumentTableActions from '@/components/documents-table-actions';
 import { TableHeaderButton } from '@/components/table-header-button';
 import { TablePagination } from '@/components/table-pagination';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
+import { Checkbox } from '@/components/ui/checkbox';
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useBulkDownloadDocuments } from '@/hooks/use-bulk-download-documents';
 import AppLayout from '@/layouts/app-layout';
+import { getConfidentialityConfig, getConfidentialityTextColor } from '@/lib/confidentiality-status';
+import { getPriorityConfig, getPriorityTextColor } from '@/lib/document-priority';
 import { getDocumentStatusBadge } from '@/lib/document-status';
 import { PaginatedData } from '@/types';
 import { type Document } from '@/types/document';
@@ -19,11 +24,12 @@ import {
   getCoreRowModel,
   getFilteredRowModel,
   getSortedRowModel,
+  RowSelectionState,
   SortingState,
   useReactTable,
   VisibilityState,
 } from '@tanstack/react-table';
-import { ChevronDownIcon, FilePlus2, RotateCcw, Settings2 } from 'lucide-react';
+import { ChevronDownIcon, Download, FilePlus2, LoaderCircle, RotateCcw, Settings2 } from 'lucide-react';
 import { useState } from 'react';
 import { type DateRange } from 'react-day-picker';
 
@@ -48,8 +54,24 @@ export const statusConfig = {
 export const documentColumns: ColumnDef<Document>[] = [
   {
     accessorKey: 'code',
-    header: ({ column }) => <TableHeaderButton column={column}>Code</TableHeaderButton>,
-    cell: ({ row }) => <div className="font-medium">{row.getValue('code')}</div>,
+    header: ({ column, table }) => (
+      <div className="ml-1.5 flex items-center gap-2">
+        <Checkbox
+          checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
+          onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+          className="data-[state=checked]:text-primary border-white data-[state=checked]:bg-white"
+        />
+        <TableHeaderButton column={column}>Code</TableHeaderButton>
+      </div>
+    ),
+    cell: ({ row }) => (
+      <div className="flex items-center gap-2">
+        <Checkbox checked={row.getIsSelected()} onCheckedChange={value => row.toggleSelected(!!value)} aria-label="Select row" />
+        <div className="font-medium">{row.getValue('code')}</div>
+      </div>
+    ),
+    enableHiding: false,
   },
   {
     accessorKey: 'title',
@@ -60,6 +82,52 @@ export const documentColumns: ColumnDef<Document>[] = [
     accessorKey: 'category.name',
     header: ({ column }) => <TableHeaderButton column={column}>Category</TableHeaderButton>,
     cell: ({ row }) => <div>{row.original.category.name}</div>,
+  },
+  {
+    accessorKey: 'priority',
+    header: ({ column }) => <TableHeaderButton column={column}>Priority</TableHeaderButton>,
+    cell: ({ row }) => {
+      const priority = row.getValue('priority') as string;
+      const config = getPriorityConfig(priority);
+      const Icon = config.icon;
+
+      return (
+        <div className={`flex items-center justify-center gap-1.5 text-sm font-medium ${getPriorityTextColor(priority)}`}>
+          <Icon className={`h-3.5 w-3.5 ${config.iconColor}`} />
+          {config.label}
+        </div>
+      );
+    },
+    sortingFn: (rowA, rowB, columnId) => {
+      const a = rowA.getValue(columnId) as string;
+      const b = rowB.getValue(columnId) as string;
+      const configA = getPriorityConfig(a);
+      const configB = getPriorityConfig(b);
+      return configA.priority - configB.priority;
+    },
+  },
+  {
+    accessorKey: 'confidentiality_level',
+    header: ({ column }) => <TableHeaderButton column={column}>Confidentiality</TableHeaderButton>,
+    cell: ({ row }) => {
+      const level = row.getValue('confidentiality_level') as string;
+      const config = getConfidentialityConfig(level);
+      const Icon = config.icon;
+
+      return (
+        <div className={`flex items-center justify-center gap-1.5 text-sm font-medium ${getConfidentialityTextColor(level)}`}>
+          <Icon className={`h-3.5 w-3.5 ${config.iconColor}`} />
+          {config.label}
+        </div>
+      );
+    },
+    sortingFn: (rowA, rowB, columnId) => {
+      const a = rowA.getValue(columnId) as string;
+      const b = rowB.getValue(columnId) as string;
+      const configA = getConfidentialityConfig(a);
+      const configB = getConfidentialityConfig(b);
+      return configA.priority - configB.priority;
+    },
   },
   {
     accessorKey: 'created_by.name',
@@ -106,13 +174,18 @@ export default function Documents() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [openDateRange, setOpenDateRange] = useState(false);
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+  const { handleBulkDownload, isDownloading } = useBulkDownloadDocuments();
+
+  console.log(documents);
 
   const table = useReactTable({
     state: {
       sorting,
       globalFilter,
       columnVisibility,
+      rowSelection,
     },
     columns: documentColumns,
     data: documents.data,
@@ -124,7 +197,12 @@ export default function Documents() {
     onGlobalFilterChange: setGlobalFilter,
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    enableRowSelection: true,
   });
+
+  const selectedRows = table.getFilteredSelectedRowModel().rows;
+  const selectedDocumentIds = selectedRows.map(row => row.original.id);
 
   const noResultsMessage = globalFilter ? `No results found for "${globalFilter}"` : 'No documents available';
 
@@ -154,6 +232,12 @@ export default function Documents() {
   const handleClearDateFilter = () => {
     setDateRange(undefined);
     router.get('/documents');
+  };
+
+  const handleDownloadAndClear = () => {
+    handleBulkDownload(selectedDocumentIds, () => {
+      setRowSelection({});
+    });
   };
 
   return (
@@ -227,6 +311,20 @@ export default function Documents() {
                   <RotateCcw className="mr-1 h-4 w-4" />
                 </Button>
               </div>
+              <Button onClick={handleDownloadAndClear} variant="ghost" className="rounded-xs" disabled={isDownloading}>
+                {isDownloading ? (
+                  <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <div className="relative inline-flex">
+                    <Download className="h-4 w-4" />
+                    {selectedDocumentIds.length > 0 && (
+                      <Badge className="absolute -top-3 -right-3 flex h-4 min-w-4 items-center justify-center rounded-full border-none px-1 py-0 text-[10px] font-semibold tabular-nums">
+                        {selectedDocumentIds.length}
+                      </Badge>
+                    )}
+                  </div>
+                )}
+              </Button>
               <div className="flex flex-col gap-3">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>

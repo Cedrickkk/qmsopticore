@@ -75,7 +75,7 @@ history = model.fit(
 test_loss, test_acc = model.evaluate(test_generator, steps=len(test_generator))
 print(f'Test accuracy: {test_acc}')
 
-model.save('model.keras')
+model.save('models/model.keras')
 print('Model saved as model.keras')
 
 train_accuracy = history.history['accuracy']

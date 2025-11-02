@@ -91,6 +91,11 @@ class UserService
         return $this->userRepository->findByEmail($email);
     }
 
+    public function findByEmailWithDepartment(string $email): ?User
+    {
+        return $this->userRepository->findByEmailWithDepartment($email);
+    }
+
     public function getUserProfileData(User $user)
     {
         $user->load(['roles:id,name', 'department:id,name']);

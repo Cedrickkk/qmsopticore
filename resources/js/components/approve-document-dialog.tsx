@@ -22,6 +22,8 @@ import { Textarea } from './ui/textarea';
 
 interface ApproveDocumentModalProps {
   documentId: number;
+  isSigningAsRepresentative?: boolean;
+  representativeFor?: string;
 }
 
 type Signature = {
@@ -31,11 +33,14 @@ type Signature = {
 type PageProps = {
   file: File;
   signatures: Signature[];
+  document: {
+    title: string;
+  };
 };
 
-export function ApproveDocumentDialog({ documentId }: ApproveDocumentModalProps) {
+export function ApproveDocumentDialog({ documentId, isSigningAsRepresentative, representativeFor }: ApproveDocumentModalProps) {
   const { auth } = usePage<SharedData>().props;
-  const { file, signatures } = usePage<PageProps>().props;
+  const { file, signatures, document } = usePage<PageProps>().props;
   const [signingInProgress, setSigningInProgress] = useState(false);
   const { data, setData, post, processing } = useForm<{ comment: string }>({
     comment: '',
@@ -51,8 +56,9 @@ export function ApproveDocumentDialog({ documentId }: ApproveDocumentModalProps)
 
       const { error, message } = await FlaskServiceApi.signDocument({
         pdf: file,
-        signatory: auth.user.name,
+        signatory: isSigningAsRepresentative ? representativeFor! : auth.user.name,
         signatures,
+        representative_name: isSigningAsRepresentative ? auth.user.name : undefined,
       });
 
       if (message) {
@@ -69,7 +75,11 @@ export function ApproveDocumentDialog({ documentId }: ApproveDocumentModalProps)
           <Alert className="border-none p-0 font-sans">
             <CircleCheckBig color="green" />
             <AlertTitle className="text-primary font-medium">Signature Applied</AlertTitle>
-            <AlertDescription>{message} Your approval will be processed momentarily.</AlertDescription>
+            <AlertDescription>
+              {isSigningAsRepresentative
+                ? `Signed on behalf of ${representativeFor}. Your approval will be processed momentarily.`
+                : `${message} Your approval will be processed momentarily.`}
+            </AlertDescription>
           </Alert>
         );
       }
@@ -105,7 +115,6 @@ export function ApproveDocumentDialog({ documentId }: ApproveDocumentModalProps)
         </Alert>
       );
 
-      // Reset loading state
       setSigningInProgress(false);
     }
   };
@@ -118,7 +127,15 @@ export function ApproveDocumentDialog({ documentId }: ApproveDocumentModalProps)
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Approve Document</DialogTitle>
-          <DialogDescription>Are you sure you want to approve "{document.title}"? This action cannot be undone.</DialogDescription>
+          <DialogDescription>
+            {isSigningAsRepresentative ? (
+              <>
+                You are approving this document on behalf of <strong>{representativeFor}</strong>. Your signature will be used.
+              </>
+            ) : (
+              <>Are you sure you want to approve "{document.title}"? This action cannot be undone.</>
+            )}
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="space-y-4 py-2">

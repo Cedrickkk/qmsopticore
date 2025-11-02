@@ -30,7 +30,7 @@ const mainNavItems: NavItem[] = [
     title: 'Departments',
     url: '/departments',
     icon: LayoutPanelTop,
-    requiredRoles: ['super_admin', 'department_admin'],
+    requiredRoles: ['super_admin'],
   },
   {
     title: 'Accounts',

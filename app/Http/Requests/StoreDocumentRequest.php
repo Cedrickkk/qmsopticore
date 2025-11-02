@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Models\Document;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreDocumentRequest extends FormRequest
 {
@@ -39,6 +40,8 @@ class StoreDocumentRequest extends FormRequest
             'users.*.name' => ['required', 'string'],
             'users.*.email' => ['required', 'email'],
             'users.*.signatory' => ['required', 'boolean'],
+            'confidentiality_level' => ['required', Rule::in(['public', 'internal', 'confidential', 'highly_confidential'])],
+            'priority' => 'required|in:normal,high,urgent',
         ];
     }
 
@@ -54,6 +57,8 @@ class StoreDocumentRequest extends FormRequest
             'category.id' => 'The document category is required.',
             'category.id.exists' => 'The selected category is invalid.',
             'category.id.exists_type' => 'The selected category does not belong to the selected document type.',
+            'confidentiality_level.required' => 'Please select a confidentiality level',
+            'confidentiality_level.in' => 'Invalid confidentiality level',
         ];
     }
 }

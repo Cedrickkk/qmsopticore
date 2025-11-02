@@ -6,6 +6,7 @@ use App\Models\User;
 use Inertia\Inertia;
 use App\Services\DashboardService;
 use App\Http\Controllers\Controller;
+use App\Models\Department;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
@@ -14,16 +15,37 @@ class DashboardController extends Controller
 
     public function index()
     {
-        $userId = User::find(Auth::id())->id;
+        $user = User::find(Auth::id());
 
-        $stats = $this->service->getDashboardStats();
+        $departmentDistribution = Department::withCount('users')
+            ->orderBy('users_count', 'desc')
+            ->get()
+            ->map(function ($dept) {
+                return [
+                    'department' => [
+                        'name' => $dept->name,
+                        'code' => $dept->code,
+                    ],
+                    'users' => $dept->users_count,
+                ];
+            });
 
-        $userRecentDocuments = $this->service->getUserRecentDocuments($userId);
+        $departmentId = null;
+
+        if ($user->hasRole('department_admin') && !$user->hasRole('super_admin')) {
+            $departmentId = $user->department_id;
+        }
+
+        $stats = $this->service->getDashboardStats($departmentId);
+
+        $userRecentDocuments = $this->service->getUserRecentDocuments($user->id, $departmentId);
+
 
         return Inertia::render('dashboard', [
             'totalDocuments' => $stats['totalDocuments'],
             'totalUsers' => $stats['totalUsers'],
             'userRecentDocuments' => $userRecentDocuments,
+            'departmentDistribution' => $departmentDistribution,
             'stats' => [
                 'documentsGrowth' => $stats['documentsGrowth'],
                 'usersGrowth' => $stats['usersGrowth'],

@@ -9,6 +9,7 @@ interface SignDocumentPayload {
   pdf: File;
   signatory: string;
   signatures: Signature[];
+  representative_name?: string;
 }
 
 interface SignDocumentResponse {
@@ -21,20 +22,35 @@ interface VerifySignaturesResponse {
   averageSimilarity: number;
   confidence: 'high' | 'low' | 'medium';
   error?: string;
+  representative_name: string;
 }
 
 export const FlaskServiceApi = {
-  async signDocument(payload: SignDocumentPayload) {
+  async signDocument({ pdf, signatory, signatures, representative_name }: SignDocumentPayload): Promise<SignDocumentResponse> {
     try {
-      const { data } = await flaskApi.post<SignDocumentResponse>('/api/sign', payload, { withCredentials: true });
+      const payload = {
+        pdf,
+        signatory,
+        signatures,
+        ...(representative_name && { representative_name }),
+      };
+
+      const { data } = await flaskApi.post<SignDocumentResponse>('/api/sign', payload, {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
       return data;
-    } catch (error: unknown) {
-      if (error instanceof AxiosError && error.response?.data?.error) {
-        throw new Error(error.response.data.error);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        return { error: error.response?.data?.error || 'Failed to sign document' };
       }
-      throw error;
+      return { error: 'An unexpected error occurred' };
     }
   },
+
   async validateSignatures(formData: FormData) {
     try {
       const { data } = await flaskApi.post<VerifySignaturesResponse>('/api/validate-signatures', formData, {

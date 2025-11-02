@@ -1,0 +1,15 @@
+=== CNN Training Statistics ===
+
+Total Epochs: 16
+Best Epoch: 16
+Best Validation Accuracy: 0.22499999403953552
+Final Training Accuracy: 0.4583333432674408
+Final Validation Accuracy: 0.22499999403953552
+Test Accuracy: 0.0416666679084301
+Final Training Loss: 1.838196039199829
+Final Validation Loss: 14.991328239440918
+Test Loss: 4.968725681304932
+Number of Classes: 24
+Image Size: 150x150
+Batch Size: 5
+Total Parameters: 11342904

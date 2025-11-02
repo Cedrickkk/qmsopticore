@@ -1,27 +1,24 @@
 <?php
 
 use App\Http\Controllers\BackupController;
+use App\Http\Controllers\System\ActivityLogController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'role:super_admin'])->group(function () {
-
   Route::prefix('system-settings')->name('system-settings.')->group(function () {
-
-    Route::redirect('/', '/system-settings/dashboard');
-
+    Route::redirect('/', 'system-settings/dashboard');
     Route::inertia('/dashboard', 'system-settings/dashboard');
-
     Route::inertia('/appearance', 'system-settings/appearance');
 
     Route::prefix('/backups')->name('backups.')->group(function () {
-
       Route::get('/', [BackupController::class, 'index'])->name('index');
     });
 
     Route::inertia('/contents', 'system-settings/contents');
-
     Route::inertia('/documents', 'system-settings/documents');
 
-    Route::inertia('/logs', 'system-settings/logs');
+    Route::prefix('/logs')->name('logs.')->group(function () {
+      Route::get('/', [ActivityLogController::class, 'index'])->name('index');
+    });
   });
 });

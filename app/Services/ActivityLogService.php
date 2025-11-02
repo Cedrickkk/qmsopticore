@@ -83,6 +83,7 @@ class ActivityLogService
             'rejected' => "Document '{$document->title}' was rejected",
             'published' => "Document '{$document->title}' was published",
             'archived' => "Document '{$document->title}' was archived",
+            'unarchived' => "Document '{$document->title}' was restored",
             'shared' => "Document '{$document->title}' was shared",
         ];
 
@@ -127,6 +128,39 @@ class ActivityLogService
             oldValues: $oldValues,
             newValues: $newValues,
             user: $performer
+        );
+    }
+
+    public function logBackup(
+        string $action,
+        $backup,
+        ?User $user = null
+    ): ActivityLog {
+        $user = $user ?? Auth::user();
+
+        $descriptions = [
+            'created' => "Backup '{$backup->filename}' ({$backup->type}) was created - {$backup->file_size}",
+            'downloaded' => "Backup '{$backup->filename}' ({$backup->type}) was downloaded",
+            'deleted' => "Backup '{$backup->filename}' ({$backup->type}) was deleted",
+            'verified' => "Backup '{$backup->filename}' ({$backup->type}) was verified",
+            'restored' => "Backup '{$backup->filename}' ({$backup->type}) was restored",
+        ];
+
+        $metadata = [
+            'filename' => $backup->filename,
+            'type' => $backup->type,
+            'size' => $backup->size,
+            'file_size' => $backup->file_size,
+            'successful' => $backup->successful,
+        ];
+
+        return $this->log(
+            action: $action,
+            description: $descriptions[$action] ?? "Backup '{$backup->filename}' action: {$action}",
+            entityType: 'Backup',
+            entityId: $backup->id,
+            newValues: $metadata,
+            user: $user
         );
     }
 

@@ -4,6 +4,9 @@
  *
  */
 
+import { ConfidentialityLevel } from '@/components/document-confidentiality-field';
+import { PriorityType } from '@/lib/document-priority';
+
 export interface Document {
   id: number;
   code: string;
@@ -18,10 +21,14 @@ export interface Document {
     id: number;
     name: string;
   };
-  status: 'approved' | 'rejected' | 'pending' | 'updated';
+  status: 'approved' | 'rejected' | 'pending' | 'updated' | 'published';
+  priority: 'normal' | 'high' | 'urgent';
   version: string;
   created_at: string;
   updated_at: string;
+  confidentiality_level: 'public' | 'internal' | 'confidential' | 'highly_confidential'; // Add this
+  require_reauth_on_view: boolean;
+  auto_blur_after_seconds: number;
 }
 
 export type DocumentCategory = {
@@ -70,6 +77,8 @@ export type CreateDocumentFormData = {
   users: DocumentUser[];
   description: string;
   permissions: DocumentPermission[];
+  confidentiality_level: ConfidentialityLevel;
+  priority: PriorityType;
 };
 
 export type DocumentPageProps = {

@@ -67,7 +67,7 @@ export function SignatureUpload({ signatures, onChange, errors, disabled, onVali
 
       if (error) {
         toast(
-          <Alert variant="destructive" className="border-none p-0 font-sans">
+          <Alert variant="destructive" className="text-destructive border-none p-0 font-sans">
             <AlertTitle>Signatures Validation Failed</AlertTitle>
             <AlertDescription className="text-muted-foreground text-sm">{error}</AlertDescription>
           </Alert>

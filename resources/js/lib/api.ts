@@ -8,7 +8,8 @@ export const laravelApi = axios.create({
 });
 
 export const flaskApi = axios.create({
-  baseURL: 'https://qmsopticore.com/flask',
+  // baseURL: 'https://qmsopticore.com/flask',
+  baseURL: 'http://localhost:5000/',
   headers: {
     'Content-Type': 'application/json',
   },

@@ -1,4 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { getConfidentialityBadge } from '@/lib/confidentiality-status';
+import { getPriorityBadge } from '@/lib/document-priority';
 import { getDocumentStatusBadge } from '@/lib/document-status';
 import { getSignatoryStatusBadge } from '@/lib/signatory-status';
 import { type Document } from '@/types/document';
@@ -17,6 +19,8 @@ export interface DocumentSignatory {
   status: 'pending' | 'approved' | 'rejected';
   signed_at: string | null;
   signatory_order: number;
+  representative_name?: string | null;
+  representative_user_id: number;
 }
 
 interface DocumentInfoProps {
@@ -30,11 +34,11 @@ export function DocumentInfo({ document }: DocumentInfoProps) {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto max-w-6xl">
         <Card className="rounded-xs">
-          <CardHeader className="px-12 py-6">
-            <CardTitle className="text-xl font-semibold text-gray-900">{document.title}</CardTitle>
+          <CardHeader className="px-12 py-2">
+            <CardTitle className="text-2xl font-semibold text-gray-900">{document.title}</CardTitle>
             <CardDescription>{document.description}</CardDescription>
           </CardHeader>
-          <CardContent className="p-6">
+          <CardContent className="px-6 py-2">
             <Card className="rounded-xs border-none shadow-none">
               <CardHeader>
                 <CardTitle>Document Details</CardTitle>
@@ -66,7 +70,19 @@ export function DocumentInfo({ document }: DocumentInfoProps) {
                     </div>
                     <Input className="border-0 text-sm shadow-none ring-0" value={document.version} disabled />
                   </div>
+                  <div className="flex items-center px-6 py-4">
+                    <div className="w-32 flex-shrink-0">
+                      <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">Priority:</Label>
+                    </div>
+                    {getPriorityBadge(document.priority, '', false)}
+                  </div>
 
+                  <div className="flex items-center px-6 py-4">
+                    <div className="w-32 flex-shrink-0">
+                      <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">Confidentiality Level:</Label>
+                    </div>
+                    {getConfidentialityBadge(document.confidentiality_level)}
+                  </div>
                   <div className="flex items-center px-6 py-4">
                     <div className="w-32 flex-shrink-0">
                       <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">Status:</Label>

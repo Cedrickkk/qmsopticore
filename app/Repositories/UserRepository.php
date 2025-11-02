@@ -27,6 +27,12 @@ class UserRepository implements UserRepositoryInterface
             ->first();
     }
 
+
+    public function findByEmailWithDepartment(string $email)
+    {
+        return User::with('department')->where('email', $email)->first();
+    }
+
     public function getUserCreationOptions()
     {
         return [
@@ -52,7 +58,7 @@ class UserRepository implements UserRepositoryInterface
             ->when($departmentId, function ($query, $departmentId) {
                 $query->where('department_id', $departmentId);
             })
-            ->with('department');
+            ->with(['department:id,name', 'roles:id,name']);
 
         return $query->latest()->paginate(10)->withQueryString();
     }

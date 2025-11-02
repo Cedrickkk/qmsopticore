@@ -13,6 +13,7 @@ interface PDFPageState {
   currentPage: number;
   scale: number;
   isLoading: boolean;
+  error: string | null;
 }
 
 interface PDFViewerProps {
@@ -23,6 +24,7 @@ interface PDFViewerProps {
 type PageProps = {
   document: TDocument;
 };
+
 export const PDFViewer = memo(function PDFViewerComponent({ file, showThumbnails = false }: PDFViewerProps) {
   const { document } = usePage<PageProps>().props;
   const [pdfState, setPdfState] = useState<PDFPageState>({
@@ -30,6 +32,7 @@ export const PDFViewer = memo(function PDFViewerComponent({ file, showThumbnails
     currentPage: 1,
     scale: 0.8,
     isLoading: true,
+    error: null,
   });
 
   const handleDocumentLoadSuccess = useCallback(({ numPages }: { numPages: number }) => {
@@ -37,6 +40,16 @@ export const PDFViewer = memo(function PDFViewerComponent({ file, showThumbnails
       ...prev,
       numPages,
       isLoading: false,
+      error: null,
+    }));
+  }, []);
+
+  const handleDocumentLoadError = useCallback((error: Error) => {
+    console.error('PDF load error:', error);
+    setPdfState(prev => ({
+      ...prev,
+      isLoading: false,
+      error: error.message,
     }));
   }, []);
 
@@ -55,56 +68,55 @@ export const PDFViewer = memo(function PDFViewerComponent({ file, showThumbnails
   }, []);
 
   return (
-    <div>
-      <div className="my-4 flex flex-col gap-4">
-        <Document
-          className="bg-primary/10 border-primary relative flex h-fit justify-center rounded-xs border shadow-sm transition-colors"
-          key={document.status}
-          file={file}
-          loading={
-            <div className="flex h-[700px] items-center justify-center">
-              <LoaderCircle className="text-muted-foreground animate-spin text-sm">Loading PDF...</LoaderCircle>
-            </div>
-          }
-          onLoadSuccess={handleDocumentLoadSuccess}
-        >
-          <div className="flex h-[700px] items-center justify-center overflow-y-auto p-4">
-            <Page
-              key={`page_${pdfState.currentPage}`}
-              pageNumber={pdfState.currentPage}
-              scale={pdfState.scale}
-              className="shadow-sm"
-              renderTextLayer={false}
-              renderAnnotationLayer={false}
-              loading={
-                <div className="items-center justify-center">
-                  <LoaderCircle className="text-muted-foreground animate-spin">Loading PDF...</LoaderCircle>
-                </div>
-              }
-            />
+    <div className="flex flex-col gap-4">
+      <Document
+        className="bg-primary/10 border-primary w-full overflow-hidden rounded-xs border shadow-sm"
+        key={document.status}
+        file={file}
+        loading={
+          <div className="flex h-[70vh] items-center justify-center">
+            <LoaderCircle className="text-muted-foreground h-8 w-8 animate-spin" />
           </div>
-        </Document>
-
-        <div className="flex flex-col gap-4">
-          {showThumbnails && (
-            <PDFThumbnails
-              file={file}
-              numPages={pdfState.numPages}
-              currentPage={pdfState.currentPage}
-              onPageChange={handlePageChange}
-              key={document.id}
-            />
-          )}
-
-          <PDFControls
-            currentPage={pdfState.currentPage}
-            numPages={pdfState.numPages}
+        }
+        error={
+          <div className="flex h-[70vh] flex-col items-center justify-center gap-2">
+            <p className="text-destructive font-medium">Failed to load PDF</p>
+            {pdfState.error && <p className="text-muted-foreground text-sm">{pdfState.error}</p>}
+          </div>
+        }
+        onLoadSuccess={handleDocumentLoadSuccess}
+        onLoadError={handleDocumentLoadError}
+      >
+        <div className="flex h-[90vh] w-full items-center justify-center overflow-auto p-4">
+          <Page
+            key={`page_${pdfState.currentPage}_${pdfState.scale}`}
+            pageNumber={pdfState.currentPage}
             scale={pdfState.scale}
-            onPageChange={handlePageChange}
-            onZoom={handleZoom}
+            className="mx-auto shadow-sm"
+            renderTextLayer={false}
+            renderAnnotationLayer={false}
+            loading={
+              <div className="flex h-full items-center justify-center">
+                <LoaderCircle className="text-muted-foreground h-8 w-8 animate-spin" />
+              </div>
+            }
           />
         </div>
-      </div>
+      </Document>
+
+      {showThumbnails && pdfState.numPages > 0 && (
+        <Document file={file}>
+          <PDFThumbnails numPages={pdfState.numPages} currentPage={pdfState.currentPage} onPageChange={handlePageChange} />
+        </Document>
+      )}
+
+      <PDFControls
+        currentPage={pdfState.currentPage}
+        numPages={pdfState.numPages}
+        scale={pdfState.scale}
+        onPageChange={handlePageChange}
+        onZoom={handleZoom}
+      />
     </div>
   );
 });

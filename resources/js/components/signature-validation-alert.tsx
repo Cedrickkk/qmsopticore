@@ -28,7 +28,7 @@ const getConfidenceColor = (confidence: string) => {
 
 export function SignatureValidationAlert({ isMatch, averageSimilarity, confidence }: SignatureValidationAlertProps) {
   return (
-    <Alert className="border-none p-0 font-sans">
+    <Alert variant="destructive" className={cn('border-none p-0 font-sans', !isMatch && 'text-destructive')}>
       <AlertTitle>{isMatch ? 'Signatures Validation Successful' : 'Signatures Validation Failed'}</AlertTitle>
       <AlertDescription className="grid gap-1">
         <div className="text-muted-foreground mt-2 grid gap-1 text-xs">

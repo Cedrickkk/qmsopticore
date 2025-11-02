@@ -11,7 +11,7 @@ import { useDownloadDocument } from '@/hooks/use-download-document';
 import { Document } from '@/types/document';
 import { Link } from '@inertiajs/react';
 import { Row } from '@tanstack/react-table';
-import { ArchiveX, Download, Eye, MoreHorizontal, Send } from 'lucide-react';
+import { ArchiveX, Download, Eye, MoreHorizontal } from 'lucide-react';
 import { useState } from 'react';
 import DocumentArchiveForm from './document-archive-form';
 
@@ -43,10 +43,6 @@ export default function DocumentTableActions({ row }: TableActionsProps) {
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => handleDownload(row.original)}>
             <Download /> <span>Download PDF </span>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Send />
-            <span>Share Document</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem className="text-destructive dark:bg-destructive dark:text-white" onClick={() => setIsOpen(open => !open)}>

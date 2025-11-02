@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { cn } from '@/lib/utils';
-import { FileStack } from 'lucide-react';
+import { TrendingUp } from 'lucide-react';
 import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts';
 
 interface DocumentActivity {
@@ -17,7 +17,7 @@ interface DocumentActivityChartProps {
 const chartConfig = {
   desktop: {
     label: 'Downloads',
-    color: 'var(--primary)',
+    color: 'var(--chart-2)',
   },
 } satisfies ChartConfig;
 
@@ -36,14 +36,21 @@ export default function DocumentActivityChart({ data }: DocumentActivityChartPro
     documents: item.count,
   }));
 
+  const isPositiveGrowth = calculateGrowth() >= 0;
+
   return (
     <Card className="h-fit w-full rounded-xs transition duration-300 ease-linear">
       <CardHeader>
-        <CardTitle className="flex items-center justify-between text-2xl font-bold">
-          <span>Document Overview</span>
-          <span>
-            <FileStack className="size-7" />
-          </span>
+        <CardTitle className="flex items-center justify-between">
+          Document Overview
+          <div
+            className={cn(
+              'rounded-full bg-gradient-to-br p-2.5 transition-transform',
+              isPositiveGrowth ? 'from-emerald-500 to-green-600' : 'from-orange-500 to-red-600'
+            )}
+          >
+            <TrendingUp className={cn('h-5 w-5 text-white transition-transform', !isPositiveGrowth && 'rotate-180')} />
+          </div>
         </CardTitle>
         <CardDescription>Weekly document creation</CardDescription>
       </CardHeader>

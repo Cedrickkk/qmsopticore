@@ -1,15 +1,17 @@
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Eye } from 'lucide-react';
 import { File } from 'react-pdf/dist/esm/shared/types.js';
-import { PDFViewer } from './document-viewer';
+import { PDFViewerWithSecurity } from './document-viewer-with-security';
 
 interface DocumentPreviewerProps {
   file: File;
+  confidentiality_level: 'public' | 'internal' | 'confidential' | 'highly_confidential';
+  auto_blur_after_seconds: number;
+  requires_reauth_on_view: boolean;
 }
 
-export function DocumentPreviewer({ file }: DocumentPreviewerProps) {
+export function DocumentPreviewer({ file, confidentiality_level, auto_blur_after_seconds, requires_reauth_on_view }: DocumentPreviewerProps) {
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -18,14 +20,18 @@ export function DocumentPreviewer({ file }: DocumentPreviewerProps) {
           Preview
         </Button>
       </SheetTrigger>
-      <SheetContent className="max-w-4xl min-w-[65vw] p-6">
-        <SheetHeader className="sr-only p-6 pb-0">
+      <SheetContent className="max-w-4xl min-w-[75vw] overflow-y-auto px-12 py-6 pt-12">
+        <SheetHeader className="sr-only">
           <SheetTitle>Document Preview</SheetTitle>
-          <SheetDescription>Scroll to view the entire document and controls.</SheetDescription>
+          <SheetDescription>View and navigate through the document.</SheetDescription>
         </SheetHeader>
-        <ScrollArea className="h-screen p-6">
-          <PDFViewer file={file} showThumbnails />
-        </ScrollArea>
+        <PDFViewerWithSecurity
+          file={file}
+          showThumbnails
+          confidentiality_level={confidentiality_level}
+          auto_blur_after_seconds={auto_blur_after_seconds}
+          require_reauth_on_view={requires_reauth_on_view}
+        />
       </SheetContent>
     </Sheet>
   );

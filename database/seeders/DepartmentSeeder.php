@@ -15,7 +15,10 @@ class DepartmentSeeder extends Seeder
     {
         foreach (DepartmentEnum::cases() as $department) {
             Department::firstOrCreate(
-                ['name' => $department->label()]
+                [
+                    'name' => $department->label(),
+                    'code' => $department->value
+                ]
             );
         }
     }

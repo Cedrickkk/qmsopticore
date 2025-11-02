@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
+use App\Casts\HumanReadableTime;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class DocumentWorkflowLog extends Model
 {
-
     use HasFactory;
 
     protected $fillable = [
@@ -18,6 +18,11 @@ class DocumentWorkflowLog extends Model
         'from_status',
         'to_status',
         'notes',
+    ];
+
+    protected $casts = [
+        'created_at' => HumanReadableTime::class,
+        'updated_at' => HumanReadableTime::class,
     ];
 
     public function document(): BelongsTo
