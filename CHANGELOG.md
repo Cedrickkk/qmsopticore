@@ -1,3 +1,16 @@
+# [1.3.0](https://github.com/Cedrickkk/qmsopticore/compare/v1.2.1...v1.3.0) (2025-11-02)
+
+
+### Features
+
+* add activity logging for user authentication ([a1615ee](https://github.com/Cedrickkk/qmsopticore/commit/a1615ee2f59a72abeb6c823a35fd4c3a186a6bab))
+* add core activity logging infrastructure ([2f7f340](https://github.com/Cedrickkk/qmsopticore/commit/2f7f340e05d031a887d7a24e134a188015530d0d))
+* add date range filtering to documents table ([37f0836](https://github.com/Cedrickkk/qmsopticore/commit/37f0836386aed0252a58ddc83d63eb241513d804))
+* add online status display to accounts table ([16bec3c](https://github.com/Cedrickkk/qmsopticore/commit/16bec3c9f02e94b2503edabcadb5b47cf82a6768))
+* extend DocumentRepositoryInterface for upcoming feature ([abeccb2](https://github.com/Cedrickkk/qmsopticore/commit/abeccb25ed75951cc45d45e3ca225f856b94db1f))
+* redesign document viewer with access information ([202445c](https://github.com/Cedrickkk/qmsopticore/commit/202445c6c66c3e1e0317ac0a5889b2a870e57bca))
+* restrict department selection for department admins in account creation ([7682de1](https://github.com/Cedrickkk/qmsopticore/commit/7682de1997b3f7b6344f5e32b6f31697daff4dcb))
+
 ## [1.2.1](https://github.com/Cedrickkk/qmsopticore/compare/v1.2.0...v1.2.1) (2025-05-23)
 
 
