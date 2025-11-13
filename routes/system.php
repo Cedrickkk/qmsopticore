@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'role:super_admin'])->group(function () {
   Route::prefix('system-settings')->name('system-settings.')->group(function () {
-    Route::redirect('/', 'system-settings/dashboard');
+    Route::redirect('/', 'system-settings/backups');
     Route::inertia('/dashboard', 'system-settings/dashboard');
     Route::inertia('/appearance', 'system-settings/appearance');
 

@@ -4,34 +4,34 @@ import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { Database, FileSymlink, FileText, Palette, Settings, TextSearch } from 'lucide-react';
+import { Database, TextSearch } from 'lucide-react';
 
 const sidebarNavItems: NavItem[] = [
-  {
-    title: 'Dashboard',
-    url: '/system-settings/dashboard',
-    icon: Settings,
-  },
-  {
-    title: 'Appearance',
-    url: '/system-settings/appearance',
-    icon: Palette,
-  },
+  // {
+  //   title: 'Dashboard',
+  //   url: '/system-settings/dashboard',
+  //   icon: Settings,
+  // },
+  // {
+  //   title: 'Appearance',
+  //   url: '/system-settings/appearance',
+  //   icon: Palette,
+  // },
   {
     title: 'Backups',
     url: '/system-settings/backups',
     icon: Database,
   },
-  {
-    title: 'Contents',
-    url: '/system-settings/contents',
-    icon: FileText,
-  },
-  {
-    title: 'Documents',
-    url: '/system-settings/documents',
-    icon: FileSymlink,
-  },
+  // {
+  //   title: 'Contents',
+  //   url: '/system-settings/contents',
+  //   icon: FileText,
+  // },
+  // {
+  //   title: 'Documents',
+  //   url: '/system-settings/documents',
+  //   icon: FileSymlink,
+  // },
   {
     title: 'Logs',
     url: '/system-settings/logs',
@@ -44,7 +44,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
 
   return (
     <div className="px-4 py-6">
-      <Heading title="System Settings" description="Manage your system's core functionality." />
+      <Heading title="System Settings" />
 
       <div className="flex flex-col space-y-8 lg:flex-row lg:space-y-0 lg:space-x-12">
         <aside className="w-full max-w-xl lg:w-48">

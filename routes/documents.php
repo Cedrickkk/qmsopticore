@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Documents\DocumentController;
 use App\Http\Controllers\Documents\ArchivedDocumentController;
 
-Route::middleware(['auth', 'role:super_admin|department_admin|regular_user'])->group(function () {
+Route::middleware(['auth', 'role:super_admin|department_admin|regular_user', 'permission'])->group(function () {
   Route::prefix('documents')->name('documents.')->group(function () {
     Route::get('/', [DocumentController::class, 'index'])->name('index');
     Route::get('/create', [DocumentController::class, 'create'])->name('create');
