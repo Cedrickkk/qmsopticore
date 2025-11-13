@@ -1,5 +1,4 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -7,7 +6,7 @@ import AppLayout from '@/layouts/app-layout';
 import { getOnlineStatusBadge } from '@/lib/online-status';
 import { BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { Activity, FilesIcon, Key, Pencil, User } from 'lucide-react';
+import { Activity, FilesIcon, Key, User } from 'lucide-react';
 import { ReactNode } from 'react';
 
 export interface UserProfile {
@@ -58,12 +57,12 @@ export default function UserProfileLayout({ user, activeTab, children }: UserPro
 
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <div className="container mx-auto max-w-6xl py-6">
-          <div className="mb-4 flex justify-end">
+          {/* <div className="mb-4 flex justify-end">
             <Button className="rounded-xs" variant="ghost">
               <Pencil />
               Edit Profile
             </Button>
-          </div>
+          </div> */}
 
           <Card className="rounded-xs">
             <CardHeader className="space-y-6 px-12 py-6">
