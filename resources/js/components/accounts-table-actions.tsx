@@ -11,7 +11,7 @@ import { UserWithDepartment } from '@/pages/accounts';
 import { User as UserType } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { Row } from '@tanstack/react-table';
-import { Activity, Files, Key, MoreHorizontal, Trash2, User } from 'lucide-react';
+import { Activity, Files, Key, MoreHorizontal, User } from 'lucide-react';
 
 interface AccountsTableActionsProps {
   row: Row<UserWithDepartment>;
@@ -62,12 +62,12 @@ export default function AccountsTableActions({ row }: AccountsTableActionsProps)
           </Link>
         </DropdownMenuItem>
 
-        {!isCurrentUser && (
+        {/* {!isCurrentUser && (
           <DropdownMenuItem className="text-destructive focus:text-destructive">
             <Trash2 className="text-destructive dark:text-white" />
             <span>Disable Account</span>
           </DropdownMenuItem>
-        )}
+        )} */}
       </DropdownMenuContent>
     </DropdownMenu>
   );
