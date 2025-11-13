@@ -42,7 +42,7 @@ class StoreUserRequest extends FormRequest
                 'required',
                 'file',
                 'mimes:jpg,jpeg,png',
-                'max:1024',
+                'max:2048',
             ],
             'signatures' => [
                 'required',
@@ -54,7 +54,7 @@ class StoreUserRequest extends FormRequest
                 'required',
                 'file',
                 'mimes:jpg,jpeg,png',
-                'max:1024',
+                'max:2048',
             ],
             'role' => ['required', 'string', 'in:super_admin,department_admin,regular_user']
         ];
