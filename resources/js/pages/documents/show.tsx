@@ -3,6 +3,7 @@ import { ApproveDocumentDialog } from '@/components/approve-document-dialog';
 import { DocumentInfo, DocumentSignatory } from '@/components/document-info';
 import { DocumentPreviewer } from '@/components/document-previewer';
 import DocumentWorkflowHistory from '@/components/document-workflow-history';
+import { PasswordDownloadDialog } from '@/components/password-download-dialog';
 import { RejectDocumentDialog } from '@/components/reject-document-dialog';
 import { RemoveRepresentativeButton } from '@/components/remove-representative-button';
 import { SetRepresentativeDialog } from '@/components/set-representative-dialog';
@@ -64,7 +65,8 @@ type PageProps = {
 
 export default function Show() {
   const { file, document, canSign, nextSignatory, accessPermissions, workflowLogs } = usePage<PageProps>().props;
-  const { handleDownload } = useDownloadDocument();
+  const { handleDownload, isPasswordDialogOpen, handlePasswordCancel, password, setPassword, handlePasswordSubmit, isDownloading, pendingDocument } =
+    useDownloadDocument();
   const { auth } = usePage<SharedData>().props;
 
   const userSignatory = document.signatories?.find(
@@ -181,6 +183,15 @@ export default function Show() {
           </div>
         </div>
       </DocumentShowLayout>
+      <PasswordDownloadDialog
+        isOpen={isPasswordDialogOpen}
+        onClose={handlePasswordCancel}
+        password={password}
+        setPassword={setPassword}
+        onSubmit={handlePasswordSubmit}
+        isDownloading={isDownloading}
+        documentTitle={pendingDocument?.title}
+      />
     </AppLayout>
   );
 }
