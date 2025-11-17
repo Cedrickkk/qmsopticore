@@ -9,6 +9,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Textarea } from '@/components/ui/textarea';
 import { FlaskServiceApi } from '@/services/flask';
 import { SharedData } from '@/types';
 import { useForm, usePage } from '@inertiajs/react';
@@ -17,8 +20,6 @@ import { AlertCircleIcon, CircleCheckBig, LoaderCircle } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
-import { Label } from './ui/label';
-import { Textarea } from './ui/textarea';
 
 interface ApproveDocumentModalProps {
   documentId: number;
@@ -42,6 +43,7 @@ export function ApproveDocumentDialog({ documentId, isSigningAsRepresentative, r
   const { auth } = usePage<SharedData>().props;
   const { file, signatures, document } = usePage<PageProps>().props;
   const [signingInProgress, setSigningInProgress] = useState(false);
+  const [inkColor, setInkColor] = useState<'black' | 'blue'>('black');
   const { data, setData, post, processing } = useForm<{ comment: string }>({
     comment: '',
   });
@@ -59,7 +61,10 @@ export function ApproveDocumentDialog({ documentId, isSigningAsRepresentative, r
         signatory: isSigningAsRepresentative ? representativeFor! : auth.user.name,
         signatures,
         representative_name: isSigningAsRepresentative ? auth.user.name : undefined,
+        ink_color: inkColor,
       });
+
+      console.log(inkColor);
 
       if (message) {
         post(`/documents/${documentId}/approve`, {
@@ -77,8 +82,8 @@ export function ApproveDocumentDialog({ documentId, isSigningAsRepresentative, r
             <AlertTitle className="text-primary font-medium">Signature Applied</AlertTitle>
             <AlertDescription>
               {isSigningAsRepresentative
-                ? `Signed on behalf of ${representativeFor}. Your approval will be processed momentarily.`
-                : `${message} Your approval will be processed momentarily.`}
+                ? `Signed on behalf of ${representativeFor} with ${inkColor} ink. Your approval will be processed momentarily.`
+                : `${message} Your approval with ${inkColor} ink will be processed momentarily.`}
             </AlertDescription>
           </Alert>
         );
@@ -139,6 +144,25 @@ export function ApproveDocumentDialog({ documentId, isSigningAsRepresentative, r
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2">Ink Color</Label>
+              <RadioGroup value={inkColor} onValueChange={value => setInkColor(value as 'black' | 'blue')} className="flex gap-4">
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="black" id="black" />
+                  <Label htmlFor="black" className="cursor-pointer font-normal">
+                    Black
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="blue" id="blue" />
+                  <Label htmlFor="blue" className="flex cursor-pointer items-center gap-1 font-normal">
+                    Blue
+                  </Label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            {/* Comment */}
             <div className="space-y-2">
               <Label htmlFor="comment">Comment (optional)</Label>
               <Textarea

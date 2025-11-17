@@ -10,6 +10,7 @@ interface SignDocumentPayload {
   signatory: string;
   signatures: Signature[];
   representative_name?: string;
+  ink_color: 'black' | 'blue';
 }
 
 interface SignDocumentResponse {
@@ -26,12 +27,13 @@ interface VerifySignaturesResponse {
 }
 
 export const FlaskServiceApi = {
-  async signDocument({ pdf, signatory, signatures, representative_name }: SignDocumentPayload): Promise<SignDocumentResponse> {
+  async signDocument({ pdf, signatory, signatures, representative_name, ink_color }: SignDocumentPayload): Promise<SignDocumentResponse> {
     try {
       const payload = {
         pdf,
         signatory,
         signatures,
+        ink_color,
         ...(representative_name && { representative_name }),
       };
 

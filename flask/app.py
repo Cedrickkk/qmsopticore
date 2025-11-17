@@ -41,6 +41,10 @@ def sign():
 
     signatory = data['signatory'] 
     representative_name = data.get('representative_name')
+    ink_color = data.get('ink_color', 'black')  # Get ink color, default to black
+
+    if ink_color not in ['black', 'blue']:
+        ink_color = 'black'
 
     signature_paths = data['signatures']
     
@@ -55,13 +59,54 @@ def sign():
     try:
         augmented_signature = create_augmented_signature(signature_full_paths)
 
-        add_signature_above_name(pdf_file, augmented_signature, signatory, representative_name)
+        add_signature_above_name(
+            pdf_file, 
+            augmented_signature, 
+            signatory, 
+            representative_name,
+            ink_color  
+        )
 
-        return jsonify({"message": "Signature added successfully!"}), 200
+        return jsonify({
+            "message": f"Signature added successfully with {ink_color} ink!"
+        }), 200
 
     except Exception as e:
         print(f"Error adding signature: {e}")
-        return jsonify({"error": f"Failed to add signature: {str(e)}"}), 200
+        return jsonify({"error": f"Failed to add signature: {str(e)}"}), 500
+
+# @app.route('/api/sign', methods=['POST'])
+# def sign():
+#     data = request.get_json()
+
+#     if not data or 'pdf' not in data or 'signatory' not in data or 'signatures' not in data:
+#         return jsonify({"error": "PDF file path, signatory, and signature images are required."}), 400
+
+#     pdf_file = os.path.join(LARAVEL_STORAGE_DIR, data['pdf'].replace('/storage', '').lstrip('/'))
+
+#     signatory = data['signatory'] 
+#     representative_name = data.get('representative_name')
+
+#     signature_paths = data['signatures']
+    
+#     signature_full_paths = [
+#         os.path.join(LARAVEL_STORAGE_DIR, sig_path.replace('/storage', '').lstrip('/'))
+#         for sig_path in signature_paths
+#     ]
+
+#     if not os.path.exists(pdf_file):
+#         return jsonify({"error": f"Document file not found: {os.path.basename(pdf_file)}"}), 400
+
+#     try:
+#         augmented_signature = create_augmented_signature(signature_full_paths)
+
+#         add_signature_above_name(pdf_file, augmented_signature, signatory, representative_name)
+
+#         return jsonify({"message": "Signature added successfully!"}), 200
+
+#     except Exception as e:
+#         print(f"Error adding signature: {e}")
+#         return jsonify({"error": f"Failed to add signature: {str(e)}"}), 200
 
 
 @app.route('/api/validate-signatures', methods=['POST'])

@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Lock, ShieldAlert } from 'lucide-react';
+import { ShieldAlert } from 'lucide-react';
 
 interface PasswordDownloadDialogProps {
   isOpen: boolean;
@@ -54,7 +54,6 @@ export function PasswordDownloadDialog({
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
             <Label htmlFor="password" className="flex items-center gap-2">
-              <Lock className="h-4 w-4" />
               Account Password
             </Label>
             <Input
