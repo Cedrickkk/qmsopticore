@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ShieldAlert } from 'lucide-react';
+import { Loader2, ShieldAlert } from 'lucide-react';
 
 interface PasswordDownloadDialogProps {
   isOpen: boolean;
@@ -76,7 +76,8 @@ export function PasswordDownloadDialog({
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction onClick={onSubmit} disabled={!password || isDownloading}>
-            {isDownloading ? 'Downloading...' : 'Download'}
+            {isDownloading && <Loader2 className="h-4 w-4 animate-spin" />}
+            Download
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
