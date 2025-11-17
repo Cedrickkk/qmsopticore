@@ -178,8 +178,6 @@ export default function Documents() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const { handleBulkDownload, isDownloading } = useBulkDownloadDocuments();
 
-  console.log(documents);
-
   const table = useReactTable({
     state: {
       sorting,

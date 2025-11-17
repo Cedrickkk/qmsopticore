@@ -14,6 +14,7 @@ import { Row } from '@tanstack/react-table';
 import { ArchiveX, Download, Eye, MoreHorizontal } from 'lucide-react';
 import { useState } from 'react';
 import DocumentArchiveForm from './document-archive-form';
+import { PasswordDownloadDialog } from './password-download-dialog';
 
 interface TableActionsProps {
   row: Row<Document>;
@@ -22,7 +23,8 @@ interface TableActionsProps {
 export default function DocumentTableActions({ row }: TableActionsProps) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const { handleDownload } = useDownloadDocument();
+  const { handleDownload, isPasswordDialogOpen, handlePasswordCancel, password, setPassword, handlePasswordSubmit, isDownloading, pendingDocument } =
+    useDownloadDocument();
 
   return (
     <>
@@ -53,6 +55,15 @@ export default function DocumentTableActions({ row }: TableActionsProps) {
       </DropdownMenu>
 
       <DocumentArchiveForm open={isOpen} onOpenChange={setIsOpen} document={row.original} />
+      <PasswordDownloadDialog
+        isOpen={isPasswordDialogOpen}
+        onClose={handlePasswordCancel}
+        password={password}
+        setPassword={setPassword}
+        onSubmit={handlePasswordSubmit}
+        isDownloading={isDownloading}
+        documentTitle={pendingDocument?.title}
+      />
     </>
   );
 }

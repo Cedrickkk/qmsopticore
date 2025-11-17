@@ -17,6 +17,7 @@
     "setasign/fpdi": "^2.6",
     "spatie/laravel-backup": "^9.3",
     "spatie/laravel-permission": "^6.16",
+    "tecnickcom/tcpdf": "^6.10",
     "tightenco/ziggy": "^2.4"
   },
   "require-dev": {

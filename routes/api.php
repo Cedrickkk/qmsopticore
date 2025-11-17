@@ -11,7 +11,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/users/search', [ApiUserController::class, 'search']);
     Route::get('/users/search-representative', [ApiUserController::class, 'searchRepresentative']);
 
-    Route::get('/documents/{document}/download', [ApiDocumentController::class, 'download']);
+    Route::post('/documents/{document}/download', [ApiDocumentController::class, 'download']);
     Route::post('/documents/bulk-download', [ApiDocumentController::class, 'bulkDownload']);
 
     Route::post('/validate-signatures', [SignatureController::class, 'validate']);

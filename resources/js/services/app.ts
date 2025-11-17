@@ -58,11 +58,19 @@ export const UserServiceApi = {
 };
 
 export const DocumentServiceApi = {
-  async download(document: Document): Promise<DownloadResponse> {
+  async download(document: Document, password?: string | null): Promise<DownloadResponse> {
     try {
-      const { data } = await laravelApi.get(`/api/documents/${document.id}/download`, {
-        responseType: 'blob',
-      });
+      const { data } = await laravelApi.post(
+        `/api/documents/${document.id}/download`,
+        { password },
+        {
+          responseType: 'blob',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json, application/octet-stream',
+          },
+        }
+      );
       return { data };
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -76,9 +84,9 @@ export const DocumentServiceApi = {
     }
   },
 
-  async bulkDownload(documentIds: number[]): Promise<DownloadResponse> {
+  async bulkDownload(documentIds: number[], password?: string | null): Promise<DownloadResponse> {
     try {
-      const { data } = await laravelApi.post('/api/documents/bulk-download', { document_ids: documentIds }, { responseType: 'blob' });
+      const { data } = await laravelApi.post('/api/documents/bulk-download', { document_ids: documentIds, password }, { responseType: 'blob' });
       return { data };
     } catch (error) {
       if (error instanceof AxiosError) {
