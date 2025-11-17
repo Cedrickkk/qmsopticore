@@ -6,7 +6,7 @@ import { PDFViewerWithSecurity } from './document-viewer-with-security';
 
 interface DocumentPreviewerProps {
   file: File;
-  confidentiality_level: 'public' | 'internal' | 'confidential' | 'highly_confidential';
+  confidentiality_level: 'public' | 'internal' | 'confidential';
   auto_blur_after_seconds: number;
   requires_reauth_on_view: boolean;
 }

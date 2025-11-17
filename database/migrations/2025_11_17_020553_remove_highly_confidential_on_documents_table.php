@@ -11,9 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('documents', function (Blueprint $table) {
+        Schema::table('documents', function (Blueprint  $table) {
             $table->dropColumn('confidentiality_level');
-            $table->enum('confidentiality_level', ['public', 'internal', 'confidential', 'highly_confidential'])
+        });
+
+        Schema::table('documents', function (Blueprint  $table) {
+            $table->enum('confidentiality_level', ['public', 'internal', 'confidential'])
                 ->default('internal');
         });
     }

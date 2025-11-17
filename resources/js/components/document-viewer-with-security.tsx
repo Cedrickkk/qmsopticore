@@ -24,7 +24,7 @@ interface PDFPageState {
 interface PDFViewerWithSecurityProps {
   file: File;
   showThumbnails?: boolean;
-  confidentiality_level: 'public' | 'internal' | 'confidential' | 'highly_confidential';
+  confidentiality_level: 'public' | 'internal' | 'confidential';
   auto_blur_after_seconds?: number;
   require_reauth_on_view?: boolean;
 }

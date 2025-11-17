@@ -12,7 +12,7 @@ export function useDownloadDocument() {
   const [isDownloading, setIsDownloading] = useState(false);
 
   const handleDownload = useCallback(async (documentData: Document) => {
-    if (documentData.confidentiality_level === 'confidential' || documentData.confidentiality_level === 'highly_confidential') {
+    if (documentData.confidentiality_level === 'confidential') {
       setPendingDocument(documentData);
       setPassword('');
       setIsPasswordDialogOpen(true);
@@ -49,10 +49,7 @@ export function useDownloadDocument() {
       const link = document.createElement('a');
       link.href = url;
 
-      const filename =
-        documentData.confidentiality_level === 'confidential' || documentData.confidentiality_level === 'highly_confidential'
-          ? `${documentData.title}`
-          : documentData.title;
+      const filename = documentData.confidentiality_level === 'confidential' ? `${documentData.title}` : documentData.title;
 
       link.download = filename;
       document.body.appendChild(link);

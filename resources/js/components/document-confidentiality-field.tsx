@@ -11,7 +11,7 @@ interface DocumentConfidentialityFieldProps {
   onLevelChange: (level: ConfidentialityType) => void;
 }
 
-const confidentialityLevels: ConfidentialityType[] = ['public', 'internal', 'confidential', 'highly_confidential'];
+const confidentialityLevels: ConfidentialityType[] = ['public', 'internal', 'confidential'];
 
 export function DocumentConfidentialityField({ level, onLevelChange }: DocumentConfidentialityFieldProps) {
   const selectedConfig = getConfidentialityConfig(level);

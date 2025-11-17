@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge';
-import { Eye, Lock, Shield, ShieldAlert } from 'lucide-react';
+import { Eye, Lock, Shield } from 'lucide-react';
 
 const confidentialityConfig = {
   public: {
@@ -37,18 +37,6 @@ const confidentialityConfig = {
     bannerColor: 'border-orange-500 bg-orange-50 text-orange-700',
     icon: Lock,
     description: 'Restricted access with enhanced security. Auto-locks after 1 minute. Requires password re-authentication.',
-  },
-  highly_confidential: {
-    priority: 1,
-    label: 'Highly Confidential',
-    shortLabel: 'HIGHLY CONFIDENTIAL',
-    color: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
-    borderColor: 'border-red-200',
-    textColor: 'text-red-700 dark:text-red-400',
-    iconColor: 'text-red-700 dark:text-red-400',
-    bannerColor: 'border-red-500 bg-red-50 text-red-700',
-    icon: ShieldAlert,
-    description: 'Maximum security restrictions. Auto-locks after 30 seconds. Requires password re-authentication.',
   },
 } as const;
 
@@ -123,8 +111,6 @@ export const getAutoBlurSeconds = (level: string): number => {
   const normalizedLevel = level.toLowerCase().replace(/\s+/g, '_') as ConfidentialityType;
 
   switch (normalizedLevel) {
-    case 'highly_confidential':
-      return 30;
     case 'confidential':
       return 60;
     case 'internal':
@@ -136,5 +122,5 @@ export const getAutoBlurSeconds = (level: string): number => {
 
 export const requiresReauth = (level: string): boolean => {
   const normalizedLevel = level.toLowerCase().replace(/\s+/g, '_') as ConfidentialityType;
-  return normalizedLevel === 'confidential' || normalizedLevel === 'highly_confidential';
+  return normalizedLevel === 'confidential';
 };

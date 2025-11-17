@@ -11,7 +11,7 @@ type PageProps = {
     id: number;
     title: string;
     code: string;
-    confidentiality_level: 'public' | 'internal' | 'confidential' | 'highly_confidential';
+    confidentiality_level: 'public' | 'internal' | 'confidential';
   };
 };
 
@@ -27,7 +27,6 @@ export default function Authenticate({ document }: PageProps) {
 
   const getConfidentialityBadge = () => {
     const badges = {
-      highly_confidential: { color: 'bg-red-100 text-red-800 border-red-200', label: 'HIGHLY CONFIDENTIAL' },
       confidential: { color: 'bg-orange-100 text-orange-800 border-orange-200', label: 'CONFIDENTIAL' },
       internal: { color: 'bg-yellow-100 text-yellow-800 border-yellow-200', label: 'INTERNAL' },
       public: { color: 'bg-gray-100 text-gray-800 border-gray-200', label: 'PUBLIC' },

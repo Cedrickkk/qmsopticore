@@ -126,14 +126,8 @@ class Document extends Model
 
     public function  isConfidential()
     {
-        return in_array($this->confidentiality_level, ['confidential', 'highly_confidential']);
+        return $this->confidentiality_level == 'confidential';
     }
-
-    public function isHighlyConfidential(): bool
-    {
-        return $this->confidentiality_level === 'highly_confidential';
-    }
-
 
     public function requiresReauth(): bool
     {
@@ -147,7 +141,6 @@ class Document extends Model
         }
 
         return match ($this->confidentiality_level) {
-            'highly_confidential' => 30,
             'confidential' => 60,
             'internal' => 120,
             default => 0,

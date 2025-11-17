@@ -46,7 +46,6 @@ class DocumentService
         $confidentialityLevel = $data['confidentiality_level'] ?? 'internal';
 
         $autoBlurSeconds = match ($confidentialityLevel) {
-            'highly_confidential' => 30,
             'confidential' => 60,
             'internal' => 120,
             default => null,

@@ -26,7 +26,7 @@ export interface Document {
   version: string;
   created_at: string;
   updated_at: string;
-  confidentiality_level: 'public' | 'internal' | 'confidential' | 'highly_confidential'; // Add this
+  confidentiality_level: 'public' | 'internal' | 'confidential';
   require_reauth_on_view: boolean;
   auto_blur_after_seconds: number;
 }

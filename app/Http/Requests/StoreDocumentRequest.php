@@ -40,7 +40,7 @@ class StoreDocumentRequest extends FormRequest
             'users.*.name' => ['required', 'string'],
             'users.*.email' => ['required', 'email'],
             'users.*.signatory' => ['required', 'boolean'],
-            'confidentiality_level' => ['required', Rule::in(['public', 'internal', 'confidential', 'highly_confidential'])],
+            'confidentiality_level' => ['required', Rule::in(['public', 'internal', 'confidential'])],
             'priority' => 'required|in:normal,high,urgent',
         ];
     }

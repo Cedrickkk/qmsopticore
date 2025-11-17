@@ -57,7 +57,7 @@ type PageProps = {
       avatar: string | null;
     };
   }>;
-  confidentiality_level: 'public' | 'internal' | 'confidential' | 'highly_confidential';
+  confidentiality_level: 'public' | 'internal' | 'confidential';
   require_reauth_on_view: boolean;
   auto_blur_after_seconds: number;
 };
