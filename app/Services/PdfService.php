@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Storage;
 
 class PdfService
 {
-    public function updateVersion(Document $document, string $version)
+    public function addFooterDetails(Document $document, string $version)
     {
         $path = Storage::path("documents/{$document->filename}");
 
@@ -17,13 +17,13 @@ class PdfService
         $pageCount = $pdf->setSourceFile($path);
 
         for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
-            $this->addVersionToPage($pdf, $pageNo, $version);
+            $this->addFooterToPage($pdf, $pageNo, $version, $document->code);
         }
 
         $pdf->Output($path, 'F');
     }
 
-    private function addVersionToPage(Fpdi $pdf, int $pageNo, string $version): void
+    private function addFooterToPage(Fpdi $pdf, int $pageNo, string $version, string $code): void
     {
         $pdf->AddPage();
         $templateId = $pdf->importPage($pageNo);
@@ -35,15 +35,18 @@ class PdfService
         $pdf->SetFont('Helvetica', '', 6);
         $pdf->SetTextColor(128, 128, 128);
 
-        $text = "VERSION: $version";
-        $textWidth = $pdf->GetStringWidth($text);
-
-        $footerX = $pageWidth - $textWidth - 5;
         $footerY = $pageHeight - 5;
 
-        $pdf->SetAutoPageBreak(false);
-        $pdf->Text($footerX, $footerY, $text);
+        $codeText = "DOCUMENT CODE: $code";
+        $codeX = 5;
 
+        $versionText = "VERSION: $version";
+        $versionTextWidth = $pdf->GetStringWidth($versionText);
+        $versionX = $pageWidth - $versionTextWidth - 5;
+
+        $pdf->SetAutoPageBreak(false);
+        $pdf->Text($codeX, $footerY, $codeText);
+        $pdf->Text($versionX, $footerY, $versionText);
         $pdf->SetAutoPageBreak(true, 10);
     }
 }

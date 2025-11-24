@@ -87,7 +87,7 @@ class DocumentService
             $this->handleRecipients($users, $document);
         }
 
-        $this->pdfService->updateVersion($document, $document->version);
+        $this->pdfService->addFooterDetails($document, $document->version);
 
         return $document;
     }
@@ -112,9 +112,9 @@ class DocumentService
         return $this->fileService->exists($filename);
     }
 
-    public function updateVersion(Document $document, string $version)
+    public function addFooterDetails(Document $document, string $version)
     {
-        $this->pdfService->updateVersion($document, $version);
+        $this->pdfService->addFooterDetails($document, $version);
     }
 
     public function archive(Document $document, int $archivedBy, string $reason = 'Manual archive')
